@@ -30,6 +30,26 @@
       margin-top: 10px;
       text-align: center;
     }
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .google-btn:hover {
+      background: #f6f9ff;
+    }
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
   </style>
 </head>
 
@@ -78,6 +98,15 @@
                     <p id="error-message" class="error-message"></p>
                     <button class="btn btn-primary w-100" type="submit">Login</button>
                   </div>
+                  <!-- Google Sign-In (commented out until Client ID is provided) -->
+                  <!--
+                  <div class="col-12">
+                    <div class="google-btn" id="google-login-btn">
+                      <img src="https://www.google.com/favicon.ico" alt="Google">
+                      <span>Sign in with Google</span>
+                    </div>
+                  </div>
+                  -->
                   <div class="col-12">
                     <p class="small mb-0">Don't have an account? <a href="pages-register.html">Create an account</a></p>
                   </div>
@@ -100,6 +129,8 @@
 <!-- Vendor JS Files -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
+<!-- Google Sign-In (commented out until Client ID is provided) -->
+<!-- <script src="https://accounts.google.com/gsi/client" async defer></script> -->
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
@@ -107,30 +138,71 @@
 
 <!-- Login Logic -->
 <script>
-  const form = document.getElementById('login-form');
-  const errorMessage = document.getElementById('error-message');
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    errorMessage.style.display = 'none';
-
-    if (!form.checkValidity()) {
-      form.classList.add('was-validated');
+    if (!form) {
+      console.error('Login form not found!');
+      errorMessage.textContent = 'Form initialization failed. Please refresh the page.';
+      errorMessage.style.display = 'block';
       return;
     }
 
-    const username = document.getElementById('yourUsername').value.trim();
-    const password = document.getElementById('yourPassword').value;
-
-    const result = login(username, password);
-    if (result.success) {
-      window.location.href = 'index.html';
-    } else {
-      errorMessage.textContent = result.message;
+    if (typeof login !== 'function') {
+      console.error('auth.js not loaded or login function is missing!');
+      errorMessage.textContent = 'Login functionality is unavailable. Please check your network or contact support.';
       errorMessage.style.display = 'block';
+      return;
     }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      errorMessage.style.display = 'none';
+
+      if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+      }
+
+      const username = document.getElementById('yourUsername').value.trim();
+      const password = document.getElementById('yourPassword').value;
+
+      console.log('Attempting login for user:', username);
+
+      try {
+        const result = login(username, password);
+        console.log('Login result:', result);
+        if (result.success) {
+          window.location.href = 'index.html';
+        } else {
+          errorMessage.textContent = result.message;
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        errorMessage.textContent = 'An unexpected error occurred. Please try again.';
+        errorMessage.style.display = 'block';
+      }
+    });
+
+    // Google Sign-In (uncomment and add your Client ID to enable)
+    /*
+    if (typeof google !== 'undefined') {
+      google.accounts.id.initialize({
+        client_id: 'YOUR_ACTUAL_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+        callback: loginWithGoogle
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('google-login-btn'),
+        { theme: 'outline', size: 'large', width: 400 }
+      );
+    } else {
+      console.warn('Google Sign-In library not loaded. Google Sign-In will be disabled.');
+      document.getElementById('google-login-btn').style.display = 'none';
+    }
+    */
   });
 </script>
 </body>
-
 </html>

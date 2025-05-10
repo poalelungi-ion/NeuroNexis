@@ -36,6 +36,26 @@
       margin-top: 10px;
       text-align: center;
     }
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .google-btn:hover {
+      background: #f6f9ff;
+    }
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
   </style>
 </head>
 
@@ -57,7 +77,7 @@
               <div class="card-body">
                 <div class="pt-4 pb-2">
                   <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
-                  <p class="text-center small">Enter your details to register</p>
+                  <p class="text-center small">Enter your details</p>
                 </div>
 
                 <form id="register-form" class="row g-3 needs-validation" novalidate>
@@ -96,6 +116,15 @@
                     <p id="success-message" class="success-message"></p>
                     <button class="btn btn-primary w-100" type="submit">Create Account</button>
                   </div>
+                  <!-- Google Sign-In (commented out until Client ID is provided) -->
+                  <!--
+                  <div class="col-12">
+                    <div class="google-btn" id="google-register-btn">
+                      <img src="https://www.google.com/favicon.ico" alt="Google">
+                      <span>Sign up with Google</span>
+                    </div>
+                  </div>
+                  -->
                   <div class="col-12">
                     <p class="small mb-0">Already have an account? <a href="pages-login.html">Log in</a></p>
                   </div>
@@ -117,6 +146,9 @@
 
 <!-- Vendor JS Files -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
+<!-- Google Sign-In (commented out until Client ID is provided) -->
+<!-- <script src="https://accounts.google.com/gsi/client" async defer></script> -->
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
@@ -138,7 +170,6 @@
       return;
     }
 
-    // Check if auth.js is loaded
     if (typeof register !== 'function') {
       console.error('auth.js not loaded or register function is missing!');
       errorMessage.textContent = 'Registration functionality is unavailable. Please check your network or contact support.';
@@ -190,8 +221,24 @@
         errorMessage.style.display = 'block';
       }
     });
+
+    // Google Sign-In (uncomment and add your Client ID to enable)
+    /*
+    if (typeof google !== 'undefined') {
+      google.accounts.id.initialize({
+        client_id: 'YOUR_ACTUAL_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+        callback: loginWithGoogle
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('google-register-btn'),
+        { theme: 'outline', size: 'large', width: 400 }
+      );
+    } else {
+      console.warn('Google Sign-In library not loaded. Google Sign-In will be disabled.');
+      document.getElementById('google-register-btn').style.display = 'none';
+    }
+    */
   });
 </script>
 </body>
-
 </html>

@@ -4,500 +4,275 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>AI Productivity Dashboard - NiceAdmin</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>AI Productivity Dashboard - NEURONEXIS</title>
+  <meta content="AI-powered productivity dashboard for tasks, reminders, and calendar management" name="description">
+  <meta content="AI, productivity, dashboard, NEURONEXIS" name="keywords">
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Font Awesome for Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-  <!-- Template Main CSS File -->
-  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#6B7280',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            background: '#F9FAFB',
+            card: '#FFFFFF',
+            soft: '#EDE9FE',
+          },
+          borderRadius: {
+            'xl': '12px',
+            '2xl': '16px',
+          },
+          animation: {
+            slideIn: 'slideIn 0.3s ease-in-out',
+            pulse: 'pulse 1s infinite',
+          },
+          keyframes: {
+            slideIn: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulse: {
+              '0%': { transform: 'scale(1)', opacity: '1' },
+              '100%': { transform: 'scale(2)', opacity: '0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
 
-  <!-- Custom Styles for Chatbot and Productivity Features -->
+  <!-- Custom Styles -->
   <style>
-    :root {
-      --primary: #4154f1;
-      --background: #f6f9ff;
-      --card-bg: #ffffff;
-      --text: #1c2526;
-      --secondary-text: #6e6e73;
-      --accent: #ff771d;
-      --success: #2eca6a;
-      --danger: #ff3b30;
-      --border-radius: 12px;
-    }
-    .card.chat-card {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    #chat-box {
-      height: 500px;
-      overflow-y: auto;
-      padding: 20px;
-      background: transparent;
+    .chat-box, .daily-overview, .tasks-reminders {
       scrollbar-width: none;
     }
-    #chat-box::-webkit-scrollbar {
+    .chat-box::-webkit-scrollbar, .daily-overview::-webkit-scrollbar, .tasks-reminders::-webkit-scrollbar {
       display: none;
     }
-    .message {
-      margin: 12px 0;
-      padding: 12px 18px;
-      border-radius: var(--border-radius);
-      max-width: 70%;
-      font-size: 16px;
-      line-height: 1.5;
-      animation: slideIn 0.3s ease;
-    }
-    .user {
-      background: var(--primary);
-      color: white;
-      margin-left: auto;
-      border-bottom-right-radius: 4px;
-    }
-    .ai {
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--text);
-      border-bottom-left-radius: 4px;
-    }
-    .message h1, .message h2, .message h3, .message h4, .message h5, .message h6 {
-      font-weight: 600;
-      margin: 8px 0;
-    }
-    .message p {
-      margin: 4px 0;
-    }
-    .message ul, .message ol {
-      padding-left: 20px;
-      margin: 8px 0;
-    }
-    .message pre, .message code {
-      background: rgba(0, 0, 0, 0.05);
-      padding: 10px;
+    .message img, .overview-item img {
+      max-width: 100%;
+      height: auto;
       border-radius: 8px;
-      white-space: pre-wrap;
-      word-break: break-word;
     }
-    .document-message {
-      position: relative;
-      max-width: 85%;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 20px;
-      border: 2px solid var(--primary);
+    .forced-colors\:bg-white {
+      background-color: white;
     }
-    .document-message .open-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: var(--border-radius);
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: transform 0.2s;
-      margin-top: 10px;
+    @media (forced-colors: active) {
+      .forced-colors\:bg-white {
+        background-color: Canvas;
+      }
+      .forced-colors\:text-black {
+        color: CanvasText;
+      }
     }
-    .document-message .open-btn:hover {
-      transform: scale(1.05);
-      background: #2f3fc7;
+    .chat-box {
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
     }
-    .typing-indicator {
-      display: none;
-      font-style: italic;
-      color: var(--secondary-text);
-      padding: 10px;
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
-    #input-form {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-      align-items: center;
+    #main {
+      padding-bottom: 60px; /* Adjust for footer height */
     }
-    #user-input {
-      flex-grow: 1;
-      padding: 12px;
-      border: none;
-      border-radius: var(--border-radius);
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 16px;
-      transition: box-shadow 0.2s;
+    section {
+      gap: 0;
     }
-    #user-input:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(65, 84, 241, 0.3);
+    .lg\:grid-cols-3 {
+      grid-template-columns: 1fr;
     }
-    #file-input {
-      display: none;
-    }
-    #upload-btn, #send-btn, #mic-btn, #pomodoro-btn {
-      padding: 12px;
-      border: none;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s, background 0.2s;
-      cursor: pointer;
-    }
-    #upload-btn {
-      background: var(--accent);
-      color: white;
-    }
-    #upload-btn:hover {
-      transform: scale(1.1);
-      background: #e66b0e;
-    }
-    #send-btn {
-      background: var(--primary);
-      color: white;
-    }
-    #send-btn:hover {
-      transform: scale(1.1);
-      background: #2f3fc7;
-    }
-    #mic-btn {
-      background: var(--success);
-      color: white;
-      position: relative;
-    }
-    #mic-btn:hover {
-      transform: scale(1.1);
-      background: #27a55b;
-    }
-    #mic-btn.listening {
-      background: var(--danger);
-    }
-    #mic-btn.listening::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12px;
-      height: 12px;
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-      animation: pulse 1s infinite;
-    }
-    #pomodoro-btn {
-      background: var(--accent);
-      color: white;
-    }
-    #pomodoro-btn:hover {
-      transform: scale(1.1);
-      background: #e66b0e;
-    }
-    #pomodoro-btn.active {
-      background: var(--success);
-    }
-    #lang-select {
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 14px;
-      width: auto;
-      padding: 12px 16px;
-      border-radius: var(--border-radius);
-    }
-    #lang-select:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(65, 84, 241, 0.3);
-    }
-    /* Productivity Features */
-    #tasks-reminders {
-      max-height: 300px;
-      overflow-y: auto;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: var(--border-radius);
-      margin-top: 20px;
-    }
-    .task-item, .reminder-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.05);
-    }
-    .task-item.completed {
-      background: rgba(46, 202, 106, 0.1);
-      text-decoration: line-through;
-    }
-    .task-item .delete-btn, .reminder-item .delete-btn {
-      color: var(--danger);
-      cursor: pointer;
-    }
-    #pomodoro-timer {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--text);
-      margin-top: 15px;
-      text-align: center;
-    }
-    #daily-recommendations {
-      margin-top: 20px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: var(--border-radius);
-    }
-    #daily-recommendations ul {
-      padding-left: 20px;
-    }
-    /* Modal Styles */
-    .modal-content {
-      border-radius: var(--border-radius);
-      background: var(--card-bg);
-    }
-    .modal-header {
-      border-bottom: none;
-      padding: 20px;
-    }
-    .modal-title {
-      font-weight: 600;
-      color: var(--text);
-    }
-    .modal-body {
-      padding: 20px;
-    }
-    #document-editor {
-      width: 100%;
-      min-height: 400px;
-      max-height: 600px;
-      overflow-y: auto;
-      padding: 15px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      font-size: 16px;
-      resize: none;
-    }
-    #document-editor:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(65, 84, 241, 0.3);
-    }
-    .modal-footer {
-      border-top: none;
-      padding: 20px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .modal-footer .btn {
-      border-radius: var(--border-radius);
-      padding: 10px 20px;
-      font-weight: 500;
-    }
-    @keyframes pulse {
-      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-3 {
+        grid-template-columns: 1fr 2fr 1fr;
+      }
     }
   </style>
 </head>
 
-<body>
+<body class="bg-background text-gray-900 font-inter min-h-screen flex flex-col">
 <!-- ======= Header ======= -->
-<header id="header" class="header fixed-top d-flex align-items-center">
-  <div class="d-flex align-items-center justify-content-between">
-    <a href="index.html" class="logo d-flex align-items-center">
-      <img src="assets/img/logo.png" alt="">
-      <span class="d-none d-lg-block">NiceAdmin</span>
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm flex items-center justify-between px-2 py-2 md:px-6 md:py-3 w-full">
+  <div class="flex items-center">
+    <a href="index.html" class="flex items-center space-x-1">
+      <img src="assets/img/logo.png" alt="NEURONEXIS" class="h-6 md:h-8">
+      <span class="hidden md:block text-lg md:text-xl font-semibold text-primary">NEURONEXIS</span>
     </a>
-    <i class="bi bi-list toggle-sidebar-btn"></i>
+    <button id="toggle-sidebar-btn" class="md:hidden ml-2 text-gray-600">
+      <i class="fas fa-bars text-lg md:text-xl"></i>
+    </button>
   </div>
-  <div class="search-bar">
-    <form class="search-form d-flex align-items-center" method="POST" action="#">
-      <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-      <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-    </form>
-  </div>
-  <nav class="header-nav ms-auto">
-    <ul class="d-flex align-items-center">
-      <li class="nav-item d-block d-lg-none">
-        <a class="nav-link nav-icon search-bar-toggle " href="#">
-          <i class="bi bi-search"></i>
-        </a>
-      </li>
-      <li class="nav-item dropdown pe-3">
-        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-          <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-          <span class="d-none d-md-block dropdown-toggle ps-2">poalelungi.ion</span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-          <li class="dropdown-header">
-            <h6>Poalelungi Ion</h6>
-            <span>developer</span>
-          </li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item d-flex align-items-center" href="users-profile.html"><i class="bi bi-person"></i><span>My Profile</span></a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item d-flex align-items-center" href="users-profile.html"><i class="bi bi-gear"></i><span>Account Settings</span></a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="bi bi-question-circle"></i><span>Need Help?</span></a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item d-flex align-items-center" href="#"><i class="bi bi-box-arrow-right"></i><span>Sign Out</span></a></li>
-        </ul>
-      </li>
-    </ul>
+  <nav class="flex items-center space-x-2">
+    <div class="relative hidden md:block">
+      <input type="text" id="search-input" placeholder="Search..." class="pl-8 pr-3 py-1 md:py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32 md:w-48">
+      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    </div>
+    <div class="relative">
+      <button class="flex items-center space-x-1" data-bs-toggle="dropdown">
+        <img id="header-profile-image" src="assets/img/profile-img.jpg" alt="Profile" class="h-6 md:h-8 w-6 md:w-8 rounded-full object-cover">
+        <span id="user-name" class="hidden md:block text-sm font-medium text-gray-700">Guest</span>
+      </button>
+      <ul class="dropdown-menu absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white rounded-xl shadow-lg py-1 hidden">
+        <li class="px-3 py-1">
+          <p id="user-fullname" class="font-semibold text-gray-800 text-xs md:text-sm">Guest</p>
+          <p id="user-role" class="text-xs md:text-sm text-gray-500">Guest User</p>
+        </li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-1 md:mr-2"></i> My Profile</a></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-1 md:mr-2"></i> Account Settings</a></li>
+        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-question-circle mr-1 md:mr-2"></i> Need Help?</a></li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="#" id="logout-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-danger hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-1 md:mr-2"></i> Sign Out</a></li>
+      </ul>
+    </div>
   </nav>
 </header>
 
 <!-- ======= Sidebar ======= -->
-<aside id="sidebar" class="sidebar">
-  <ul class="sidebar-nav" id="sidebar-nav">
-    <li class="nav-item">
-      <a class="nav-link " href="index.html">
-        <i class="bi bi-grid"></i>
-        <span>Dashboard</span>
+<aside id="sidebar" class="fixed top-0 left-0 w-48 md:w-64 h-full bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
+  <div class="flex items-center justify-between p-2 md:p-4 border-b">
+    <span class="text-lg md:text-xl font-semibold text-primary">Menu</span>
+    <button id="close-sidebar-btn" class="md:hidden text-gray-600">
+      <i class="fas fa-times text-lg md:text-xl"></i>
+    </button>
+  </div>
+  <ul class="py-2 md:py-4">
+    <li class="px-2 md:px-4 py-1 md:py-2">
+      <a href="index.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-tachometer-alt mr-1 md:mr-3"></i> Dashboard
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="users-profile.html">
-        <i class="bi bi-person"></i>
-        <span>Profile</span>
+    <li class="px-2 md:px-4 py-1 md:py-2">
+      <a href="document-editor.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-file-alt mr-1 md:mr-3"></i> Document Editor
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.html">
-        <i class="bi bi-question-circle"></i>
-        <span>F.A.Q</span>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="login-nav">
+      <a href="pages-login.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-sign-in-alt mr-1 md:mr-3"></i> Login
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-contact.html">
-        <i class="bi bi-envelope"></i>
-        <span>Contact</span>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="register-nav">
+      <a href="pages-register.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-user-plus mr-1 md:mr-3"></i> Register
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="profile-nav" style="display: none;">
+      <a href="users-profile.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-user-circle mr-1 md:mr-3"></i> Profile
       </a>
     </li>
   </ul>
 </aside>
 
 <!-- ======= Main Content ======= -->
-<main id="main" class="main">
-  <div class="pagetitle">
-    <h1>AI Productivity Dashboard</h1>
-    <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-        <li class="breadcrumb-item active">Dashboard</li>
+<main id="main" class="mt-12 md:mt-20 md:ml-64 p-0 flex-1">
+  <div class="p-2 md:p-4">
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">AI Productivity Dashboard</h1>
+    <nav class="mt-1 md:mt-2">
+      <ol class="flex space-x-1 md:space-x-2 text-xs md:text-sm text-gray-500">
+        <li><a href="index.html" class="hover:text-primary">Home</a></li>
+        <li>/</li>
+        <li class="text-primary">Dashboard</li>
       </ol>
     </nav>
   </div>
 
-  <section class="section dashboard">
-    <div class="row">
-      <!-- Chatbot and Productivity Features -->
-      <div class="col-lg-8">
-        <div class="card chat-card">
-          <div class="card-body">
-            <h5 class="card-title">Chat with AI Assistant</h5>
-            <div id="chat-box">
-              <div class="message ai">Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile, și îți ofer memento-uri sau recomandări zilnice. Încarcă documente (.txt, .md, .docx, .pdf) sau cere-mi să generez contracte, orare, sau alte documente. Cum te ajut astăzi?</div>
-            </div>
-            <div class="typing-indicator">AI-ul tastează...</div>
-            <form id="input-form">
-              <select id="lang-select" title="Selectează limba pentru voce">
-                <option value="ro-RO">Română</option>
-                <option value="en-US">English</option>
-                <option value="ru-RU">Русский</option>
-                <option value="es-ES">Español</option>
-                <option value="fr-FR">Français</option>
-              </select>
-              <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off">
-              <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple>
-              <button type="button" id="upload-btn" title="Încarcă document"><i class="fa fa-upload"></i></button>
-              <button type="button" id="mic-btn" title="Vorbește mesajul tău"><i class="fa fa-microphone"></i></button>
-              <button type="button" id="pomodoro-btn" title="Pornește modul Pomodoro"><i class="fa fa-clock"></i></button>
-              <button type="submit" id="send-btn"><i class="fa fa-paper-plane"></i></button>
-            </form>
-            <div id="pomodoro-timer"></div>
-          </div>
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+    <!-- Pomodoro Timer -->
+    <div class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Pomodoro Timer</h2>
+      <div id="pomodoro-block" class="text-center h-full flex flex-col justify-center">
+        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-gray-800 mb-2 md:mb-4">25:00</div>
+        <div id="pomodoro-session" class="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">Work Session</div>
+        <div class="flex justify-center space-x-1 md:space-x-2">
+          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
+          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
+          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
         </div>
       </div>
-      <!-- Tasks, Reminders, and Recommendations -->
-      <div class="col-lg-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Tasks & Reminders</h5>
-            <div id="tasks-reminders"></div>
-          </div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
+      <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
+        <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
+          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Cum te ajut astăzi?
         </div>
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Daily Recommendations</h5>
-            <div id="daily-recommendations"></div>
-          </div>
-        </div>
+      </div>
+      <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
+      <form id="input-form" class="flex items-center space-x-1 md:space-x-2 w-full">
+        <select id="lang-select" class="bg-white border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0">
+          <option value="ro-RO">Română</option>
+          <option value="en-US">English</option>
+          <option value="ru-RU">Русский</option>
+          <option value="es-ES">Español</option>
+          <option value="fr-FR">Français</option>
+        </select>
+        <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-lg px-2 md:px-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+        <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple class="hidden">
+        <button type="button" id="upload-btn" title="Încarcă document" class="bg-accent text-white rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
+          <i class="fa fa-upload text-xs md:text-base"></i>
+        </button>
+        <button type="button" id="mic-btn" title="Vorbește mesajul tău" class="bg-success text-white rounded-full p-1 md:p-3 hover:bg-green-600 transition">
+          <i class="fa fa-microphone text-xs md:text-base"></i>
+        </button>
+        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-indigo-700 transition">
+          <i class="fa fa-paper-plane text-xs md:text-base"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Daily Overview (Conditional) -->
+    <div id="daily-overview-container" class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full hidden">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Overview</h2>
+      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
+    </div>
+
+    <!-- Tasks & Reminders -->
+    <div class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Tasks & Reminders</h2>
+      <div id="tasks-reminders" class="tasks-reminders flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
+    </div>
+
+    <!-- Daily Recommendations -->
+    <div class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Recommendations</h2>
+      <div id="daily-recommendations" class="p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner flex-1">
+        <p>Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!</p>
       </div>
     </div>
   </section>
 </main>
 
 <!-- ======= Footer ======= -->
-<footer id="footer" class="footer">
-  <div class="copyright">
-    &copy; Copyright <strong><span>NeuroNexis</span></strong>. All Rights Reserved
-  </div>
-  <div class="credits">
-    Designed by <a href="#">Poalelungi Consulting</a>
-  </div>
+<footer class="bg-white py-2 md:py-6 text-center text-gray-600 w-full">
+  <div class="text-xs md:text-sm">© Copyright <strong>NeuroNexis</strong>. All Rights Reserved</div>
+  <div class="text-xs md:text-sm">Designed by <a href="#" class="text-primary hover:underline">Poalelungi Consulting</a></div>
 </footer>
 
-<!-- Document Editor Modal -->
-<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="documentModalLabel">Editează Document</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <textarea id="document-editor" placeholder="Editează conținutul documentului aici..."></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
-        <button type="button" class="btn btn-primary" id="download-md">Descarcă .md</button>
-        <button type="button" class="btn btn-primary" id="download-txt">Descarcă .txt</button>
-        <button type="button" class="btn btn-primary" id="download-docx">Descarcă .docx</button>
-        <button type="button" class="btn btn-primary" id="download-pdf">Descarcă .pdf</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Vendor JS Files -->
-<script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="assets/vendor/chart.js/chart.umd.js"></script>
-<script src="assets/vendor/echarts/echarts.min.js"></script>
-<script src="assets/vendor/quill/quill.js"></script>
-<script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-<script src="assets/vendor/tinymce/tinymce.min.js"></script>
-<script src="assets/vendor/php-email-form/validate.js"></script>
-
-<!-- Additional Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
@@ -506,13 +281,14 @@
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
+<script src="assets/js/auth.js"></script>
 
 <!-- Chatbot and Productivity Logic -->
 <script>
   // Configure pdf.js worker
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-  // Chat Elements
+  // Elements
   const chatBox = document.getElementById('chat-box');
   const form = document.getElementById('input-form');
   const input = document.getElementById('user-input');
@@ -520,12 +296,19 @@
   const uploadBtn = document.getElementById('upload-btn');
   const typingIndicator = document.querySelector('.typing-indicator');
   const micBtn = document.getElementById('mic-btn');
-  const pomodoroBtn = document.getElementById('pomodoro-btn');
   const langSelect = document.getElementById('lang-select');
   const tasksReminders = document.getElementById('tasks-reminders');
   const dailyRecommendations = document.getElementById('daily-recommendations');
-  const documentEditor = document.getElementById('document-editor');
-  const documentModal = new bootstrap.Modal(document.getElementById('documentModal'));
+  const dailyOverview = document.getElementById('daily-overview');
+  const dailyOverviewContainer = document.getElementById('daily-overview-container');
+  const sidebar = document.getElementById('sidebar');
+  const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const pomodoroTimer = document.getElementById('pomodoro-timer');
+  const pomodoroSession = document.getElementById('pomodoro-session');
+  const pomodoroStartBtn = document.getElementById('pomodoro-start-btn');
+  const pomodoroPauseBtn = document.getElementById('pomodoro-pause-btn');
+  const pomodoroResetBtn = document.getElementById('pomodoro-reset-btn');
 
   // Language-specific placeholders
   const placeholders = {
@@ -537,73 +320,175 @@
   };
 
   // In-memory store for tasks and reminders
-  let tasks = [];
-  let reminders = [];
+  let tasks = userData[currentUser]?.tasks || [];
+  let reminders = userData[currentUser]?.reminders || [];
 
-  // Pomodoro Timer
-  let pomodoroActive = false;
-  let pomodoroTime = 25 * 60; // 25 minutes in seconds
-  let pomodoroInterval = null;
-  let isWorkSession = true;
-
-  function startPomodoro() {
-    if (pomodoroActive) {
-      clearInterval(pomodoroInterval);
-      pomodoroActive = false;
-      pomodoroBtn.classList.remove('active');
-      document.getElementById('pomodoro-timer').textContent = '';
-      return;
-    }
-    pomodoroActive = true;
-    pomodoroBtn.classList.add('active');
-    pomodoroTime = isWorkSession ? 25 * 60 : 5 * 60;
-    pomodoroInterval = setInterval(() => {
-      pomodoroTime--;
-      const minutes = Math.floor(pomodoroTime / 60);
-      const seconds = pomodoroTime % 60;
-      document.getElementById('pomodoro-timer').textContent = `${isWorkSession ? 'Work' : 'Break'}: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-      if (pomodoroTime <= 0) {
-        isWorkSession = !isWorkSession;
-        pomodoroTime = isWorkSession ? 25 * 60 : 5 * 60;
-        addMessage(`Timpul de ${isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`, 'ai');
-      }
-    }, 1000);
+  // Check authentication
+  if (!currentUser || !users[currentUser]) {
+    window.location.href = 'pages-login.html';
+  } else {
+    document.getElementById('login-nav').style.display = 'none';
+    document.getElementById('register-nav').style.display = 'none';
+    document.getElementById('profile-nav').style.display = 'block';
+    loadProfile();
   }
 
-  pomodoroBtn.addEventListener('click', startPomodoro);
+  // Load profile data
+  function loadProfile() {
+    const user = users[currentUser];
+    if (user) {
+      document.getElementById('user-name').textContent = currentUser;
+      document.getElementById('user-fullname').textContent = user.name || currentUser;
+      document.getElementById('user-role').textContent = user.email;
+      const profileImage = user.profileImage || 'assets/img/profile-img.jpg';
+      document.getElementById('header-profile-image').src = profileImage;
+    }
+    renderTasksReminders();
+    generateDailyOverview();
+    generateDailyRecommendations();
+  }
+
+  // Sidebar toggle
+  toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+  closeSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+  });
+
+  // Dropdown toggle
+  document.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', () => {
+    const dropdown = document.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('hidden');
+  });
+
+  // Pomodoro Timer
+  let pomodoroState = JSON.parse(localStorage.getItem('pomodoroState')) || {
+    active: false,
+    paused: false,
+    time: 25 * 60,
+    isWorkSession: true,
+    lastUpdate: Date.now()
+  };
+  let pomodoroInterval = null;
+
+  function updatePomodoroDisplay() {
+    const minutes = Math.floor(pomodoroState.time / 60);
+    const seconds = Math.floor(pomodoroState.time % 60);
+    pomodoroTimer.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    pomodoroSession.textContent = pomodoroState.isWorkSession ? 'Work Session' : 'Break Session';
+    pomodoroStartBtn.classList.toggle('hidden', pomodoroState.active && !pomodoroState.paused);
+    pomodoroPauseBtn.classList.toggle('hidden', !pomodoroState.active || pomodoroState.paused);
+  }
+
+  function savePomodoroState() {
+    localStorage.setItem('pomodoroState', JSON.stringify(pomodoroState));
+  }
+
+  function startPomodoro() {
+    if (pomodoroState.active && !pomodoroState.paused) return;
+    pomodoroState.active = true;
+    pomodoroState.paused = false;
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function pausePomodoro() {
+    pomodoroState.paused = true;
+    clearInterval(pomodoroInterval);
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function resetPomodoro() {
+    clearInterval(pomodoroInterval);
+    pomodoroState = {
+      active: false,
+      paused: false,
+      time: 25 * 60,
+      isWorkSession: true,
+      lastUpdate: Date.now()
+    };
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function updatePomodoro() {
+    const now = Date.now();
+    const elapsed = (now - pomodoroState.lastUpdate) / 1000;
+    pomodoroState.time -= elapsed;
+    pomodoroState.lastUpdate = now;
+
+    if (pomodoroState.time <= 0) {
+      pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
+      pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
+      addMessage(`Timpul de ${pomodoroState.isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${pomodoroState.isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`, 'ai');
+    }
+
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  pomodoroStartBtn.addEventListener('click', startPomodoro);
+  pomodoroPauseBtn.addEventListener('click', pausePomodoro);
+  pomodoroResetBtn.addEventListener('click', resetPomodoro);
+
+  // Initialize Pomodoro
+  if (pomodoroState.active && !pomodoroState.paused) {
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+  }
+  updatePomodoroDisplay();
 
   // Task and Reminder Management
   function addTask(description, deadline) {
     const task = { id: Date.now(), description, deadline, completed: false };
     tasks.push(task);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
     renderTasksReminders();
     if (deadline) {
       addReminder(`Task: ${description}`, deadline);
     }
+    generateDailyOverview();
   }
 
   function addReminder(description, deadline) {
     const reminder = { id: Date.now(), description, deadline };
     reminders.push(reminder);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
     renderTasksReminders();
     checkReminders();
+    generateDailyOverview();
   }
 
   function deleteTask(id) {
     tasks = tasks.filter(task => task.id !== id);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
     renderTasksReminders();
+    generateDailyOverview();
   }
 
   function deleteReminder(id) {
     reminders = reminders.filter(reminder => reminder.id !== id);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
     renderTasksReminders();
+    generateDailyOverview();
   }
 
   function toggleTaskCompletion(id) {
     const task = tasks.find(task => task.id === id);
     if (task) {
       task.completed = !task.completed;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
       renderTasksReminders();
+      generateDailyOverview();
     }
   }
 
@@ -611,19 +496,22 @@
     tasksReminders.innerHTML = '';
     tasks.forEach(task => {
       const div = document.createElement('div');
-      div.className = `task-item ${task.completed ? 'completed' : ''}`;
+      div.className = `flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2 ${task.completed ? 'bg-green-50 line-through' : ''}`;
       div.innerHTML = `
-          <span><input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})"> ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}</span>
-          <i class="fa fa-trash delete-btn" onclick="deleteTask(${task.id})"></i>
+          <span class="flex items-center text-xs md:text-sm">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})" class="mr-1 md:mr-2">
+            ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}
+          </span>
+          <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteTask(${task.id})"></i>
         `;
       tasksReminders.appendChild(div);
     });
     reminders.forEach(reminder => {
       const div = document.createElement('div');
-      div.className = 'reminder-item';
+      div.className = 'flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
       div.innerHTML = `
-          <span>${reminder.description} (${new Date(reminder.deadline).toLocaleString()})</span>
-          <i class="fa fa-trash delete-btn" onclick="deleteReminder(${reminder.id})"></i>
+          <span class="text-xs md:text-sm">${reminder.description} (${new Date(reminder.deadline).toLocaleString()})</span>
+          <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteReminder(${reminder.id})"></i>
         `;
       tasksReminders.appendChild(div);
     });
@@ -636,25 +524,66 @@
       if (deadline <= now && !reminder.notified) {
         addMessage(`Memento: ${reminder.description} este scadent acum!`, 'ai');
         reminder.notified = true;
+        userData[currentUser].reminders = reminders;
+        saveUserData();
       }
     });
   }
 
-  setInterval(checkReminders, 60000); // Check reminders every minute
+  setInterval(checkReminders, 60000);
+
+  function generateDailyOverview() {
+    const today = new Date();
+    const emails = userData[currentUser].emails || [];
+    const events = userData[currentUser].calendarEvents || [];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    dailyOverview.innerHTML = '';
+
+    if (events.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente de astăzi</h4><ul class="list-disc pl-3 md:pl-5">${events.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleTimeString()} - ${new Date(e.end.dateTime).toLocaleTimeString()})</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    if (emails.length > 0) {
+      emails.forEach(email => {
+        const from = email.payload?.headers.find(h => h.name === 'From')?.value || 'Unknown';
+        const subject = email.payload?.headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+        const snippet = email.snippet?.substring(0, 100) + (email.snippet?.length > 100 ? '...' : '') || '';
+        const taskSuggestion = `Răspunde la e-mailul de la ${from}: ${subject}`;
+        const div = document.createElement('div');
+        div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+            <p class="text-xs md:text-sm"><strong>De la:</strong> ${from}</p>
+            <p class="text-xs md:text-sm"><strong>Subiect:</strong> ${subject}</p>
+            <p class="text-xs md:text-sm">${snippet}</p>
+            <button onclick="addTask('${taskSuggestion}', null); generateDailyOverview();" class="bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 mt-1 md:mt-2 hover:bg-indigo-700 text-xs md:text-sm">Adaugă ca sarcină</button>
+          `;
+        dailyOverview.appendChild(div);
+      });
+    }
+
+    if (pendingTasks.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Sarcini pendinte</h4><ul class="list-disc pl-3 md:pl-5">${pendingTasks.map(t => `<li class="text-xs md:text-sm">${t.description} ${t.deadline ? `(${new Date(t.deadline).toLocaleString()})` : ''}</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    dailyOverviewContainer.classList.toggle('hidden', !events.length && !emails.length && !pendingTasks.length);
+  }
 
   function generateDailyRecommendations() {
     const today = new Date();
-    const recommendations = [];
-    const pendingTasks = tasks.filter(task => !task.completed);
-    if (pendingTasks.length === 0) {
-      recommendations.push('Nicio sarcină astăzi. Poți adăuga noi sarcini sau cere idei pentru organizarea zilei.');
-    } else {
+    const recommendations = ['Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!'];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    if (pendingTasks.length > 0) {
       pendingTasks.sort((a, b) => new Date(a.deadline || Infinity) - new Date(b.deadline || Infinity));
-      recommendations.push(`**Priorități de astăzi:**`);
+      recommendations.push('**Priorități de astăzi:**');
       pendingTasks.slice(0, 3).forEach(task => {
         recommendations.push(`- ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
       });
-      recommendations.push(`**Sfat:** Folosește modul Pomodoro pentru a te concentra pe ${pendingTasks[0]?.description || 'sarcinile importante'}.`);
     }
     dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
   }
@@ -683,12 +612,13 @@
     };
 
     recognition.onstart = () => {
-      micBtn.classList.add('listening');
+      micBtn.classList.add('bg-red-500', 'hover:bg-red-600');
       input.placeholder = placeholders[langSelect.value].listening;
     };
 
     recognition.onend = () => {
-      micBtn.classList.remove('listening');
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
       input.placeholder = placeholders[langSelect.value].default;
       if (finalTranscript.trim()) {
         form.dispatchEvent(new Event('submit'));
@@ -697,14 +627,15 @@
     };
 
     recognition.onerror = (event) => {
-      micBtn.classList.remove('listening');
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
       input.placeholder = placeholders[langSelect.value].default;
       console.error('Speech recognition error:', event.error);
       addMessage('Eroare la intrarea vocală. Te rog încearcă din nou.', 'ai');
     };
 
     micBtn.addEventListener('click', () => {
-      if (!micBtn.classList.contains('listening')) {
+      if (!micBtn.classList.contains('bg-red-500')) {
         finalTranscript = '';
         recognition.lang = langSelect.value;
         recognition.start();
@@ -730,7 +661,7 @@
     const files = fileInput.files;
     if (files.length === 0) return;
 
-    typingIndicator.style.display = 'block';
+    typingIndicator.classList.remove('hidden');
     chatBox.scrollTop = chatBox.scrollHeight;
 
     let fileContents = [];
@@ -750,7 +681,7 @@
     const message = input.value.trim() || 'Analizează documentele încărcate.';
     const combinedMessage = `${message}\n\n${fileContents.join('\n\n')}`;
     const aiResponse = await sendMessageToAI(combinedMessage);
-    typingIndicator.style.display = 'none';
+    typingIndicator.classList.add('hidden');
     addMessage(aiResponse, 'ai', true);
     fileInput.value = '';
   });
@@ -800,17 +731,41 @@
 
     addMessage(message, 'user');
     input.value = '';
-    typingIndicator.style.display = 'block';
+    typingIndicator.classList.remove('hidden');
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Parse message for tasks or calendar events
+    userData[currentUser].chats = userData[currentUser].chats || [];
+    userData[currentUser].chats.push({ type: 'user', text: message });
+    saveUserData();
+
+    // Check for document creation requests
+    if (message.toLowerCase().includes('creează document') ||
+            message.toLowerCase().includes('create document') ||
+            message.toLowerCase().includes('contract') ||
+            message.toLowerCase().includes('orar') ||
+            message.toLowerCase().includes('schedule') ||
+            message.toLowerCase().includes('excel')) {
+      addMessage('Redirecționez către editorul de documente pentru a crea documentul solicitat.', 'ai');
+      setTimeout(() => {
+        window.location.href = `document-editor.html?query=${encodeURIComponent(message)}`;
+      }, 1000);
+      typingIndicator.classList.add('hidden');
+      return;
+    }
+
     if (message.toLowerCase().includes('adaugă sarcină') || message.toLowerCase().includes('task')) {
-      const parts = message.split('scadent');
-      const description = parts[0].replace(/adaugă sarcină|task/i, '').trim();
-      const deadline = parts[1] ? new Date(parts[1].trim()) : null;
-      if (description) {
-        addTask(description, deadline);
-        addMessage(`Sarcină adăugată: ${description}${deadline ? ` (scadent: ${deadline.toLocaleString()})` : ''}`, 'ai');
+      typingIndicator.classList.remove('hidden');
+      const aiResponse = await sendMessageToAI(`Generează un nume și o descriere pentru o sarcină bazată pe: "${message}". Returnează sub forma: **Nume:** [nume] **Descriere:** [descriere]`);
+      typingIndicator.classList.add('hidden');
+      const nameMatch = aiResponse.match(/Nume: (.*)/);
+      const descMatch = aiResponse.match(/Descriere: (.*)/);
+      if (nameMatch && descMatch) {
+        const name = nameMatch[1].trim();
+        const description = descMatch[1].trim();
+        addTask(`${name}: ${description}`, null);
+        addMessage(`Sarcină adăugată: ${name}: ${description}`, 'ai');
+      } else {
+        addMessage('Eroare la generarea sarcinii. Te rog încearcă din nou.', 'ai');
       }
     } else if (message.toLowerCase().includes('adaugă memento') || message.toLowerCase().includes('reminder')) {
       const parts = message.split('la');
@@ -822,17 +777,19 @@
       }
     } else {
       const aiResponse = await sendMessageToAI(message);
-      typingIndicator.style.display = 'none';
+      typingIndicator.classList.add('hidden');
       addMessage(aiResponse, 'ai', true);
+      userData[currentUser].chats.push({ type: 'ai', text: aiResponse });
+      saveUserData();
     }
 
     generateDailyRecommendations();
-    typingIndicator.style.display = 'none';
+    generateDailyOverview();
   });
 
   function addMessage(text, type, isDocument = false) {
     const div = document.createElement('div');
-    div.classList.add('message', type);
+    div.className = `message ${type} p-1 md:p-3 rounded-lg max-w-[70%] ${type === 'user' ? 'bg-primary text-white ml-auto rounded-br-none' : 'bg-soft text-gray-800 rounded-bl-none'} animate-slideIn shadow-sm`;
 
     let generalContent = text;
     let documentContent = '';
@@ -843,23 +800,23 @@
       const endIdx = text.includes(documentEndMarker) ? text.indexOf(documentEndMarker) : text.length;
       documentContent = text.slice(startIdx, endIdx).trim();
       generalContent = text.slice(0, startIdx - documentMarker.length).trim() + text.slice(endIdx + documentEndMarker.length).trim();
-      div.classList.add('document-message');
+      div.classList.add('border-2', 'border-primary');
     }
 
     if (generalContent) {
       const renderedHtml = marked.parse(generalContent);
       const contentDiv = document.createElement('div');
       contentDiv.innerHTML = renderedHtml;
+      contentDiv.className = 'prose prose-sm max-w-none text-xs md:text-sm';
       div.appendChild(contentDiv);
     }
 
     if (documentContent && type === 'ai') {
       const openBtn = document.createElement('button');
-      openBtn.classList.add('open-btn');
-      openBtn.textContent = 'Deschide Document';
+      openBtn.className = 'mt-1 md:mt-2 bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 hover:bg-indigo-700 flex items-center text-xs md:text-sm';
+      openBtn.innerHTML = '<i class="fas fa-file-alt mr-1 md:mr-2"></i>Deschide în Editorul de Documente';
       openBtn.addEventListener('click', () => {
-        documentEditor.value = documentContent;
-        documentModal.show();
+        window.location.href = `document-editor.html?content=${encodeURIComponent(documentContent)}`;
       });
       div.appendChild(openBtn);
     }
@@ -867,65 +824,6 @@
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
-
-  // Document Download Functions
-  function downloadFile(content, filename, type) {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  document.getElementById('download-md').addEventListener('click', () => {
-    const content = documentEditor.value;
-    downloadFile(content, `AI_Document_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
-    documentModal.hide();
-  });
-
-  document.getElementById('download-txt').addEventListener('click', () => {
-    const content = documentEditor.value;
-    downloadFile(content, `AI_Document_${new Date().toISOString().slice(0, 10)}.txt`, 'text/plain');
-    documentModal.hide();
-  });
-
-  document.getElementById('download-docx').addEventListener('click', async () => {
-    const content = documentEditor.value;
-    const doc = new docx.Document({
-      sections: [{
-        properties: {},
-        children: content.split('\n').map(line => new docx.Paragraph({
-          text: line,
-          bold: line.startsWith('**') && line.endsWith('**'),
-          heading: line.startsWith('**') ? docx.HeadingLevel.HEADING_1 : undefined
-        }))
-      }]
-    });
-    const blob = await docx.Packer.toBlob(doc);
-    downloadFile(blob, `AI_Document_${new Date().toISOString().slice(0, 10)}.docx`, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    documentModal.hide();
-  });
-
-  document.getElementById('download-pdf').addEventListener('click', () => {
-    const content = documentEditor.value;
-    const element = document.createElement('div');
-    element.innerHTML = marked.parse(content);
-    element.style.padding = '20px';
-    element.style.fontFamily = 'Nunito, sans-serif';
-    element.style.fontSize = '16px';
-    html2pdf()
-            .from(element)
-            .set({
-              margin: 1,
-              filename: `AI_Document_${new Date().toISOString().slice(0, 10)}.pdf`,
-              html2canvas: { scale: 2 },
-              jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            })
-            .save();
-    documentModal.hide();
-  });
 
   async function sendMessageToAI(message) {
     try {
@@ -962,18 +860,20 @@
     }
   }
 
-  // Adjust chat box height for mobile
+  // Adjust heights for mobile
   window.addEventListener('resize', () => {
-    chatBox.style.height = window.innerWidth < 768 ? `${window.innerHeight - 300}px` : '500px';
+    const height = window.innerHeight - (document.getElementById('header').offsetHeight + document.querySelector('footer').offsetHeight + 20);
+    chatBox.style.maxHeight = `${height * 0.6}px`;
+    dailyOverview.style.maxHeight = `${height * 0.6}px`;
+    tasksReminders.style.maxHeight = `${height * 0.4}px`;
   });
   window.dispatchEvent(new Event('resize'));
 
   // Set initial placeholder
   input.placeholder = placeholders[langSelect.value].default;
 
-  // Initialize daily recommendations
-  generateDailyRecommendations();
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', logout);
 </script>
 </body>
-
 </html>
