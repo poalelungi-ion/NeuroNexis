@@ -81,9 +81,11 @@
     }
     .ql-container {
       min-height: 400px;
-      max-height: 600px;
+      max-height: 60vh;
       border: none;
       background-color: #FFFFFF;
+      overflow-y: auto;
+      resize: vertical;
     }
     .ql-toolbar {
       border: none;
@@ -94,6 +96,8 @@
       padding: 20px;
       font-size: 16px;
       line-height: 1.6;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     .ai-toolbar, .context-menu {
       position: absolute;
@@ -131,6 +135,111 @@
     }
     .dropdown-menu.active {
       display: block;
+    }
+    /* Mobile and Responsive Styles */
+    @media (max-width: 768px) {
+      #main {
+        margin-left: 0 !important;
+        flex-direction: column;
+        padding: 1rem;
+      }
+      #sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 40;
+        transform: translateX(-100%);
+      }
+      #sidebar.active {
+        transform: translateX(0);
+      }
+      #header {
+        padding: 0.75rem 1rem;
+      }
+      .ql-container {
+        max-height: 50vh;
+        min-height: 300px;
+        max-width: 100vw;
+      }
+      .ql-toolbar {
+        padding: 0.5rem;
+      }
+      .ql-editor {
+        padding: 1rem;
+        font-size: 14px;
+      }
+      .chat-box {
+        max-height: calc(100vh - 400px) !important;
+      }
+      .document-list {
+        max-height: calc(100vh - 150px);
+      }
+      .flex.items-center.justify-between.mb-4 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .flex.space-x-2 {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .bg-white.rounded-xl.shadow-sm.p-6.mb-6 {
+        padding: 1rem;
+      }
+      .bg-white.rounded-xl.shadow-sm.p-6 {
+        padding: 1rem;
+      }
+      button, input[type="text"], input[type="file"] + button {
+        padding: 0.75rem;
+        font-size: 14px;
+        min-width: 100px;
+        touch-action: manipulation;
+      }
+      #document-title {
+        width: 100%;
+        font-size: 1.5rem;
+      }
+      #input-form {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      #user-input {
+        width: 100%;
+        padding: 0.75rem;
+      }
+      #send-btn {
+        width: 100%;
+        padding: 0.75rem;
+      }
+      .hidden.md\:block {
+        display: none !important;
+      }
+      footer {
+        padding: 1rem;
+        font-size: 0.875rem;
+      }
+    }
+    @media (max-width: 576px) {
+      .ql-container {
+        max-height: 40vh;
+        min-height: 200px;
+      }
+      .chat-box {
+        max-height: calc(100vh - 350px) !important;
+      }
+      button, input[type="text"], input[type="file"] + button {
+        padding: 0.5rem;
+        font-size: 12px;
+      }
+      .flex-wrap.gap-2.mt-4 {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .flex-wrap.gap-2.mt-4 > button {
+        width: 100%;
+      }
     }
   </style>
 </head>
