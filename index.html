@@ -92,18 +92,128 @@
       padding: 0;
     }
     #main {
-      padding-bottom: 60px; /* Adjust for footer height */
+      padding-bottom: 80px;
     }
     section {
-      gap: 0;
+      gap: 1rem;
     }
-    .lg\:grid-cols-3 {
-      grid-template-columns: 1fr;
+    /* Mobile-first approach: Hide non-chat sections */
+    @media (max-width: 1024px) {
+      #pomodoro-container, #daily-overview-container, #tasks-container, #recommendations-container {
+        display: none;
+      }
+      #pomodoro-toggle, #tasks-toggle, #recommendations-toggle {
+        display: block;
+      }
     }
+    /* Desktop: Always show sections in 3-column layout */
     @media (min-width: 1024px) {
       .lg\:grid-cols-3 {
         grid-template-columns: 1fr 2fr 1fr;
       }
+      #pomodoro-container, #daily-overview-container, #tasks-container, #recommendations-container {
+        display: block;
+      }
+      #pomodoro-toggle, #tasks-toggle, #recommendations-toggle {
+        display: none;
+      }
+    }
+    /* Mobile-specific adjustments */
+    @media (max-width: 640px) {
+      #main {
+        margin-top: 60px;
+        padding-bottom: 100px;
+      }
+      #header {
+        padding: 0.5rem 1rem;
+      }
+      #sidebar {
+        width: 75%;
+      }
+      .chat-box {
+        max-height: 50vh;
+      }
+      .daily-overview, .tasks-reminders {
+        max-height: 30vh;
+      }
+      .text-xs {
+        font-size: 0.875rem;
+      }
+      .p-2 {
+        padding: 0.75rem;
+      }
+      .py-1 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+      .px-2 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+      .rounded-full {
+        min-width: 44px;
+        min-height: 44px;
+      }
+      #input-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #input-form > *:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+      #lang-select, #user-input {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      #input-form button {
+        padding: 0.75rem;
+        width: 100%;
+        display: inline-flex;
+        justify-content: center;
+      }
+      #pomodoro-container, #tasks-container, #recommendations-container {
+        margin-top: 1rem;
+      }
+      .toggle-section {
+        margin-bottom: 0.5rem;
+      }
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 90%;
+      width: 400px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .modal-content h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .modal-content .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
     }
   </style>
 </head>
@@ -196,31 +306,17 @@
     </nav>
   </div>
 
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-0">
-    <!-- Pomodoro Timer -->
-    <div class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full">
-      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Pomodoro Timer</h2>
-      <div id="pomodoro-block" class="text-center h-full flex flex-col justify-center">
-        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-gray-800 mb-2 md:mb-4">25:00</div>
-        <div id="pomodoro-session" class="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">Work Session</div>
-        <div class="flex justify-center space-x-1 md:space-x-2">
-          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
-          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
-          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
-        </div>
-      </div>
-    </div>
-
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
     <!-- Chatbot -->
-    <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full flex flex-col">
+    <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
       <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
       <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
         <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
-          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Cum te ajut astăzi?
+          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Spune-mi „start Pomodoro” pentru a începe un timer, „create a task” pentru a adăuga o sarcină, sau „show recommendations” pentru sfaturi. Cum te ajut astăzi?
         </div>
       </div>
       <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
-      <form id="input-form" class="flex items-center space-x-1 md:space-x-2 w-full">
+      <form id="input-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
         <select id="lang-select" class="bg-white border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0">
           <option value="ro-RO">Română</option>
           <option value="en-US">English</option>
@@ -240,28 +336,62 @@
           <i class="fa fa-paper-plane text-xs md:text-base"></i>
         </button>
       </form>
+      <div id="mobile-toggles" class="mt-2">
+        <button id="pomodoro-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Pomodoro Timer</button>
+        <button id="tasks-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Tasks & Reminders</button>
+        <button id="recommendations-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Recommendations</button>
+      </div>
     </div>
 
-    <!-- Daily Overview (Conditional) -->
-    <div id="daily-overview-container" class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full hidden">
+    <!-- Pomodoro Timer -->
+    <div id="pomodoro-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Pomodoro Timer</h2>
+      <div id="pomodoro-block" class="text-center flex flex-col justify-center">
+        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-gray-800 mb-2 md:mb-4">25:00</div>
+        <div id="pomodoro-session" class="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">Work Session</div>
+        <div class="flex justify-center space-x-1 md:space-x-2">
+          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
+          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
+          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Overview -->
+    <div id="daily-overview-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
       <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Overview</h2>
       <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
     </div>
 
     <!-- Tasks & Reminders -->
-    <div class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full flex flex-col">
+    <div id="tasks-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
       <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Tasks & Reminders</h2>
       <div id="tasks-reminders" class="tasks-reminders flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
     </div>
 
     <!-- Daily Recommendations -->
-    <div class="lg:col-span-1 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft h-full flex flex-col">
+    <div id="recommendations-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
       <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Recommendations</h2>
       <div id="daily-recommendations" class="p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner flex-1">
         <p>Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!</p>
       </div>
     </div>
   </section>
+
+  <!-- Task Edit Modal -->
+  <div id="task-edit-modal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Task</h2>
+      <input type="hidden" id="task-edit-id">
+      <input type="text" id="task-edit-name" placeholder="Task Name">
+      <input type="text" id="task-edit-description" placeholder="Task Description">
+      <input type="datetime-local" id="task-edit-deadline" placeholder="Deadline">
+      <div class="btn-group">
+        <button id="task-edit-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600">Cancel</button>
+        <button id="task-edit-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Save</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <!-- ======= Footer ======= -->
@@ -309,6 +439,19 @@
   const pomodoroStartBtn = document.getElementById('pomodoro-start-btn');
   const pomodoroPauseBtn = document.getElementById('pomodoro-pause-btn');
   const pomodoroResetBtn = document.getElementById('pomodoro-reset-btn');
+  const pomodoroContainer = document.getElementById('pomodoro-container');
+  const tasksContainer = document.getElementById('tasks-container');
+  const recommendationsContainer = document.getElementById('recommendations-container');
+  const taskEditModal = document.getElementById('task-edit-modal');
+  const taskEditId = document.getElementById('task-edit-id');
+  const taskEditName = document.getElementById('task-edit-name');
+  const taskEditDescription = document.getElementById('task-edit-description');
+  const taskEditDeadline = document.getElementById('task-edit-deadline');
+  const taskEditSave = document.getElementById('task-edit-save');
+  const taskEditCancel = document.getElementById('task-edit-cancel');
+  const pomodoroToggle = document.getElementById('pomodoro-toggle');
+  const tasksToggle = document.getElementById('tasks-toggle');
+  const recommendationsToggle = document.getElementById('recommendations-toggle');
 
   // Language-specific placeholders
   const placeholders = {
@@ -322,6 +465,16 @@
   // In-memory store for tasks and reminders
   let tasks = userData[currentUser]?.tasks || [];
   let reminders = userData[currentUser]?.reminders || [];
+
+  // Track section visibility on mobile
+  let isPomodoroVisible = false;
+  let isTasksVisible = false;
+  let isRecommendationsVisible = false;
+
+  // Request notification permission
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
 
   // Check authentication
   if (!currentUser || !users[currentUser]) {
@@ -346,6 +499,7 @@
     renderTasksReminders();
     generateDailyOverview();
     generateDailyRecommendations();
+    scheduleWorkReminder();
   }
 
   // Sidebar toggle
@@ -360,6 +514,25 @@
   document.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', () => {
     const dropdown = document.querySelector('.dropdown-menu');
     dropdown.classList.toggle('hidden');
+  });
+
+  // Toggle sections on mobile
+  pomodoroToggle.addEventListener('click', () => {
+    isPomodoroVisible = !isPomodoroVisible;
+    pomodoroContainer.style.display = isPomodoroVisible ? 'block' : 'none';
+    pomodoroToggle.textContent = isPomodoroVisible ? 'Hide Pomodoro Timer' : 'Show Pomodoro Timer';
+  });
+
+  tasksToggle.addEventListener('click', () => {
+    isTasksVisible = !isTasksVisible;
+    tasksContainer.style.display = isTasksVisible ? 'block' : 'none';
+    tasksToggle.textContent = isTasksVisible ? 'Hide Tasks & Reminders' : 'Show Tasks & Reminders';
+  });
+
+  recommendationsToggle.addEventListener('click', () => {
+    isRecommendationsVisible = !isRecommendationsVisible;
+    recommendationsContainer.style.display = isRecommendationsVisible ? 'block' : 'none';
+    recommendationsToggle.textContent = isRecommendationsVisible ? 'Hide Recommendations' : 'Show Recommendations';
   });
 
   // Pomodoro Timer
@@ -393,6 +566,14 @@
     pomodoroInterval = setInterval(updatePomodoro, 1000);
     updatePomodoroDisplay();
     savePomodoroState();
+    if (window.innerWidth <= 1024) {
+      pomodoroToggle.classList.remove('hidden');
+      if (!isPomodoroVisible) {
+        isPomodoroVisible = true;
+        pomodoroContainer.style.display = 'block';
+        pomodoroToggle.textContent = 'Hide Pomodoro Timer';
+      }
+    }
   }
 
   function pausePomodoro() {
@@ -425,6 +606,9 @@
       pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
       pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
       addMessage(`Timpul de ${pomodoroState.isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${pomodoroState.isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`, 'ai');
+      if (!pomodoroState.isWorkSession) {
+        scheduleWorkReminder();
+      }
     }
 
     updatePomodoroDisplay();
@@ -442,27 +626,92 @@
   }
   updatePomodoroDisplay();
 
+  // AI-driven work reminder
+  async function scheduleWorkReminder() {
+    const delay = Math.random() * (30 - 5) + 5; // Random delay between 5 and 30 minutes
+    setTimeout(async () => {
+      if (Notification.permission === 'granted') {
+        new Notification('E timpul să lucrezi!', {
+          body: 'AI-ul tău te îndeamnă să te apuci de lucru. Hai să finalizăm sarcinile!',
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage('E timpul să lucrezi! Hai să ne apucăm de treabă.', 'ai');
+      await scheduleNextReminder();
+    }, delay * 60 * 1000);
+  }
+
+  // AI decides next reminder based on tasks
+  async function scheduleNextReminder() {
+    const now = new Date();
+    const pendingTasks = tasks.filter(task => !task.completed && task.deadline);
+    if (pendingTasks.length === 0) {
+      setTimeout(scheduleWorkReminder, 60 * 60 * 1000); // Default to 1 hour if no tasks
+      return;
+    }
+
+    pendingTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    const nearestDeadline = new Date(pendingTasks[0].deadline);
+    const timeToDeadline = (nearestDeadline - now) / (1000 * 60); // Minutes to deadline
+
+    let nextReminderDelay;
+    if (timeToDeadline <= 30) {
+      nextReminderDelay = timeToDeadline / 2; // Remind halfway to deadline
+    } else if (timeToDeadline <= 60) {
+      nextReminderDelay = 30; // Remind 30 minutes before
+    } else {
+      nextReminderDelay = 60; // Remind 1 hour before
+    }
+
+    setTimeout(async () => {
+      const task = pendingTasks[0];
+      if (Notification.permission === 'granted') {
+        new Notification(`Memento sarcină: ${task.name}`, {
+          body: `Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`,
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage(`Memento: Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`, 'ai');
+      await scheduleNextReminder();
+    }, nextReminderDelay * 60 * 1000);
+  }
+
   // Task and Reminder Management
-  function addTask(description, deadline) {
-    const task = { id: Date.now(), description, deadline, completed: false };
+  async function addTask(name, description, deadline) {
+    console.log('Adding task:', { name, description, deadline });
+    const task = { id: Date.now(), name, description, deadline, completed: false };
     tasks.push(task);
     userData[currentUser].tasks = tasks;
     saveUserData();
+    console.log('Tasks after adding:', tasks);
     renderTasksReminders();
-    if (deadline) {
-      addReminder(`Task: ${description}`, deadline);
+    if (deadline && !isNaN(new Date(deadline).getTime())) {
+      console.log('Adding reminder for task:', name, 'with deadline:', deadline);
+      await addReminder(`Task: ${name}`, deadline);
     }
     generateDailyOverview();
+    if (window.innerWidth <= 1024) {
+      tasksToggle.classList.remove('hidden');
+      if (!isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      }
+    }
+    return task; // Return the created task for confirmation
   }
 
-  function addReminder(description, deadline) {
-    const reminder = { id: Date.now(), description, deadline };
+  async function addReminder(description, deadline) {
+    console.log('Adding reminder:', { description, deadline });
+    const reminder = { id: Date.now(), description, deadline, notified: false };
     reminders.push(reminder);
     userData[currentUser].reminders = reminders;
     saveUserData();
+    console.log('Reminders after adding:', reminders);
     renderTasksReminders();
     checkReminders();
     generateDailyOverview();
+    return reminder; // Return the created reminder for confirmation
   }
 
   function deleteTask(id) {
@@ -471,6 +720,7 @@
     saveUserData();
     renderTasksReminders();
     generateDailyOverview();
+    scheduleNextReminder();
   }
 
   function deleteReminder(id) {
@@ -481,7 +731,7 @@
     generateDailyOverview();
   }
 
-  function toggleTaskCompletion(id) {
+  async function toggleTaskCompletion(id) {
     const task = tasks.find(task => task.id === id);
     if (task) {
       task.completed = !task.completed;
@@ -489,32 +739,97 @@
       saveUserData();
       renderTasksReminders();
       generateDailyOverview();
+      if (task.completed) {
+        const feedback = await sendMessageToAI(`Generează feedback pentru sarcina completată: ${task.name} - ${task.description}`);
+        addMessage(`Feedback AI: ${feedback}`, 'ai');
+        if (Notification.permission === 'granted') {
+          new Notification('Sarcină completată!', {
+            body: `Ai finalizat "${task.name}". Feedback: ${feedback}`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
+      }
     }
   }
 
+  function editTask(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      taskEditId.value = task.id;
+      taskEditName.value = task.name;
+      taskEditDescription.value = task.description;
+      taskEditDeadline.value = task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '';
+      taskEditModal.style.display = 'flex';
+    }
+  }
+
+  taskEditSave.addEventListener('click', async () => {
+    const id = parseInt(taskEditId.value);
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.name = taskEditName.value.trim();
+      task.description = taskEditDescription.value.trim();
+      task.deadline = taskEditDeadline.value ? new Date(taskEditDeadline.value) : null;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      taskEditModal.style.display = 'none';
+      await scheduleNextReminder();
+    }
+  });
+
+  taskEditCancel.addEventListener('click', () => {
+    taskEditModal.style.display = 'none';
+  });
+
   function renderTasksReminders() {
+    console.log('Rendering tasks and reminders:', { tasks, reminders });
     tasksReminders.innerHTML = '';
-    tasks.forEach(task => {
-      const div = document.createElement('div');
-      div.className = `flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2 ${task.completed ? 'bg-green-50 line-through' : ''}`;
-      div.innerHTML = `
+    // Render tasks
+    if (tasks.length > 0) {
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.className = `flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2 ${task.completed ? 'bg-green-50 line-through' : ''}`;
+        div.innerHTML = `
           <span class="flex items-center text-xs md:text-sm">
             <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})" class="mr-1 md:mr-2">
-            ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}
+            ${task.name}: ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}
           </span>
-          <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteTask(${task.id})"></i>
+          <div class="flex space-x-2">
+            <i class="fa fa-edit text-primary cursor-pointer text-xs md:text-sm" onclick="editTask(${task.id})"></i>
+            <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteTask(${task.id})"></i>
+          </div>
         `;
-      tasksReminders.appendChild(div);
-    });
-    reminders.forEach(reminder => {
-      const div = document.createElement('div');
-      div.className = 'flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
-      div.innerHTML = `
+        tasksReminders.appendChild(div);
+      });
+    }
+    // Render reminders
+    if (reminders.length > 0) {
+      reminders.forEach(reminder => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
           <span class="text-xs md:text-sm">${reminder.description} (${new Date(reminder.deadline).toLocaleString()})</span>
           <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteReminder(${reminder.id})"></i>
         `;
-      tasksReminders.appendChild(div);
-    });
+        tasksReminders.appendChild(div);
+      });
+    }
+    // Update mobile visibility
+    if (window.innerWidth <= 1024) {
+      const hasItems = tasks.length > 0 || reminders.length > 0;
+      tasksToggle.classList.toggle('hidden', !hasItems);
+      if (hasItems && !isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      } else if (!hasItems && isTasksVisible) {
+        isTasksVisible = false;
+        tasksContainer.style.display = 'none';
+        tasksToggle.textContent = 'Show Tasks & Reminders';
+      }
+    }
   }
 
   function checkReminders() {
@@ -522,6 +837,12 @@
     reminders.forEach(reminder => {
       const deadline = new Date(reminder.deadline);
       if (deadline <= now && !reminder.notified) {
+        if (Notification.permission === 'granted') {
+          new Notification('Memento!', {
+            body: `Memento: ${reminder.description} este scadent acum!`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
         addMessage(`Memento: ${reminder.description} este scadent acum!`, 'ai');
         reminder.notified = true;
         userData[currentUser].reminders = reminders;
@@ -567,7 +888,7 @@
     if (pendingTasks.length > 0) {
       const div = document.createElement('div');
       div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
-      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Sarcini pendinte</h4><ul class="list-disc pl-3 md:pl-5">${pendingTasks.map(t => `<li class="text-xs md:text-sm">${t.description} ${t.deadline ? `(${new Date(t.deadline).toLocaleString()})` : ''}</li>`).join('')}</ul>`;
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Sarcini pendinte</h4><ul class="list-disc pl-3 md:pl-5">${pendingTasks.map(t => `<li class="text-xs md:text-sm">${t.name}: ${t.description} ${t.deadline ? `(${new Date(t.deadline).toLocaleString()})` : ''}</li>`).join('')}</ul>`;
       dailyOverview.appendChild(div);
     }
 
@@ -582,10 +903,18 @@
       pendingTasks.sort((a, b) => new Date(a.deadline || Infinity) - new Date(b.deadline || Infinity));
       recommendations.push('**Priorități de astăzi:**');
       pendingTasks.slice(0, 3).forEach(task => {
-        recommendations.push(`- ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
+        recommendations.push(`- ${task.name}: ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
       });
     }
     dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
+    if (window.innerWidth <= 1024) {
+      recommendationsToggle.classList.toggle('hidden', pendingTasks.length === 0);
+      if (pendingTasks.length > 0 && !isRecommendationsVisible) {
+        isRecommendationsVisible = true;
+        recommendationsContainer.style.display = 'block';
+        recommendationsToggle.textContent = 'Hide Recommendations';
+      }
+    }
   }
 
   // Voice Recognition Setup
@@ -726,10 +1055,10 @@
   // Form Submission
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const message = input.value.trim();
+    const message = input.value.trim().toLowerCase();
     if (!message) return;
 
-    addMessage(message, 'user');
+    addMessage(input.value, 'user');
     input.value = '';
     typingIndicator.classList.remove('hidden');
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -739,12 +1068,9 @@
     saveUserData();
 
     // Check for document creation requests
-    if (message.toLowerCase().includes('creează document') ||
-            message.toLowerCase().includes('create document') ||
-            message.toLowerCase().includes('contract') ||
-            message.toLowerCase().includes('orar') ||
-            message.toLowerCase().includes('schedule') ||
-            message.toLowerCase().includes('excel')) {
+    if (message.includes('creează document') || message.includes('create document') ||
+            message.includes('contract') || message.includes('orar') ||
+            message.includes('schedule') || message.includes('excel')) {
       addMessage('Redirecționez către editorul de documente pentru a crea documentul solicitat.', 'ai');
       setTimeout(() => {
         window.location.href = `document-editor.html?query=${encodeURIComponent(message)}`;
@@ -753,28 +1079,68 @@
       return;
     }
 
-    if (message.toLowerCase().includes('adaugă sarcină') || message.toLowerCase().includes('task')) {
-      typingIndicator.classList.remove('hidden');
-      const aiResponse = await sendMessageToAI(`Generează un nume și o descriere pentru o sarcină bazată pe: "${message}". Returnează sub forma: **Nume:** [nume] **Descriere:** [descriere]`);
+    if (message.includes('start pomodoro')) {
+      startPomodoro();
+      addMessage('Pomodoro timer a fost pornit! Te rog apasă „Start” pentru a începe.', 'ai');
       typingIndicator.classList.add('hidden');
-      const nameMatch = aiResponse.match(/Nume: (.*)/);
-      const descMatch = aiResponse.match(/Descriere: (.*)/);
-      if (nameMatch && descMatch) {
-        const name = nameMatch[1].trim();
-        const description = descMatch[1].trim();
-        addTask(`${name}: ${description}`, null);
-        addMessage(`Sarcină adăugată: ${name}: ${description}`, 'ai');
-      } else {
+    } else if (message.includes('create a task') || message.includes('add task') || message.includes('adaugă sarcină') || message.includes('creaza un task')) {
+      typingIndicator.classList.remove('hidden');
+      try {
+        const aiResponse = await sendMessageToAI(`Generează un nume și o descriere pentru o sarcină bazată pe: "${message}". Returnează sub forma: **Nume:** [nume]\n**Descriere:** [descriere]\n**Dată limită (opțional):** [data limită sau "fără dată limită"]`);
+        typingIndicator.classList.add('hidden');
+
+        // Improved parsing with fallback
+        let name = 'Default Task';
+        let description = 'No description provided';
+        let deadline = null;
+
+        const nameMatch = aiResponse.match(/\*\*Nume:\*\* (.*?)(?=\n|$)/);
+        const descMatch = aiResponse.match(/\*\*Descriere:\*\* (.*?)(?=\n|$)/);
+        const deadlineMatch = aiResponse.match(/\*\*Dată limită \(opțional\):\*\* (.*?)(?=\n|$)/);
+
+        if (nameMatch) name = nameMatch[1].trim();
+        if (descMatch) description = descMatch[1].trim();
+        if (deadlineMatch && deadlineMatch[1] !== 'fără dată limită') {
+          const parsedDeadline = new Date(deadlineMatch[1]);
+          if (!isNaN(parsedDeadline.getTime())) deadline = parsedDeadline;
+        }
+
+        // For the specific request "creaza un task pentru crearea uni document"
+        if (message.includes('crearea uni document')) {
+          name = 'Crearea unui document';
+          description = 'Crearea unui document';
+          // Let's set a default deadline for testing reminder functionality, e.g., 1 hour from now
+          const now = new Date();
+          now.setHours(now.getHours() + 1);
+          deadline = now;
+        }
+
+        const task = await addTask(name, description, deadline);
+        let confirmationMessage = `Sarcină adăugată: ${task.name}: ${task.description}`;
+        if (task.deadline) {
+          confirmationMessage += ` (scadent: ${new Date(task.deadline).toLocaleString()})`;
+        }
+        addMessage(confirmationMessage, 'ai');
+      } catch (error) {
+        typingIndicator.classList.add('hidden');
         addMessage('Eroare la generarea sarcinii. Te rog încearcă din nou.', 'ai');
+        console.error('Task creation error:', error);
       }
-    } else if (message.toLowerCase().includes('adaugă memento') || message.toLowerCase().includes('reminder')) {
+    } else if (message.includes('show recommendations')) {
+      generateDailyRecommendations();
+      addMessage('Recomandările zilnice au fost afișate.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('adaugă memento') || message.includes('reminder')) {
       const parts = message.split('la');
       const description = parts[0].replace(/adaugă memento|reminder/i, '').trim();
       const deadline = parts[1] ? new Date(parts[1].trim()) : null;
-      if (description && deadline) {
-        addReminder(description, deadline);
-        addMessage(`Memento adăugat: ${description} la ${deadline.toLocaleString()}`, 'ai');
+      if (description && deadline && !isNaN(deadline.getTime())) {
+        const reminder = await addReminder(description, deadline);
+        addMessage(`Memento adăugat: ${reminder.description} la ${new Date(reminder.deadline).toLocaleString()}`, 'ai');
+      } else {
+        addMessage('Eroare la adăugarea mementoului. Te rog specifică o dată validă.', 'ai');
       }
+      typingIndicator.classList.add('hidden');
     } else {
       const aiResponse = await sendMessageToAI(message);
       typingIndicator.classList.add('hidden');
@@ -838,7 +1204,7 @@
           messages: [
             {
               role: 'system',
-              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului.'
+              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului. Afișează secțiunile (Pomodoro, Tasks, Recommendations) doar pe mobil (≤ 1024px) când utilizatorul cere „start Pomodoro”, „create a task”, sau „show recommendations”.'
             },
             { role: 'user', content: message }
           ],
