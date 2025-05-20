@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Document Editor - NEURONEXIS</title>
+  <meta content="AI-powered document editor for creating contracts, schedules, and more" name="description">
+  <meta content="AI, document editor, productivity, NEURONEXIS" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Quill Editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#6B7280',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            background: '#F9FAFB',
+            card: '#FFFFFF',
+            notion: '#F3F4F6',
+          },
+          borderRadius: {
+            'xl': '12px',
+          },
+          animation: {
+            slideIn: 'slideIn 0.3s ease-in-out',
+            pulse: 'pulse 1s infinite',
+            fadeIn: 'fadeIn 0.2s ease-in',
+          },
+          keyframes: {
+            slideIn: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulse: {
+              '0%': { transform: 'scale(1)', opacity: '1' },
+              '100%': { transform: 'scale(2)', opacity: '0' },
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .chat-box, .ql-container, .document-list {
+      scrollbar-width: none;
+    }
+    .chat-box::-webkit-scrollbar, .ql-container::-webkit-scrollbar, .document-list::-webkit-scrollbar {
+      display: none;
+    }
+    .message img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .ql-container {
+      min-height: 400px;
+      max-height: 60vh;
+      border: none;
+      background-color: #FFFFFF;
+      overflow-y: auto;
+      resize: vertical;
+    }
+    .ql-toolbar {
+      border: none;
+      background-color: #F3F4F6;
+      border-radius: 8px 8px 0 0;
+    }
+    .ql-editor {
+      padding: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .ai-toolbar, .context-menu {
+      position: absolute;
+      z-index: 1000;
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .context-menu {
+      display: none;
+    }
+    .forced-colors\:bg-white {
+      background-color: white;
+    }
+    @media (forced-colors: active) {
+      .forced-colors\:bg-white {
+        background-color: Canvas;
+      }
+      .forced-colors\:text-black {
+        color: CanvasText;
+      }
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 2px;
+      background: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 50;
+    }
+    .dropdown-menu.active {
+      display: block;
+    }
+    /* Mobile and Responsive Styles */
+    @media (max-width: 768px) {
+      #main {
+        margin-left: 0 !important;
+        flex-direction: column;
+        padding: 1rem;
+      }
+      #sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 40;
+        transform: translateX(-100%);
+      }
+      #sidebar.active {
+        transform: translateX(0);
+      }
+      #header {
+        padding: 0.75rem 1rem;
+      }
+      .ql-container {
+        max-height: 50vh;
+        min-height: 300px;
+        max-width: 100vw;
+      }
+      .ql-toolbar {
+        padding: 0.5rem;
+      }
+      .ql-editor {
+        padding: 1rem;
+        font-size: 14px;
+      }
+      .chat-box {
+        max-height: calc(100vh - 400px) !important;
+      }
+      .document-list {
+        max-height: calc(100vh - 150px);
+      }
+      .flex.items-center.justify-between.mb-4 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .flex.space-x-2 {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .bg-white.rounded-xl.shadow-sm.p-6.mb-6 {
+        padding: 1rem;
+      }
+      .bg-white.rounded-xl.shadow-sm.p-6 {
+        padding: 1rem;
+      }
+      button, input[type="text"], input[type="file"] + button {
+        padding: 0.75rem;
+        font-size: 14px;
+        min-width: 100px;
+        touch-action: manipulation;
+      }
+      #document-title {
+        width: 100%;
+        font-size: 1.5rem;
+      }
+      #input-form {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      #user-input {
+        width: 100%;
+        padding: 0.75rem;
+      }
+      #send-btn {
+        width: 100%;
+        padding: 0.75rem;
+      }
+      .hidden.md\:block {
+        display: none !important;
+      }
+      footer {
+        padding: 1rem;
+        font-size: 0.875rem;
+      }
+    }
+    @media (max-width: 576px) {
+      .ql-container {
+        max-height: 40vh;
+        min-height: 200px;
+      }
+      .chat-box {
+        max-height: calc(100vh - 350px) !important;
+      }
+      button, input[type="text"], input[type="file"] + button {
+        padding: 0.5rem;
+        font-size: 12px;
+      }
+      .flex-wrap.gap-2.mt-4 {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .flex-wrap.gap-2.mt-4 > button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-notion text-gray-900 font-inter">
+<!-- ======= Header ======= -->
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm flex items-center justify-between px-4 py-3 md:px-6">
+  <div class="flex items-center">
+    <a href="index.html" class="flex items-center space-x-2">
+      <img src="assets/img/logo.png" alt="NEURONEXIS" class="h-8">
+      <span class="hidden md:block text-xl font-semibold text-primary">NEURONEXIS</span>
+    </a>
+    <button id="toggle-sidebar-btn" class="md:hidden ml-4 text-gray-600">
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+  </div>
+  <nav class="flex items-center space-x-4">
+    <div class="relative hidden md:block">
+      <input type="text" id="search-input" placeholder="Search documents..." class="pl-10 pr-4 py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+      <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    </div>
+    <div class="relative">
+      <button id="profile-dropdown-btn" class="flex items-center space-x-2 focus:outline-none">
+        <img id="header-profile-image" src="assets/img/user-icon.png" alt="Profile" class="h-8 w-8 rounded-full object-cover">
+        <span id="user-name" class="hidden md:block text-sm font-medium text-gray-700">Guest</span>
+      </button>
+      <ul id="profile-dropdown" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 hidden">
+        <li class="px-4 py-2">
+          <p id="user-fullname" class="font-semibold text-gray-800">Guest</p>
+          <p id="user-role" class="text-sm text-gray-500">Guest User</p>
+        </li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="users-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-2"></i> My Profile</a></li>
+        <li><a href="users-profile.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-2"></i> Account Settings</a></li>
+        <li><a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-question-circle mr-2"></i> Need Help?</a></li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="#" id="logout-btn" class="flex items-center px-4 py-2 text-sm text-danger hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2"></i> Sign Out</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
+  <div class="flex items-center justify-between p-4 border-b">
+    <span class="text-xl font-semibold text-primary">Menu</span>
+    <button id="close-sidebar-btn" class="md:hidden text-gray-600">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+  </div>
+  <ul class="py-4">
+    <li class="px-4 py-2">
+      <a href="index.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-4 py-2">
+        <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+      </a>
+    </li>
+    <li class="px-4 py-2">
+      <a href="document-editor.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-4 py-2">
+        <i class="fas fa-file-alt mr-3"></i> Document Editor
+      </a>
+    </li>
+    <li class="px-4 py-2" id="login-nav">
+      <a href="pages-login.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-4 py-2">
+        <i class="fas fa-sign-in-alt mr-3"></i> Login
+      </a>
+    </li>
+    <li class="px-4 py-2" id="register-nav">
+      <a href="pages-register.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-4 py-2">
+        <i class="fas fa-user-plus mr-3"></i> Register
+      </a>
+    </li>
+    <li class="px-4 py-2" id="profile-nav" style="display: none;">
+      <a href="users-profile.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-4 py-2">
+        <i class="fas fa-user-circle mr-3"></i> Profile
+      </a>
+    </li>
+  </ul>
+</aside>
+
+<!-- ======= Main Content ======= -->
+<main id="main" class="mt-20 md:ml-64 p-4 md:p-6 flex">
+  <!-- Document List Sidebar -->
+  <aside class="w-64 bg-white rounded-xl shadow-sm p-4 mr-4 hidden md:block">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold text-gray-800">Your Documents</h2>
+      <button id="new-document-btn" class="bg-primary text-white rounded-lg px-3 py-1 hover:bg-indigo-700">
+        <i class="fas fa-plus mr-1"></i> New
+      </button>
+    </div>
+    <div id="document-list" class="document-list max-h-[calc(100vh-200px)] overflow-y-auto"></div>
+  </aside>
+
+  <!-- Editor and Chat -->
+  <div class="flex-1">
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <input id="document-title" type="text" placeholder="Untitled Document" class="text-2xl font-semibold text-gray-800 focus:outline-none">
+        <div class="flex space-x-2">
+          <button id="save-document-btn" class="bg-success text-white rounded-lg px-4 py-2 hover:bg-green-600">Save</button>
+          <button id="version-history-btn" class="bg-secondary text-white rounded-lg px-4 py-2 hover:bg-gray-700">Version History</button>
+          <input type="file" id="upload-document" accept=".docx,.txt,.md" class="hidden">
+          <button id="upload-btn" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Upload</button>
+        </div>
+      </div>
+      <div id="quill-editor" class="bg-white rounded-lg"></div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button id="download-md" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Download .md</button>
+        <button id="download-txt" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Download .txt</button>
+        <button id="download-docx" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Download .docx</button>
+        <button id="download-pdf" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Download .pdf</button>
+        <button id="insert-ai-text" class="bg-accent text-white rounded-lg px-4 py-2 hover:bg-yellow-600">Insert AI Text</button>
+      </div>
+    </div>
+
+    <!-- Chatbot for Document Assistance -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Document Assistant</h2>
+      <div id="chat-box" class="chat-box max-h-[300px] overflow-y-auto p-4 bg-notion rounded-lg mb-4">
+        <div class="message ai bg-gray-100 text-gray-800 rounded-lg p-3 max-w-[70%]">
+          Bună! Sunt asistentul tău pentru documente. Poți încărca un document, selecta text pentru reformulare sau inserare de text AI. Ex: „Adaugă o clauză” sau „Rescrie mai concis”.
+        </div>
+      </div>
+      <div class="typing-indicator text-gray-500 italic hidden">AI-ul tastează...</div>
+      <form id="input-form" class="flex items-center space-x-2">
+        <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-3 hover:bg-indigo-700 transition">
+          <i class="fa fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Version History Modal -->
+<div id="version-history-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded-xl p-6 w-full max-w-md">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold text-gray-800">Version History</h2>
+      <button id="close-version-modal" class="text-gray-600 hover:text-gray-800">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="version-list" class="max-h-[400px] overflow-y-auto"></div>
+  </div>
+</div>
+
+<!-- AI Toolbar and Context Menu -->
+<div id="ai-toolbar" class="ai-toolbar hidden p-2">
+  <button id="ai-rewrite" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Rewrite</button>
+  <button id="ai-summarize" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Summarize</button>
+  <button id="ai-expand" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Expand</button>
+</div>
+<div id="context-menu" class="context-menu hidden p-2">
+  <button id="context-rewrite" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Reformulate</button>
+</div>
+
+<!-- ======= Footer ======= -->
+<footer class="bg-white mt-12 py-6 text-center text-gray-600">
+  <div>© Copyright <strong>NeuroNexis</strong>. All Rights Reserved</div>
+  <div>Designed by <a href="#" class="text-primary hover:underline">Poalelungi Consulting</a></div>
+</footer>
+
+<!-- Vendor JS Files -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+<!-- Template Main JS File -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/auth.js"></script>
+
+<!-- Document Editor and Chat Logic -->
+<script>
+  // Initialize Quill Editor
+  const quill = new Quill('#quill-editor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['link', 'image'],
+        ['clean']
+      ]
+    }
+  });
+
+  // Elements
+  const chatBox = document.getElementById('chat-box');
+  const form = document.getElementById('input-form');
+  const input = document.getElementById('user-input');
+  const typingIndicator = document.querySelector('.typing-indicator');
+  const sidebar = document.getElementById('sidebar');
+  const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const documentList = document.getElementById('document-list');
+  const newDocumentBtn = document.getElementById('new-document-btn');
+  const documentTitle = document.getElementById('document-title');
+  const saveDocumentBtn = document.getElementById('save-document-btn');
+  const versionHistoryBtn = document.getElementById('version-history-btn');
+  const versionHistoryModal = document.getElementById('version-history-modal');
+  const closeVersionModal = document.getElementById('close-version-modal');
+  const versionList = document.getElementById('version-list');
+  const aiToolbar = document.getElementById('ai-toolbar');
+  const aiRewriteBtn = document.getElementById('ai-rewrite');
+  const aiSummarizeBtn = document.getElementById('ai-summarize');
+  const aiExpandBtn = document.getElementById('ai-expand');
+  const contextMenu = document.getElementById('context-menu');
+  const contextRewriteBtn = document.getElementById('context-rewrite');
+  const uploadDocument = document.getElementById('upload-document');
+  const uploadBtn = document.getElementById('upload-btn');
+  const insertAiTextBtn = document.getElementById('insert-ai-text');
+  const profileDropdownBtn = document.getElementById('profile-dropdown-btn');
+  const profileDropdown = document.getElementById('profile-dropdown');
+
+  // Document Management
+  let currentDocumentId = null;
+  let documents = userData[currentUser]?.documents || [];
+
+  // Check authentication
+  if (!currentUser || !users[currentUser]) {
+    window.location.href = 'pages-login.html';
+  } else {
+    document.getElementById('login-nav').style.display = 'none';
+    document.getElementById('register-nav').style.display = 'none';
+    document.getElementById('profile-nav').style.display = 'block';
+    loadProfile();
+  }
+
+  // Load profile data
+  function loadProfile() {
+    const user = users[currentUser];
+    if (user) {
+      document.getElementById('user-name').textContent = currentUser;
+      document.getElementById('user-fullname').textContent = user.name || currentUser;
+      document.getElementById('user-role').textContent = user.email;
+      const profileImage = user.profileImage || 'assets/img/user-icon.png';
+      document.getElementById('header-profile-image').src = profileImage;
+    }
+    initializeEditor();
+    renderDocumentList();
+  }
+
+  // Initialize editor with URL parameters
+  function initializeEditor() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('query');
+    const content = urlParams.get('content');
+    const docId = urlParams.get('docId');
+
+    if (docId) {
+      const doc = documents.find(d => d.id === docId);
+      if (doc) {
+        currentDocumentId = docId;
+        documentTitle.value = doc.title;
+        quill.root.innerHTML = doc.versions[doc.versions.length - 1].content;
+        loadChatHistory(docId);
+      }
+    } else if (content) {
+      quill.root.innerHTML = marked.parse(content);
+      saveDocument('Untitled Document');
+    } else if (query) {
+      sendMessageToAI(query).then(response => {
+        handleAIResponse(response);
+        saveDocument('Untitled Document');
+      });
+    }
+  }
+
+  // Render document list
+  function renderDocumentList() {
+    documentList.innerHTML = '';
+    documents.forEach(doc => {
+      const div = document.createElement('div');
+      div.className = 'flex justify-between items-center p-3 rounded-lg hover:bg-gray-100';
+      div.innerHTML = `
+          <span class="flex-1 truncate cursor-pointer" onclick="loadDocument('${doc.id}')">${doc.title}</span>
+          <div class="flex space-x-2">
+            <i class="fas fa-edit text-primary cursor-pointer" onclick="renameDocument('${doc.id}')"></i>
+            <i class="fas fa-trash text-danger cursor-pointer" onclick="deleteDocument('${doc.id}')"></i>
+          </div>
+        `;
+      documentList.appendChild(div);
+    });
+  }
+
+  // Save document
+  function saveDocument(title) {
+    const content = quill.root.innerHTML;
+    if (!currentDocumentId) {
+      currentDocumentId = Date.now().toString();
+      documents.push({
+        id: currentDocumentId,
+        title: title || 'Untitled Document',
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        versions: [{ content, timestamp: new Date().toISOString() }],
+        chatHistory: []
+      });
+    } else {
+      const doc = documents.find(d => d.id === currentDocumentId);
+      if (doc) {
+        doc.title = title || doc.title;
+        doc.modified = new Date().toISOString();
+        doc.versions.push({ content, timestamp: new Date().toISOString() });
+      }
+    }
+    userData[currentUser].documents = documents;
+    saveUserData();
+    renderDocumentList();
+  }
+
+  // Load document
+  function loadDocument(docId) {
+    const doc = documents.find(d => d.id === docId);
+    if (doc) {
+      currentDocumentId = docId;
+      documentTitle.value = doc.title;
+      quill.root.innerHTML = doc.versions[doc.versions.length - 1].content;
+      loadChatHistory(docId);
+    }
+  }
+
+  // Rename document
+  function renameDocument(docId) {
+    const doc = documents.find(d => d.id === docId);
+    if (doc) {
+      const newTitle = prompt('Enter new document title:', doc.title);
+      if (newTitle) {
+        doc.title = newTitle;
+        userData[currentUser].documents = documents;
+        saveUserData();
+        renderDocumentList();
+        if (currentDocumentId === docId) {
+          documentTitle.value = newTitle;
+        }
+      }
+    }
+  }
+
+  // Delete document
+  function deleteDocument(docId) {
+    if (confirm('Are you sure you want to delete this document?')) {
+      documents = documents.filter(d => d.id !== docId);
+      userData[currentUser].documents = documents;
+      saveUserData();
+      renderDocumentList();
+      if (currentDocumentId === docId) {
+        currentDocumentId = null;
+        documentTitle.value = 'Untitled Document';
+        quill.root.innerHTML = '';
+        chatBox.innerHTML = '';
+      }
+    }
+  }
+
+  // Version history
+  function showVersionHistory() {
+    const doc = documents.find(d => d.id === currentDocumentId);
+    if (!doc) return;
+
+    versionList.innerHTML = '';
+    doc.versions.forEach((version, index) => {
+      const div = document.createElement('div');
+      div.className = 'flex justify-between items-center p-3 rounded-lg hover:bg-gray-100';
+      div.innerHTML = `
+          <span>Version ${index + 1} (${new Date(version.timestamp).toLocaleString()})</span>
+          <button onclick="revertVersion(${index})" class="bg-primary text-white rounded-lg px-3 py-1 hover:bg-indigo-700">Revert</button>
+        `;
+      versionList.appendChild(div);
+    });
+    versionHistoryModal.classList.remove('hidden');
+  }
+
+  function revertVersion(index) {
+    const doc = documents.find(d => d.id === currentDocumentId);
+    if (doc) {
+      quill.root.innerHTML = doc.versions[index].content;
+      saveDocument(doc.title);
+      versionHistoryModal.classList.add('hidden');
+    }
+  }
+
+  // Sidebar toggle
+  toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+  closeSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+  });
+
+  // Profile Dropdown
+  profileDropdownBtn.addEventListener('click', () => {
+    profileDropdown.classList.toggle('active');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!profileDropdownBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+      profileDropdown.classList.remove('active');
+    }
+  });
+
+  // Document events
+  newDocumentBtn.addEventListener('click', () => {
+    currentDocumentId = null;
+    documentTitle.value = 'Untitled Document';
+    quill.root.innerHTML = '';
+    chatBox.innerHTML = '<div class="message ai bg-gray-100 text-gray-800 rounded-lg p-3 max-w-[70%]">Bună! Sunt asistentul tău pentru documente. Poți încărca un document, selecta text pentru reformulare sau inserare de text AI. Ex: „Adaugă o clauză” sau „Rescrie mai concis”.</div>';
+  });
+
+  saveDocumentBtn.addEventListener('click', () => {
+    saveDocument(documentTitle.value);
+    addMessage('Document saved successfully.', 'ai');
+  });
+
+  versionHistoryBtn.addEventListener('click', showVersionHistory);
+  closeVersionModal.addEventListener('click', () => {
+    versionHistoryModal.classList.add('hidden');
+  });
+
+  // Upload Document
+  uploadBtn.addEventListener('click', () => uploadDocument.click());
+  uploadDocument.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const text = await parseUploadedFile(file);
+      quill.root.innerHTML = marked.parse(text);
+      saveDocument(file.name.replace(/\.[^/.]+$/, '') || 'Uploaded Document');
+      uploadDocument.value = '';
+    }
+  });
+
+  async function parseUploadedFile(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          docx.load(content).then(doc => {
+            resolve(doc.getText());
+          });
+        } else if (file.type === 'text/plain' || file.name.endsWith('.md')) {
+          resolve(content);
+        } else {
+          resolve('Unsupported file format');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  // AI Toolbar
+  quill.on('selection-change', (range, oldRange, source) => {
+    if (range && range.length > 0) {
+      const bounds = quill.getBounds(range.index, range.length);
+      const editor = document.querySelector('.ql-editor');
+      const editorRect = editor.getBoundingClientRect();
+      aiToolbar.style.top = `${editorRect.top + bounds.bottom + window.scrollY + 10}px`;
+      aiToolbar.style.left = `${editorRect.left + bounds.left}px`;
+      aiToolbar.classList.remove('hidden');
+    } else {
+      aiToolbar.classList.add('hidden');
+    }
+  });
+
+  async function handleAIToolbarAction(action) {
+    const range = quill.getSelection();
+    if (!range || range.length === 0) return;
+
+    const selectedText = quill.getText(range.index, range.length);
+    const prompt = action === 'rewrite' ? `Rescrie următorul text mai concis și clar: "${selectedText}"` :
+            action === 'summarize' ? `Rezuma următorul text: "${selectedText}"` :
+                    `Extinde următorul text cu mai multe detalii: "${selectedText}"`;
+
+    typingIndicator.classList.remove('hidden');
+    const response = await sendMessageToAI(prompt);
+    typingIndicator.classList.add('hidden');
+
+    quill.deleteText(range.index, range.length);
+    quill.insertText(range.index, response);
+    saveDocument(documentTitle.value);
+    aiToolbar.classList.add('hidden');
+  }
+
+  aiRewriteBtn.addEventListener('click', () => handleAIToolbarAction('rewrite'));
+  aiSummarizeBtn.addEventListener('click', () => handleAIToolbarAction('summarize'));
+  aiExpandBtn.addEventListener('click', () => handleAIToolbarAction('expand'));
+
+  // Context Menu
+  quill.root.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const range = quill.getSelection();
+    if (range && range.length > 0) {
+      const bounds = quill.getBounds(range.index, range.length);
+      const editor = document.querySelector('.ql-editor');
+      const editorRect = editor.getBoundingClientRect();
+      contextMenu.style.top = `${editorRect.top + bounds.bottom + window.scrollY + 10}px`;
+      contextMenu.style.left = `${editorRect.left + bounds.left}px`;
+      contextMenu.classList.remove('hidden');
+    }
+  });
+
+  document.addEventListener('click', () => contextMenu.classList.add('hidden'));
+
+  contextRewriteBtn.addEventListener('click', async () => {
+    const range = quill.getSelection();
+    if (range && range.length > 0) {
+      const selectedText = quill.getText(range.index, range.length);
+      typingIndicator.classList.remove('hidden');
+      const response = await sendMessageToAI(`Rescrie următorul text mai natural și clar: "${selectedText}"`);
+      typingIndicator.classList.add('hidden');
+      quill.deleteText(range.index, range.length);
+      quill.insertText(range.index, response);
+      saveDocument(documentTitle.value);
+      contextMenu.classList.add('hidden');
+    }
+  });
+
+  // Insert AI Text
+  insertAiTextBtn.addEventListener('click', async () => {
+    const range = quill.getSelection();
+    if (range) {
+      const prompt = 'Generează un text relevant despre un contract de prestări servicii, integrându-l natural cu contextul existent.';
+      typingIndicator.classList.remove('hidden');
+      const response = await sendMessageToAI(prompt);
+      typingIndicator.classList.add('hidden');
+      quill.insertText(range.index, response);
+      saveDocument(documentTitle.value);
+    }
+  });
+
+  // Form Submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage(message, 'user');
+    input.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    const response = await sendMessageToAI(message);
+    typingIndicator.classList.add('hidden');
+    handleAIResponse(response);
+  });
+
+  function loadChatHistory(docId) {
+    const doc = documents.find(d => d.id === docId);
+    if (doc && doc.chatHistory) {
+      chatBox.innerHTML = '';
+      doc.chatHistory.forEach(entry => {
+        addMessage(entry.text, entry.type);
+      });
+    } else {
+      chatBox.innerHTML = '<div class="message ai bg-gray-100 text-gray-800 rounded-lg p-3 max-w-[70%]">Bună! Sunt asistentul tău pentru documente. Poți încărca un document, selecta text pentru reformulare sau inserare de text AI. Ex: „Adaugă o clauză” sau „Rescrie mai concis”.</div>';
+    }
+  }
+
+  function handleAIResponse(response) {
+    const documentMarker = '===DOCUMENT===';
+    const documentEndMarker = '===END_DOCUMENT===';
+    let chatMessage = response;
+
+    if (response.includes(documentMarker)) {
+      const startIdx = response.indexOf(documentMarker) + documentMarker.length;
+      const endIdx = response.includes(documentEndMarker) ? response.indexOf(documentEndMarker) : response.length;
+      const documentContent = response.slice(startIdx, endIdx).trim();
+      chatMessage = response.slice(0, startIdx - documentMarker.length).trim() + response.slice(endIdx + documentEndMarker.length).trim();
+
+      if (response.toLowerCase().includes('rescrie') || response.toLowerCase().includes('rewrite')) {
+        quill.root.innerHTML = marked.parse(documentContent);
+      } else {
+        quill.root.innerHTML += marked.parse(documentContent);
+      }
+      saveDocument(documentTitle.value);
+    }
+
+    if (chatMessage.trim()) {
+      addMessage(chatMessage, 'ai');
+    }
+  }
+
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = `message ${type} p-3 rounded-lg max-w-[70%] ${type === 'user' ? 'bg-primary text-white ml-auto rounded-br-none' : 'bg-gray-100 text-gray-800 rounded-bl-none'} animate-slideIn`;
+    const renderedHtml = marked.parse(text);
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = renderedHtml;
+    contentDiv.className = 'prose prose-sm max-w-none';
+    div.appendChild(contentDiv);
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    if (currentDocumentId) {
+      const doc = documents.find(d => d.id === currentDocumentId);
+      if (doc) {
+        doc.chatHistory.push({ text, type });
+        userData[currentUser].documents = documents;
+        saveUserData();
+      }
+    }
+  }
+
+  // Document Download Functions
+  function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('download-md').addEventListener('click', () => {
+    const content = quill.root.innerHTML;
+    downloadFile(content, `${documentTitle.value || 'Document'}_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
+  });
+
+  document.getElementById('download-txt').addEventListener('click', () => {
+    const content = quill.getText();
+    downloadFile(content, `${documentTitle.value || 'Document'}_${new Date().toISOString().slice(0, 10)}.txt`, 'text/plain');
+  });
+
+  document.getElementById('download-docx').addEventListener('click', async () => {
+    const content = quill.getContents();
+    const doc = new docx.Document({
+      sections: [{
+        properties: {},
+        children: content.ops.map(op => {
+          if (typeof op.insert === 'string') {
+            return new docx.Paragraph({
+              text: op.insert,
+              bold: op.attributes?.bold,
+              italic: op.attributes?.italic,
+              underline: op.attributes?.underline,
+              heading: op.attributes?.header ? `Heading${op.attributes.header}` : undefined,
+              alignment: op.attributes?.align ? op.attributes.align : undefined
+            });
+          }
+          return new docx.Paragraph({});
+        })
+      }]
+    });
+    const blob = await docx.Packer.toBlob(doc);
+    downloadFile(blob, `${documentTitle.value || 'Document'}_${new Date().toISOString().slice(0, 10)}.docx`, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  });
+
+  document.getElementById('download-pdf').addEventListener('click', () => {
+    const content = quill.root.innerHTML;
+    const element = document.createElement('div');
+    element.innerHTML = content;
+    element.className = 'p-6 font-inter text-base';
+    html2pdf()
+            .from(element)
+            .set({
+              margin: 1,
+              filename: `${documentTitle.value || 'Document'}_${new Date().toISOString().slice(0, 10)}.pdf`,
+              html2canvas: { scale: 2 },
+              jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            })
+            .save();
+  });
+
+  async function sendMessageToAI(message) {
+    try {
+      const doc = documents.find(d => d.id === currentDocumentId);
+      const context = doc ? `Document content: ${doc.versions[doc.versions.length - 1].content}\nChat history: ${JSON.stringify(doc.chatHistory)}` : '';
+      const fullPrompt = `${context}\nUser message: ${message}`;
+
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer xai-s5HQ5gNoPDyPp82gCG2dBFhp5r6cBn89w82jPjcc2492CPor5VsKfrofpl53K2H0dZaEtb1fqHKnVgya'
+        },
+        body: JSON.stringify({
+          model: 'grok-3',
+          messages: [
+            {
+              role: 'system',
+              content: 'Ești un asistent AI specializat în crearea și editarea de documente, inspirat de Notion AI. Generează documente profesionale (ex. contracte, orare, scrisori) în română, folosind markdown. Include conținutul documentului între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru cereri de adăugare (ex. „adaugă o secțiune”), generează conținut care se integrează cu documentul existent fără a-l înlocui. Pentru cereri de rescriere (ex. „rescrie acest paragraf”), înlocuiește doar conținutul specificat. Folosește istoricul conversației și conținutul documentului pentru a oferi răspunsuri relevante. Răspunde structurat și clar.'
+            },
+            { role: 'user', content: fullPrompt }
+          ],
+          stream: false,
+          temperature: 0.7,
+          max_tokens: 4096
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content || 'Îmi pare rău, nu am primit un răspuns de la AI.';
+    } catch (error) {
+      console.error('Error:', error);
+      return 'Eroare la conectarea cu API-ul xAI Grok. Cheia API poate fi invalidă sau serviciul indisponibil.';
+    }
+  }
+
+  // Adjust heights for mobile
+  window.addEventListener('resize', () => {
+    const height = window.innerWidth < 768 ? `${window.innerHeight - 400}px` : '300px';
+    chatBox.style.maxHeight = height;
+  });
+  window.dispatchEvent(new Event('resize'));
+
+  // Pomodoro Timer (Persistent)
+  let pomodoroState = JSON.parse(localStorage.getItem('pomodoroState')) || {
+    active: false,
+    paused: false,
+    time: 25 * 60,
+    isWorkSession: true,
+    lastUpdate: Date.now()
+  };
+  let pomodoroInterval = null;
+
+  function updatePomodoro() {
+    const now = Date.now();
+    const elapsed = (now - pomodoroState.lastUpdate) / 1000;
+    pomodoroState.time -= elapsed;
+    pomodoroState.lastUpdate = now;
+
+    if (pomodoroState.time <= 0) {
+      pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
+      pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
+      alert(`Timpul de ${pomodoroState.isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${pomodoroState.isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`);
+    }
+
+    localStorage.setItem('pomodoroState', JSON.stringify(pomodoroState));
+  }
+
+  if (pomodoroState.active && !pomodoroState.paused) {
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+  }
+
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', logout);
+</script>
+</body>
+</html>

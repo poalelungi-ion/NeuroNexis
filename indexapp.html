@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>AI Productivity Dashboard - NEURONEXIS</title>
+  <meta content="AI-powered productivity dashboard for tasks, reminders, and calendar management" name="description">
+  <meta content="AI, productivity, dashboard, NEURONEXIS" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#6B7280',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            background: '#F9FAFB',
+            card: '#FFFFFF',
+            soft: '#EDE9FE',
+          },
+          borderRadius: {
+            'xl': '12px',
+            '2xl': '16px',
+          },
+          animation: {
+            slideIn: 'slideIn 0.3s ease-in-out',
+            pulse: 'pulse 1s infinite',
+          },
+          keyframes: {
+            slideIn: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulse: {
+              '0%': { transform: 'scale(1)', opacity: '1' },
+              '100%': { transform: 'scale(2)', opacity: '0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .chat-box, .daily-overview, .tasks-reminders {
+      scrollbar-width: none;
+    }
+    .chat-box::-webkit-scrollbar, .daily-overview::-webkit-scrollbar, .tasks-reminders::-webkit-scrollbar {
+      display: none;
+    }
+    .message img, .overview-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .forced-colors\:bg-white {
+      background-color: white;
+    }
+    @media (forced-colors: active) {
+      .forced-colors\:bg-white {
+        background-color: Canvas;
+      }
+      .forced-colors\:text-black {
+        color: CanvasText;
+      }
+    }
+    .chat-box {
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
+    }
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #main {
+      padding-bottom: 80px;
+    }
+    section {
+      gap: 1rem;
+    }
+    /* Mobile-first approach: Hide non-chat sections */
+    @media (max-width: 1024px) {
+      #pomodoro-container, #daily-overview-container, #tasks-container, #recommendations-container {
+        display: none;
+      }
+      #pomodoro-toggle, #tasks-toggle, #recommendations-toggle {
+        display: block;
+      }
+    }
+    /* Desktop: Always show sections in 3-column layout */
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-3 {
+        grid-template-columns: 1fr 2fr 1fr;
+      }
+      #pomodoro-container, #daily-overview-container, #tasks-container, #recommendations-container {
+        display: block;
+      }
+      #pomodoro-toggle, #tasks-toggle, #recommendations-toggle {
+        display: none;
+      }
+    }
+    /* Mobile-specific adjustments */
+    @media (max-width: 640px) {
+      #main {
+        margin-top: 60px;
+        padding-bottom: 100px;
+      }
+      #header {
+        padding: 0.5rem 1rem;
+      }
+      #sidebar {
+        width: 75%;
+      }
+      .chat-box {
+        max-height: 50vh;
+      }
+      .daily-overview, .tasks-reminders {
+        max-height: 30vh;
+      }
+      .text-xs {
+        font-size: 0.875rem;
+      }
+      .p-2 {
+        padding: 0.75rem;
+      }
+      .py-1 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+      .px-2 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+      .rounded-full {
+        min-width: 44px;
+        min-height: 44px;
+      }
+      #input-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #input-form > *:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+      #lang-select, #user-input {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      #input-form button {
+        padding: 0.75rem;
+        width: 100%;
+        display: inline-flex;
+        justify-content: center;
+      }
+      #pomodoro-container, #tasks-container, #recommendations-container {
+        margin-top: 1rem;
+      }
+      .toggle-section {
+        margin-bottom: 0.5rem;
+      }
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 90%;
+      width: 400px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .modal-content h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .modal-content .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-gray-900 font-inter min-h-screen flex flex-col">
+<!-- ======= Header ======= -->
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm flex items-center justify-between px-2 py-2 md:px-6 md:py-3 w-full">
+  <div class="flex items-center">
+    <a href="index.html" class="flex items-center space-x-1">
+      <img src="assets/img/logo.png" alt="NEURONEXIS" class="h-6 md:h-8">
+      <span class="hidden md:block text-lg md:text-xl font-semibold text-primary">NEURONEXIS</span>
+    </a>
+    <button id="toggle-sidebar-btn" class="md:hidden ml-2 text-gray-600">
+      <i class="fas fa-bars text-lg md:text-xl"></i>
+    </button>
+  </div>
+  <nav class="flex items-center space-x-2">
+    <div class="relative hidden md:block">
+      <input type="text" id="search-input" placeholder="Search..." class="pl-8 pr-3 py-1 md:py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32 md:w-48">
+      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    </div>
+    <div class="relative">
+      <button class="flex items-center space-x-1" data-bs-toggle="dropdown">
+        <img id="header-profile-image" src="assets/img/profile-img.jpg" alt="Profile" class="h-6 md:h-8 w-6 md:w-8 rounded-full object-cover">
+        <span id="user-name" class="hidden md:block text-sm font-medium text-gray-700">Guest</span>
+      </button>
+      <ul class="dropdown-menu absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white rounded-xl shadow-lg py-1 hidden">
+        <li class="px-3 py-1">
+          <p id="user-fullname" class="font-semibold text-gray-800 text-xs md:text-sm">Guest</p>
+          <p id="user-role" class="text-xs md:text-sm text-gray-500">Guest User</p>
+        </li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-1 md:mr-2"></i> My Profile</a></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-1 md:mr-2"></i> Account Settings</a></li>
+        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-question-circle mr-1 md:mr-2"></i> Need Help?</a></li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="#" id="logout-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-danger hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-1 md:mr-2"></i> Sign Out</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="fixed top-0 left-0 w-48 md:w-64 h-full bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
+  <div class="flex items-center justify-between p-2 md:p-4 border-b">
+    <span class="text-lg md:text-xl font-semibold text-primary">Menu</span>
+    <button id="close-sidebar-btn" class="md:hidden text-gray-600">
+      <i class="fas fa-times text-lg md:text-xl"></i>
+    </button>
+  </div>
+  <ul class="py-2 md:py-4">
+    <li class="px-2 md:px-4 py-1 md:py-2">
+      <a href="index.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-tachometer-alt mr-1 md:mr-3"></i> Dashboard
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2">
+      <a href="document-editor.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-file-alt mr-1 md:mr-3"></i> Document Editor
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="login-nav">
+      <a href="pages-login.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-sign-in-alt mr-1 md:mr-3"></i> Login
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="register-nav">
+      <a href="pages-register.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-user-plus mr-1 md:mr-3"></i> Register
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="profile-nav" style="display: none;">
+      <a href="users-profile.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-user-circle mr-1 md:mr-3"></i> Profile
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="google-connect-nav">
+      <button id="signin-button" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2 w-full text-left">
+        <i class="fab fa-google mr-1 md:mr-3"></i> Connect with Google
+      </button>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="google-disconnect-nav" style="display: none;">
+      <button id="signout-button" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2 w-full text-left">
+        <i class="fas fa-sign-out-alt mr-1 md:mr-3"></i> Disconnect from Google
+      </button>
+    </li>
+  </ul>
+</aside>
+
+<!-- ======= Main Content ======= -->
+<main id="main" class="mt-12 md:mt-20 md:ml-64 p-0 flex-1">
+  <div class="p-2 md:p-4">
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">AI Productivity Dashboard</h1>
+    <nav class="mt-1 md:mt-2">
+      <ol class="flex space-x-1 md:space-x-2 text-xs md:text-sm text-gray-500">
+        <li><a href="index.html" class="hover:text-primary">Home</a></li>
+        <li>/</li>
+        <li class="text-primary">Dashboard</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Chatbot -->
+    <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
+      <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
+        <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
+          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Spune-mi „show emails” pentru a vedea e-mailurile recente, „show calendar” pentru evenimente, „start Pomodoro” pentru timer, sau „create a task” pentru a adăuga o sarcină. Cum te ajut astăzi?
+        </div>
+      </div>
+      <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
+      <form id="input-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
+        <select id="lang-select" class="bg-white border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0">
+          <option value="ro-RO">Română</option>
+          <option value="en-US">English</option>
+          <option value="ru-RU">Русский</option>
+          <option value="es-ES">Español</option>
+          <option value="fr-FR">Français</option>
+        </select>
+        <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-lg px-2 md:px-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+        <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple class="hidden">
+        <button type="button" id="upload-btn" title="Încarcă document" class="bg-accent text-white rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
+          <i class="fa fa-upload text-xs md:text-base"></i>
+        </button>
+        <button type="button" id="mic-btn" title="Vorbește mesajul tău" class="bg-success text-white rounded-full p-1 md:p-3 hover:bg-green-600 transition">
+          <i class="fa fa-microphone text-xs md:text-base"></i>
+        </button>
+        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-indigo-700 transition">
+          <i class="fa fa-paper-plane text-xs md:text-base"></i>
+        </button>
+      </form>
+      <div id="mobile-toggles" class="mt-2">
+        <button id="pomodoro-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Pomodoro Timer</button>
+        <button id="tasks-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Tasks & Reminders</button>
+        <button id="recommendations-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Recommendations</button>
+      </div>
+    </div>
+
+    <!-- Pomodoro Timer -->
+    <div id="pomodoro-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Pomodoro Timer</h2>
+      <div id="pomodoro-block" class="text-center flex flex-col justify-center">
+        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-gray-800 mb-2 md:mb-4">25:00</div>
+        <div id="pomodoro-session" class="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">Work Session</div>
+        <div class="flex justify-center space-x-1 md:space-x-2">
+          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
+          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
+          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Overview -->
+    <div id="daily-overview-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Overview</h2>
+      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
+    </div>
+
+    <!-- Tasks & Reminders -->
+    <div id="tasks-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Tasks & Reminders</h2>
+      <div id="tasks-reminders" class="tasks-reminders flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
+    </div>
+
+    <!-- Daily Recommendations -->
+    <div id="recommendations-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Recommendations</h2>
+      <div id="daily-recommendations" class="p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner flex-1">
+        <p>Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Task Edit Modal -->
+  <div id="task-edit-modal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Task</h2>
+      <input type="hidden" id="task-edit-id">
+      <input type="text" id="task-edit-name" placeholder="Task Name">
+      <input type="text" id="task-edit-description" placeholder="Task Description">
+      <input type="datetime-local" id="task-edit-deadline" placeholder="Deadline">
+      <div class="btn-group">
+        <button id="task-edit-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600">Cancel</button>
+        <button id="task-edit-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Save</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ======= Footer ======= -->
+<footer class="bg-white py-2 md:py-6 text-center text-gray-600 w-full">
+  <div class="text-xs md:text-sm">© Copyright <strong>NeuroNexis</strong>. All Rights Reserved</div>
+  <div class="text-xs md:text-sm">Designed by <a href="#" class="text-primary hover:underline">Poalelungi Consulting</a></div>
+</footer>
+
+<!-- Vendor JS Files -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="https://apis.google.com/js/api.js"></script>
+
+<!-- Template Main JS File -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/auth.js"></script>
+
+<!-- Chatbot and Productivity Logic -->
+<script>
+  // Configure pdf.js worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+  // Elements
+  const chatBox = document.getElementById('chat-box');
+  const form = document.getElementById('input-form');
+  const input = document.getElementById('user-input');
+  const fileInput = document.getElementById('file-input');
+  const uploadBtn = document.getElementById('upload-btn');
+  const typingIndicator = document.querySelector('.typing-indicator');
+  const micBtn = document.getElementById('mic-btn');
+  const langSelect = document.getElementById('lang-select');
+  const tasksReminders = document.getElementById('tasks-reminders');
+  const dailyRecommendations = document.getElementById('daily-recommendations');
+  const dailyOverview = document.getElementById('daily-overview');
+  const dailyOverviewContainer = document.getElementById('daily-overview-container');
+  const sidebar = document.getElementById('sidebar');
+  const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const pomodoroTimer = document.getElementById('pomodoro-timer');
+  const pomodoroSession = document.getElementById('pomodoro-session');
+  const pomodoroStartBtn = document.getElementById('pomodoro-start-btn');
+  const pomodoroPauseBtn = document.getElementById('pomodoro-pause-btn');
+  const pomodoroResetBtn = document.getElementById('pomodoro-reset-btn');
+  const pomodoroContainer = document.getElementById('pomodoro-container');
+  const tasksContainer = document.getElementById('tasks-container');
+  const recommendationsContainer = document.getElementById('recommendations-container');
+  const taskEditModal = document.getElementById('task-edit-modal');
+  const taskEditId = document.getElementById('task-edit-id');
+  const taskEditName = document.getElementById('task-edit-name');
+  const taskEditDescription = document.getElementById('task-edit-description');
+  const taskEditDeadline = document.getElementById('task-edit-deadline');
+  const taskEditSave = document.getElementById('task-edit-save');
+  const taskEditCancel = document.getElementById('task-edit-cancel');
+  const pomodoroToggle = document.getElementById('pomodoro-toggle');
+  const tasksToggle = document.getElementById('tasks-toggle');
+  const recommendationsToggle = document.getElementById('recommendations-toggle');
+  const signinButton = document.getElementById('signin-button');
+  const signoutButton = document.getElementById('signout-button');
+  const googleConnectNav = document.getElementById('google-connect-nav');
+  const googleDisconnectNav = document.getElementById('google-disconnect-nav');
+
+  // Language-specific placeholders
+  const placeholders = {
+    'en-US': { default: 'Type your message...', listening: 'Listening...' },
+    'ro-RO': { default: 'Tastează mesajul tău...', listening: 'Ascult...' },
+    'ru-RU': { default: 'Введите ваше сообщение...', listening: 'Слушаю...' },
+    'es-ES': { default: 'Escribe tu mensaje...', listening: 'Escuchando...' },
+    'fr-FR': { default: 'Tapez votre message...', listening: 'Écoute...' }
+  };
+
+  // In-memory store for tasks, reminders, emails, and events
+  let tasks = userData[currentUser]?.tasks || [];
+  let reminders = userData[currentUser]?.reminders || [];
+  let emails = userData[currentUser]?.emails || [];
+  let calendarEvents = userData[currentUser]?.calendarEvents || [];
+
+  // Track section visibility on mobile
+  let isPomodoroVisible = false;
+  let isTasksVisible = false;
+  let isRecommendationsVisible = false;
+
+  // Request notification permission
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
+
+  // Check authentication
+  if (!currentUser || !users[currentUser]) {
+    window.location.href = 'pages-login.html';
+  } else {
+    document.getElementById('login-nav').style.display = 'none';
+    document.getElementById('register-nav').style.display = 'none';
+    document.getElementById('profile-nav').style.display = 'block';
+    loadProfile();
+  }
+
+  // Google API Initialization
+  function handleClientLoad() {
+    gapi.load('client:auth2', initClient);
+  }
+
+  function initClient() {
+    gapi.client.init({
+      clientId: '906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com',
+      discoveryDocs: [
+        "https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest",
+        "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+      ],
+      scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar"
+    }).then(() => {
+      gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+      updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+      signinButton.onclick = () => gapi.auth2.getAuthInstance().signIn();
+      signoutButton.onclick = () => gapi.auth2.getAuthInstance().signOut();
+    }).catch(error => {
+      console.error('Google API initialization failed:', error);
+      addMessage('Eroare la inițializarea Google API. Verifică configurația client ID.', 'ai');
+    });
+  }
+
+  function updateSigninStatus(isSignedIn) {
+    if (isSignedIn) {
+      googleConnectNav.style.display = 'none';
+      googleDisconnectNav.style.display = 'block';
+      listMessages();
+      listEvents();
+    } else {
+      googleConnectNav.style.display = 'block';
+      googleDisconnectNav.style.display = 'none';
+      emails = [];
+      calendarEvents = [];
+      userData[currentUser].emails = emails;
+      userData[currentUser].calendarEvents = calendarEvents;
+      saveUserData();
+      generateDailyOverview();
+    }
+  }
+
+  function listMessages() {
+    gapi.client.gmail.users.messages.list({
+      'userId': 'me',
+      'maxResults': 10
+    }).then(response => {
+      const messages = response.result.messages;
+      if (messages && messages.length > 0) {
+        const promises = messages.map(message =>
+                gapi.client.gmail.users.messages.get({
+                  'userId': 'me',
+                  'id': message.id,
+                  'format': 'metadata'
+                })
+        );
+        Promise.all(promises).then(responses => {
+          emails = responses.map(resp => ({
+            id: resp.result.id,
+            payload: {
+              headers: resp.result.payload.headers
+            },
+            snippet: resp.result.snippet
+          }));
+          userData[currentUser].emails = emails;
+          saveUserData();
+          generateDailyOverview();
+        });
+      } else {
+        emails = [];
+        userData[currentUser].emails = emails;
+        saveUserData();
+        generateDailyOverview();
+        addMessage('Nu s-au găsit e-mailuri.', 'ai');
+      }
+    }).catch(error => {
+      console.error('Error fetching emails:', error);
+      addMessage('Eroare la preluarea e-mailurilor.', 'ai');
+    });
+  }
+
+  function listEvents() {
+    gapi.client.calendar.events.list({
+      'calendarId': 'primary',
+      'timeMin': (new Date()).toISOString(),
+      'showDeleted': false,
+      'singleEvents': true,
+      'maxResults': 10,
+      'orderBy': 'startTime'
+    }).then(response => {
+      const events = response.result.items;
+      if (events && events.length > 0) {
+        calendarEvents = events.map(event => ({
+          summary: event.summary,
+          start: { dateTime: event.start.dateTime || event.start.date },
+          end: { dateTime: event.end.dateTime || event.end.date }
+        }));
+        userData[currentUser].calendarEvents = calendarEvents;
+        saveUserData();
+        generateDailyOverview();
+      } else {
+        calendarEvents = [];
+        userData[currentUser].calendarEvents = calendarEvents;
+        saveUserData();
+        generateDailyOverview();
+        addMessage('Nu s-au găsit evenimente viitoare.', 'ai');
+      }
+    }).catch(error => {
+      console.error('Error fetching events:', error);
+      addMessage('Eroare la preluarea evenimentelor.', 'ai');
+    });
+  }
+
+  // Load profile data
+  function loadProfile() {
+    const user = users[currentUser];
+    if (user) {
+      document.getElementById('user-name').textContent = currentUser;
+      document.getElementById('user-fullname').textContent = user.name || currentUser;
+      document.getElementById('user-role').textContent = user.email;
+      const profileImage = user.profileImage || 'assets/img/profile-img.jpg';
+      document.getElementById('header-profile-image').src = profileImage;
+    }
+    renderTasksReminders();
+    generateDailyOverview();
+    generateDailyRecommendations();
+    scheduleWorkReminder();
+    // Initialize Google API
+    handleClientLoad();
+  }
+
+  // Sidebar toggle
+  toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+  closeSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+  });
+
+  // Dropdown toggle
+  document.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', () => {
+    const dropdown = document.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('hidden');
+  });
+
+  // Toggle sections on mobile
+  pomodoroToggle.addEventListener('click', () => {
+    isPomodoroVisible = !isPomodoroVisible;
+    pomodoroContainer.style.display = isPomodoroVisible ? 'block' : 'none';
+    pomodoroToggle.textContent = isPomodoroVisible ? 'Hide Pomodoro Timer' : 'Show Pomodoro Timer';
+  });
+
+  tasksToggle.addEventListener('click', () => {
+    isTasksVisible = !isTasksVisible;
+    tasksContainer.style.display = isTasksVisible ? 'block' : 'none';
+    tasksToggle.textContent = isTasksVisible ? 'Hide Tasks & Reminders' : 'Show Tasks & Reminders';
+  });
+
+  recommendationsToggle.addEventListener('click', () => {
+    isRecommendationsVisible = !isRecommendationsVisible;
+    recommendationsContainer.style.display = isRecommendationsVisible ? 'block' : 'none';
+    recommendationsToggle.textContent = isRecommendationsVisible ? 'Hide Recommendations' : 'Show Recommendations';
+  });
+
+  // Pomodoro Timer
+  let pomodoroState = JSON.parse(localStorage.getItem('pomodoroState')) || {
+    active: false,
+    paused: false,
+    time: 25 * 60,
+    isWorkSession: true,
+    lastUpdate: Date.now()
+  };
+  let pomodoroInterval = null;
+
+  function updatePomodoroDisplay() {
+    const minutes = Math.floor(pomodoroState.time / 60);
+    const seconds = Math.floor(pomodoroState.time % 60);
+    pomodoroTimer.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    pomodoroSession.textContent = pomodoroState.isWorkSession ? 'Work Session' : 'Break Session';
+    pomodoroStartBtn.classList.toggle('hidden', pomodoroState.active && !pomodoroState.paused);
+    pomodoroPauseBtn.classList.toggle('hidden', !pomodoroState.active || pomodoroState.paused);
+  }
+
+  function savePomodoroState() {
+    localStorage.setItem('pomodoroState', JSON.stringify(pomodoroState));
+  }
+
+  function startPomodoro() {
+    if (pomodoroState.active && !pomodoroState.paused) return;
+    pomodoroState.active = true;
+    pomodoroState.paused = false;
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+    updatePomodoroDisplay();
+    savePomodoroState();
+    if (window.innerWidth <= 1024) {
+      pomodoroToggle.classList.remove('hidden');
+      if (!isPomodoroVisible) {
+        isPomodoroVisible = true;
+        pomodoroContainer.style.display = 'block';
+        pomodoroToggle.textContent = 'Hide Pomodoro Timer';
+      }
+    }
+  }
+
+  function pausePomodoro() {
+    pomodoroState.paused = true;
+    clearInterval(pomodoroInterval);
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function resetPomodoro() {
+    clearInterval(pomodoroInterval);
+    pomodoroState = {
+      active: false,
+      paused: false,
+      time: 25 * 60,
+      isWorkSession: true,
+      lastUpdate: Date.now()
+    };
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function updatePomodoro() {
+    const now = Date.now();
+    const elapsed = (now - pomodoroState.lastUpdate) / 1000;
+    pomodoroState.time -= elapsed;
+    pomodoroState.lastUpdate = now;
+
+    if (pomodoroState.time <= 0) {
+      pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
+      pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
+      addMessage(`Timpul de ${pomodoroState.isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${pomodoroState.isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`, 'ai');
+      if (!pomodoroState.isWorkSession) {
+        scheduleWorkReminder();
+      }
+    }
+
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  pomodoroStartBtn.addEventListener('click', startPomodoro);
+  pomodoroPauseBtn.addEventListener('click', pausePomodoro);
+  pomodoroResetBtn.addEventListener('click', resetPomodoro);
+
+  // Initialize Pomodoro
+  if (pomodoroState.active && !pomodoroState.paused) {
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+  }
+  updatePomodoroDisplay();
+
+  // AI-driven work reminder
+  async function scheduleWorkReminder() {
+    const delay = Math.random() * (30 - 5) + 5; // Random delay between 5 and 30 minutes
+    setTimeout(async () => {
+      if (Notification.permission === 'granted') {
+        new Notification('E timpul să lucrezi!', {
+          body: 'AI-ul tău te îndeamnă să te apuci de lucru. Hai să finalizăm sarcinile!',
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage('E timpul să lucrezi! Hai să ne apucăm de treabă.', 'ai');
+      await scheduleNextReminder();
+    }, delay * 60 * 1000);
+  }
+
+  // AI decides next reminder based on tasks
+  async function scheduleNextReminder() {
+    const now = new Date();
+    const pendingTasks = tasks.filter(task => !task.completed && task.deadline);
+    if (pendingTasks.length === 0) {
+      setTimeout(scheduleWorkReminder, 60 * 60 * 1000); // Default to 1 hour if no tasks
+      return;
+    }
+
+    pendingTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    const nearestDeadline = new Date(pendingTasks[0].deadline);
+    const timeToDeadline = (nearestDeadline - now) / (1000 * 60); // Minutes to deadline
+
+    let nextReminderDelay;
+    if (timeToDeadline <= 30) {
+      nextReminderDelay = timeToDeadline / 2; // Remind halfway to deadline
+    } else if (timeToDeadline <= 60) {
+      nextReminderDelay = 30; // Remind 30 minutes before
+    } else {
+      nextReminderDelay = 60; // Remind 1 hour before
+    }
+
+    setTimeout(async () => {
+      const task = pendingTasks[0];
+      if (Notification.permission === 'granted') {
+        new Notification(`Memento sarcină: ${task.name}`, {
+          body: `Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`,
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage(`Memento: Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`, 'ai');
+      await scheduleNextReminder();
+    }, nextReminderDelay * 60 * 1000);
+  }
+
+  // Task and Reminder Management
+  async function addTask(name, description, deadline) {
+    console.log('Adding task:', { name, description, deadline });
+    const task = { id: Date.now(), name, description, deadline, completed: false };
+    tasks.push(task);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
+    console.log('Tasks after adding:', tasks);
+    renderTasksReminders();
+    if (deadline && !isNaN(new Date(deadline).getTime())) {
+      console.log('Adding reminder for task:', name, 'with deadline:', deadline);
+      await addReminder(`Task: ${name}`, deadline);
+    }
+    generateDailyOverview();
+    if (window.innerWidth <= 1024) {
+      tasksToggle.classList.remove('hidden');
+      if (!isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      }
+    }
+    return task; // Return the created task for confirmation
+  }
+
+  async function addReminder(description, deadline) {
+    console.log('Adding reminder:', { description, deadline });
+    const reminder = { id: Date.now(), description, deadline, notified: false };
+    reminders.push(reminder);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
+    console.log('Reminders after adding:', reminders);
+    renderTasksReminders();
+    checkReminders();
+    generateDailyOverview();
+    return reminder; // Return the created reminder for confirmation
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
+    renderTasksReminders();
+    generateDailyOverview();
+    scheduleNextReminder();
+  }
+
+  function deleteReminder(id) {
+    reminders = reminders.filter(reminder => reminder.id !== id);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
+    renderTasksReminders();
+    generateDailyOverview();
+  }
+
+  async function toggleTaskCompletion(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      if (task.completed) {
+        const feedback = await sendMessageToAI(`Generează feedback pentru sarcina completată: ${task.name} - ${task.description}`);
+        addMessage(`Feedback AI: ${feedback}`, 'ai');
+        if (Notification.permission === 'granted') {
+          new Notification('Sarcină completată!', {
+            body: `Ai finalizat "${task.name}". Feedback: ${feedback}`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
+      }
+    }
+  }
+
+  function editTask(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      taskEditId.value = task.id;
+      taskEditName.value = task.name;
+      taskEditDescription.value = task.description;
+      taskEditDeadline.value = task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '';
+      taskEditModal.style.display = 'flex';
+    }
+  }
+
+  taskEditSave.addEventListener('click', async () => {
+    const id = parseInt(taskEditId.value);
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.name = taskEditName.value.trim();
+      task.description = taskEditDescription.value.trim();
+      task.deadline = taskEditDeadline.value ? new Date(taskEditDeadline.value) : null;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      taskEditModal.style.display = 'none';
+      await scheduleNextReminder();
+    }
+  });
+
+  taskEditCancel.addEventListener('click', () => {
+    taskEditModal.style.display = 'none';
+  });
+
+  function renderTasksReminders() {
+    console.log('Rendering tasks and reminders:', { tasks, reminders });
+    tasksReminders.innerHTML = '';
+    // Render tasks
+    if (tasks.length > 0) {
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.className = `flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2 ${task.completed ? 'bg-green-50 line-through' : ''}`;
+        div.innerHTML = `
+          <span class="flex items-center text-xs md:text-sm">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})" class="mr-1 md:mr-2">
+            ${task.name}: ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}
+          </span>
+          <div class="flex space-x-2">
+            <i class="fa fa-edit text-primary cursor-pointer text-xs md:text-sm" onclick="editTask(${task.id})"></i>
+            <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteTask(${task.id})"></i>
+          </div>
+        `;
+        tasksReminders.appendChild(div);
+      });
+    }
+    // Render reminders
+    if (reminders.length > 0) {
+      reminders.forEach(reminder => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+          <span class="text-xs md:text-sm">${reminder.description} (${new Date(reminder.deadline).toLocaleString()})</span>
+          <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteReminder(${reminder.id})"></i>
+        `;
+        tasksReminders.appendChild(div);
+      });
+    }
+    // Update mobile visibility
+    if (window.innerWidth <= 1024) {
+      const hasItems = tasks.length > 0 || reminders.length > 0;
+      tasksToggle.classList.toggle('hidden', !hasItems);
+      if (hasItems && !isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      } else if (!hasItems && isTasksVisible) {
+        isTasksVisible = false;
+        tasksContainer.style.display = 'none';
+        tasksToggle.textContent = 'Show Tasks & Reminders';
+      }
+    }
+  }
+
+  function checkReminders() {
+    const now = new Date();
+    reminders.forEach(reminder => {
+      const deadline = new Date(reminder.deadline);
+      if (deadline <= now && !reminder.notified) {
+        if (Notification.permission === 'granted') {
+          new Notification('Memento!', {
+            body: `Memento: ${reminder.description} este scadent acum!`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
+        addMessage(`Memento: ${reminder.description} este scadent acum!`, 'ai');
+        reminder.notified = true;
+        userData[currentUser].reminders = reminders;
+        saveUserData();
+      }
+    });
+  }
+
+  setInterval(checkReminders, 60000);
+
+  function generateDailyOverview() {
+    const today = new Date();
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    dailyOverview.innerHTML = '';
+
+    // Google Emails
+    if (emails.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      let emailHtml = '<h4 class="font-semibold text-gray-800 text-xs md:text-sm">E-mailuri recente</h4><ul class="list-disc pl-3 md:pl-5">';
+      emails.forEach(email => {
+        const from = email.payload?.headers.find(h => h.name === 'From')?.value || 'Unknown';
+        const subject = email.payload?.headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+        const snippet = email.snippet?.substring(0, 100) + (email.snippet?.length > 100 ? '...' : '') || '';
+        const taskSuggestion = `Răspunde la e-mailul de la ${from}: ${subject}`;
+        emailHtml += `
+          <li class="text-xs md:text-sm">
+            <strong>De la:</strong> ${from}<br>
+            <strong>Subiect:</strong> ${subject}<br>
+            <span>${snippet}</span><br>
+            <button onclick="addTask('${taskSuggestion}', 'Răspunde la e-mail', null); generateDailyOverview();" class="bg-primary text-white rounded-lg px-2 md:px-3 py-1 mt-1 hover:bg-indigo-700 text-xs">Adaugă ca sarcină</button>
+          </li>`;
+      });
+      emailHtml += '</ul>';
+      div.innerHTML = emailHtml;
+      dailyOverview.appendChild(div);
+    }
+
+    // Google Calendar Events
+    if (calendarEvents.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente viitoare</h4><ul class="list-disc pl-3 md:pl-5">${calendarEvents.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleString()})</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    // Tasks
+    if (pendingTasks.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Sarcini pendinte</h4><ul class="list-disc pl-3 md:pl-5">${pendingTasks.map(t => `<li class="text-xs md:text-sm">${t.name}: ${t.description} ${t.deadline ? `(${new Date(t.deadline).toLocaleString()})` : ''}</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    dailyOverviewContainer.classList.toggle('hidden', !emails.length && !calendarEvents.length && !pendingTasks.length);
+  }
+
+  function generateDailyRecommendations() {
+    const today = new Date();
+    const recommendations = ['Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!'];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    if (pendingTasks.length > 0) {
+      pendingTasks.sort((a, b) => new Date(a.deadline || Infinity) - new Date(b.deadline || Infinity));
+      recommendations.push('**Priorități de astăzi:**');
+      pendingTasks.slice(0, 3).forEach(task => {
+        recommendations.push(`- ${task.name}: ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
+      });
+    }
+    if (emails.length > 0) {
+      recommendations.push('- Verifică e-mailurile recente și prioritizează răspunsurile.');
+    }
+    if (calendarEvents.length > 0) {
+      recommendations.push('- Pregătește-te pentru evenimentele viitoare din calendar.');
+    }
+    dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
+    if (window.innerWidth <= 1024) {
+      recommendationsToggle.classList.toggle('hidden', pendingTasks.length === 0 && emails.length === 0 && calendarEvents.length === 0);
+      if ((pendingTasks.length > 0 || emails.length > 0 || calendarEvents.length > 0) && !isRecommendationsVisible) {
+        isRecommendationsVisible = true;
+        recommendationsContainer.style.display = 'block';
+        recommendationsToggle.textContent = 'Hide Recommendations';
+      }
+    }
+  }
+
+  // Voice Recognition Setup
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = langSelect.value;
+
+    let finalTranscript = '';
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript = transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      input.value = finalTranscript + interimTranscript;
+    };
+
+    recognition.onstart = () => {
+      micBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+      input.placeholder = placeholders[langSelect.value].listening;
+    };
+
+    recognition.onend = () => {
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
+      input.placeholder = placeholders[langSelect.value].default;
+      if (finalTranscript.trim()) {
+        form.dispatchEvent(new Event('submit'));
+      }
+      finalTranscript = '';
+    };
+
+    recognition.onerror = (event) => {
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
+      input.placeholder = placeholders[langSelect.value].default;
+      console.error('Speech recognition error:', event.error);
+      addMessage('Eroare la intrarea vocală. Te rog încearcă din nou.', 'ai');
+    };
+
+    micBtn.addEventListener('click', () => {
+      if (!micBtn.classList.contains('bg-red-500')) {
+        finalTranscript = '';
+        recognition.lang = langSelect.value;
+        recognition.start();
+      } else {
+        recognition.stop();
+      }
+    });
+
+    langSelect.addEventListener('change', () => {
+      input.placeholder = placeholders[langSelect.value].default;
+    });
+  } else {
+    micBtn.style.display = 'none';
+    langSelect.style.display = 'none';
+  }
+
+  // File Upload Handling
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const files = fileInput.files;
+    if (files.length === 0) return;
+
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    let fileContents = [];
+    for (const file of files) {
+      let content;
+      if (file.type === 'application/pdf') {
+        content = await extractTextFromPDF(file);
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        content = await extractTextFromDocx(file);
+      } else {
+        content = await readFile(file);
+      }
+      fileContents.push(`**${file.name}**\n${content}`);
+      addMessage(`Încărcat: ${file.name}`, 'user');
+    }
+
+    const message = input.value.trim() || 'Analizează documentele încărcate.';
+    const combinedMessage = `${message}\n\n${fileContents.join('\n\n')}`;
+    const aiResponse = await sendMessageToAI(combinedMessage);
+    typingIndicator.classList.add('hidden');
+    addMessage(aiResponse, 'ai', true);
+    fileInput.value = '';
+  });
+
+  async function readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Eroare la citirea fișierului'));
+      reader.readAsText(file);
+    });
+  }
+
+  async function extractTextFromPDF(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        text += textContent.items.map(item => item.str).join(' ') + '\n';
+      }
+      return text;
+    } catch (error) {
+      console.error('Error extracting PDF text:', error);
+      return 'Eroare la extragerea textului din PDF.';
+    }
+  }
+
+  async function extractTextFromDocx(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { value } = await mammoth.extractRawText({ arrayBuffer });
+      return value;
+    } catch (error) {
+      console.error('Error extracting DOCX text:', error);
+      return 'Eroare la extragerea textului din DOCX.';
+    }
+  }
+
+  // Form Submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim().toLowerCase();
+    if (!message) return;
+
+    addMessage(input.value, 'user');
+    input.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    userData[currentUser].chats = userData[currentUser].chats || [];
+    userData[currentUser].chats.push({ type: 'user', text: message });
+    saveUserData();
+
+    // Check for document creation requests
+    if (message.includes('creează document') || message.includes('create document') ||
+            message.includes('contract') || message.includes('orar') ||
+            message.includes('schedule') || message.includes('excel')) {
+      addMessage('Redirecționez către editorul de documente pentru a crea documentul solicitat.', 'ai');
+      setTimeout(() => {
+        window.location.href = `document-editor.html?query=${encodeURIComponent(message)}`;
+      }, 1000);
+      typingIndicator.classList.add('hidden');
+      return;
+    }
+
+    // Google-related commands
+    if (message.includes('show emails') || message.includes('arată e-mailuri')) {
+      if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+        listMessages();
+        addMessage('E-mailurile recente au fost actualizate în secțiunea „Daily Overview”.', 'ai');
+      } else {
+        addMessage('Te rog conectează-te cu Google pentru a vedea e-mailurile.', 'ai');
+      }
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('show calendar') || message.includes('arată calendar')) {
+      if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+        listEvents();
+        addMessage('Evenimentele viitoare au fost actualizate în secțiunea „Daily Overview”.', 'ai');
+      } else {
+        addMessage('Te rog conectează-te cu Google pentru a vedea calendarul.', 'ai');
+      }
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('start pomodoro')) {
+      startPomodoro();
+      addMessage('Pomodoro timer a fost pornit! Te rog apasă „Start” pentru a începe.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('create a task') || message.includes('add task') || message.includes('adaugă sarcină') || message.includes('creaza un task')) {
+      typingIndicator.classList.remove('hidden');
+      try {
+        const aiResponse = await sendMessageToAI(`Generează un nume și o descriere pentru o sarcină bazată pe: "${message}". Returnează sub forma: **Nume:** [nume]\n**Descriere:** [descriere]\n**Dată limită (opțional):** [data limită sau "fără dată limită"]`);
+        typingIndicator.classList.add('hidden');
+
+        // Improved parsing with fallback
+        let name = 'Default Task';
+        let description = 'No description provided';
+        let deadline = null;
+
+        const nameMatch = aiResponse.match(/\*\*Nume:\*\* (.*?)(?=\n|$)/);
+        const descMatch = aiResponse.match(/\*\*Descriere:\*\* (.*?)(?=\n|$)/);
+        const deadlineMatch = aiResponse.match(/\*\*Dată limită \(opțional\):\*\* (.*?)(?=\n|$)/);
+
+        if (nameMatch) name = nameMatch[1].trim();
+        if (descMatch) description = descMatch[1].trim();
+        if (deadlineMatch && deadlineMatch[1] !== 'fără dată limită') {
+          const parsedDeadline = new Date(deadlineMatch[1]);
+          if (!isNaN(parsedDeadline.getTime())) deadline = parsedDeadline;
+        }
+
+        const task = await addTask(name, description, deadline);
+        let confirmationMessage = `Sarcină adăugată: ${task.name}: ${task.description}`;
+        if (task.deadline) {
+          confirmationMessage += ` (scadent: ${new Date(task.deadline).toLocaleString()})`;
+        }
+        addMessage(confirmationMessage, 'ai');
+      } catch (error) {
+        typingIndicator.classList.add('hidden');
+        addMessage('Eroare la generarea sarcinii. Te rog încearcă din nou.', 'ai');
+        console.error('Task creation error:', error);
+      }
+    } else if (message.includes('show recommendations')) {
+      generateDailyRecommendations();
+      addMessage('Recomandările zilnice au fost afișate.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('adaugă memento') || message.includes('reminder')) {
+      const parts = message.split('la');
+      const description = parts[0].replace(/adaugă memento|reminder/i, '').trim();
+      const deadline = parts[1] ? new Date(parts[1].trim()) : null;
+      if (description && deadline && !isNaN(deadline.getTime())) {
+        const reminder = await addReminder(description, deadline);
+        addMessage(`Memento adăugat: ${reminder.description} la ${new Date(reminder.deadline).toLocaleString()}`, 'ai');
+      } else {
+        addMessage('Eroare la adăugarea mementoului. Te rog specifică o dată validă.', 'ai');
+      }
+      typingIndicator.classList.add('hidden');
+    } else {
+      const aiResponse = await sendMessageToAI(message);
+      typingIndicator.classList.add('hidden');
+      addMessage(aiResponse, 'ai', true);
+      userData[currentUser].chats.push({ type: 'ai', text: aiResponse });
+      saveUserData();
+    }
+
+    generateDailyRecommendations();
+    generateDailyOverview();
+  });
+
+  function addMessage(text, type, isDocument = false) {
+    const div = document.createElement('div');
+    div.className = `message ${type} p-1 md:p-3 rounded-lg max-w-[70%] ${type === 'user' ? 'bg-primary text-white ml-auto rounded-br-none' : 'bg-soft text-gray-800 rounded-bl-none'} animate-slideIn shadow-sm`;
+
+    let generalContent = text;
+    let documentContent = '';
+    const documentMarker = '===DOCUMENT===';
+    const documentEndMarker = '===END_DOCUMENT===';
+    if (isDocument && text.includes(documentMarker)) {
+      const startIdx = text.indexOf(documentMarker) + documentMarker.length;
+      const endIdx = text.includes(documentEndMarker) ? text.indexOf(documentEndMarker) : text.length;
+      documentContent = text.slice(startIdx, endIdx).trim();
+      generalContent = text.slice(0, startIdx - documentMarker.length).trim() + text.slice(endIdx + documentEndMarker.length).trim();
+      div.classList.add('border-2', 'border-primary');
+    }
+
+    if (generalContent) {
+      const renderedHtml = marked.parse(generalContent);
+      const contentDiv = document.createElement('div');
+      contentDiv.innerHTML = renderedHtml;
+      contentDiv.className = 'prose prose-sm max-w-none text-xs md:text-sm';
+      div.appendChild(contentDiv);
+    }
+
+    if (documentContent && type === 'ai') {
+      const openBtn = document.createElement('button');
+      openBtn.className = 'mt-1 md:mt-2 bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 hover:bg-indigo-700 flex items-center text-xs md:text-sm';
+      openBtn.innerHTML = '<i class="fas fa-file-alt mr-1 md:mr-2"></i>Deschide în Editorul de Documente';
+      openBtn.addEventListener('click', () => {
+        window.location.href = `document-editor.html?content=${encodeURIComponent(documentContent)}`;
+      });
+      div.appendChild(openBtn);
+    }
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  async function sendMessageToAI(message) {
+    try {
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer xai-zMvQxdd7vj7ZG2yUDm02rSnPLvXNyb0HW6YKIgRocaXDbuQYDHy6uVriyGfb2XuclJ2nB0Rzg8RVZnuj'
+        },
+        body: JSON.stringify({
+          model: 'grok-3',
+          messages: [
+            {
+              role: 'system',
+              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului.'
+            },
+            { role: 'user', content: message }
+          ],
+          stream: false,
+          temperature: 0.7,
+          max_tokens: 4096
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content || 'Îmi pare rău, nu am primit un răspuns de la AI.';
+    } catch (error) {
+      console.error('Error:', error);
+      return 'Eroare la conectarea cu API-ul xAI Grok. Cheia API poate fi invalidă sau serviciul indisponibil.';
+    }
+  }
+
+  // Adjust heights for mobile
+  window.addEventListener('resize', () => {
+    const height = window.innerHeight - (document.getElementById('header').offsetHeight + document.querySelector('footer').offsetHeight + 20);
+    chatBox.style.maxHeight = `${height * 0.6}px`;
+    dailyOverview.style.maxHeight = `${height * 0.6}px`;
+    tasksReminders.style.maxHeight = `${height * 0.4}px`;
+  });
+  window.dispatchEvent(new Event('resize'));
+
+  // Set initial placeholder
+  input.placeholder = placeholders[langSelect.value].default;
+
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', logout);
+</script>
+</body>
+</html>
