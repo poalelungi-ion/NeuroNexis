@@ -290,16 +290,6 @@
         <i class="fas fa-user-circle mr-1 md:mr-3"></i> Profile
       </a>
     </li>
-    <li class="px-2 md:px-4 py-1 md:py-2" id="google-connect-nav">
-      <button id="signin-button" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2 w-full text-left">
-        <i class="fab fa-google mr-1 md:mr-3"></i> Connect with Google
-      </button>
-    </li>
-    <li class="px-2 md:px-4 py-1 md:py-2" id="google-disconnect-nav" style="display: none;">
-      <button id="signout-button" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2 w-full text-left">
-        <i class="fas fa-sign-out-alt mr-1 md:mr-3"></i> Disconnect from Google
-      </button>
-    </li>
   </ul>
 </aside>
 
@@ -322,7 +312,7 @@
       <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
       <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
         <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
-          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Spune-mi „show emails” pentru a vedea e-mailurile recente, „show calendar” pentru evenimente, „start Pomodoro” pentru timer, sau „create a task” pentru a adăuga o sarcină. Cum te ajut astăzi?
+          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Spune-mi „start Pomodoro” pentru a începe un timer, „create a task” pentru a adăuga o sarcină, sau „show recommendations” pentru sfaturi. Cum te ajut astăzi?
         </div>
       </div>
       <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
@@ -418,7 +408,6 @@
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-<script src="https://apis.google.com/js/api.js"></script>
 
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
@@ -463,10 +452,6 @@
   const pomodoroToggle = document.getElementById('pomodoro-toggle');
   const tasksToggle = document.getElementById('tasks-toggle');
   const recommendationsToggle = document.getElementById('recommendations-toggle');
-  const signinButton = document.getElementById('signin-button');
-  const signoutButton = document.getElementById('signout-button');
-  const googleConnectNav = document.getElementById('google-connect-nav');
-  const googleDisconnectNav = document.getElementById('google-disconnect-nav');
 
   // Language-specific placeholders
   const placeholders = {
@@ -477,11 +462,9 @@
     'fr-FR': { default: 'Tapez votre message...', listening: 'Écoute...' }
   };
 
-  // In-memory store for tasks, reminders, emails, and events
+  // In-memory store for tasks and reminders
   let tasks = userData[currentUser]?.tasks || [];
   let reminders = userData[currentUser]?.reminders || [];
-  let emails = userData[currentUser]?.emails || [];
-  let calendarEvents = userData[currentUser]?.calendarEvents || [];
 
   // Track section visibility on mobile
   let isPomodoroVisible = false;
@@ -503,119 +486,6 @@
     loadProfile();
   }
 
-  // Google API Initialization
-  function handleClientLoad() {
-    gapi.load('client:auth2', initClient);
-  }
-
-  function initClient() {
-    gapi.client.init({
-      clientId: '906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com',
-      discoveryDocs: [
-        "https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest",
-        "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
-      ],
-      scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar"
-    }).then(() => {
-      gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-      updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-      signinButton.onclick = () => gapi.auth2.getAuthInstance().signIn();
-      signoutButton.onclick = () => gapi.auth2.getAuthInstance().signOut();
-    }).catch(error => {
-      console.error('Google API initialization failed:', error);
-      addMessage('Eroare la inițializarea Google API. Verifică configurația client ID.', 'ai');
-    });
-  }
-
-  function updateSigninStatus(isSignedIn) {
-    if (isSignedIn) {
-      googleConnectNav.style.display = 'none';
-      googleDisconnectNav.style.display = 'block';
-      listMessages();
-      listEvents();
-    } else {
-      googleConnectNav.style.display = 'block';
-      googleDisconnectNav.style.display = 'none';
-      emails = [];
-      calendarEvents = [];
-      userData[currentUser].emails = emails;
-      userData[currentUser].calendarEvents = calendarEvents;
-      saveUserData();
-      generateDailyOverview();
-    }
-  }
-
-  function listMessages() {
-    gapi.client.gmail.users.messages.list({
-      'userId': 'me',
-      'maxResults': 10
-    }).then(response => {
-      const messages = response.result.messages;
-      if (messages && messages.length > 0) {
-        const promises = messages.map(message =>
-                gapi.client.gmail.users.messages.get({
-                  'userId': 'me',
-                  'id': message.id,
-                  'format': 'metadata'
-                })
-        );
-        Promise.all(promises).then(responses => {
-          emails = responses.map(resp => ({
-            id: resp.result.id,
-            payload: {
-              headers: resp.result.payload.headers
-            },
-            snippet: resp.result.snippet
-          }));
-          userData[currentUser].emails = emails;
-          saveUserData();
-          generateDailyOverview();
-        });
-      } else {
-        emails = [];
-        userData[currentUser].emails = emails;
-        saveUserData();
-        generateDailyOverview();
-        addMessage('Nu s-au găsit e-mailuri.', 'ai');
-      }
-    }).catch(error => {
-      console.error('Error fetching emails:', error);
-      addMessage('Eroare la preluarea e-mailurilor.', 'ai');
-    });
-  }
-
-  function listEvents() {
-    gapi.client.calendar.events.list({
-      'calendarId': 'primary',
-      'timeMin': (new Date()).toISOString(),
-      'showDeleted': false,
-      'singleEvents': true,
-      'maxResults': 10,
-      'orderBy': 'startTime'
-    }).then(response => {
-      const events = response.result.items;
-      if (events && events.length > 0) {
-        calendarEvents = events.map(event => ({
-          summary: event.summary,
-          start: { dateTime: event.start.dateTime || event.start.date },
-          end: { dateTime: event.end.dateTime || event.end.date }
-        }));
-        userData[currentUser].calendarEvents = calendarEvents;
-        saveUserData();
-        generateDailyOverview();
-      } else {
-        calendarEvents = [];
-        userData[currentUser].calendarEvents = calendarEvents;
-        saveUserData();
-        generateDailyOverview();
-        addMessage('Nu s-au găsit evenimente viitoare.', 'ai');
-      }
-    }).catch(error => {
-      console.error('Error fetching events:', error);
-      addMessage('Eroare la preluarea evenimentelor.', 'ai');
-    });
-  }
-
   // Load profile data
   function loadProfile() {
     const user = users[currentUser];
@@ -630,8 +500,6 @@
     generateDailyOverview();
     generateDailyRecommendations();
     scheduleWorkReminder();
-    // Initialize Google API
-    handleClientLoad();
   }
 
   // Sidebar toggle
@@ -987,41 +855,36 @@
 
   function generateDailyOverview() {
     const today = new Date();
+    const emails = userData[currentUser].emails || [];
+    const events = userData[currentUser].calendarEvents || [];
     const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
     dailyOverview.innerHTML = '';
 
-    // Google Emails
-    if (emails.length > 0) {
+    if (events.length > 0) {
       const div = document.createElement('div');
       div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
-      let emailHtml = '<h4 class="font-semibold text-gray-800 text-xs md:text-sm">E-mailuri recente</h4><ul class="list-disc pl-3 md:pl-5">';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente de astăzi</h4><ul class="list-disc pl-3 md:pl-5">${events.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleTimeString()} - ${new Date(e.end.dateTime).toLocaleTimeString()})</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    if (emails.length > 0) {
       emails.forEach(email => {
         const from = email.payload?.headers.find(h => h.name === 'From')?.value || 'Unknown';
         const subject = email.payload?.headers.find(h => h.name === 'Subject')?.value || 'No Subject';
         const snippet = email.snippet?.substring(0, 100) + (email.snippet?.length > 100 ? '...' : '') || '';
         const taskSuggestion = `Răspunde la e-mailul de la ${from}: ${subject}`;
-        emailHtml += `
-          <li class="text-xs md:text-sm">
-            <strong>De la:</strong> ${from}<br>
-            <strong>Subiect:</strong> ${subject}<br>
-            <span>${snippet}</span><br>
-            <button onclick="addTask('${taskSuggestion}', 'Răspunde la e-mail', null); generateDailyOverview();" class="bg-primary text-white rounded-lg px-2 md:px-3 py-1 mt-1 hover:bg-indigo-700 text-xs">Adaugă ca sarcină</button>
-          </li>`;
+        const div = document.createElement('div');
+        div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+            <p class="text-xs md:text-sm"><strong>De la:</strong> ${from}</p>
+            <p class="text-xs md:text-sm"><strong>Subiect:</strong> ${subject}</p>
+            <p class="text-xs md:text-sm">${snippet}</p>
+            <button onclick="addTask('${taskSuggestion}', null); generateDailyOverview();" class="bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 mt-1 md:mt-2 hover:bg-indigo-700 text-xs md:text-sm">Adaugă ca sarcină</button>
+          `;
+        dailyOverview.appendChild(div);
       });
-      emailHtml += '</ul>';
-      div.innerHTML = emailHtml;
-      dailyOverview.appendChild(div);
     }
 
-    // Google Calendar Events
-    if (calendarEvents.length > 0) {
-      const div = document.createElement('div');
-      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
-      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente viitoare</h4><ul class="list-disc pl-3 md:pl-5">${calendarEvents.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleString()})</li>`).join('')}</ul>`;
-      dailyOverview.appendChild(div);
-    }
-
-    // Tasks
     if (pendingTasks.length > 0) {
       const div = document.createElement('div');
       div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
@@ -1029,7 +892,7 @@
       dailyOverview.appendChild(div);
     }
 
-    dailyOverviewContainer.classList.toggle('hidden', !emails.length && !calendarEvents.length && !pendingTasks.length);
+    dailyOverviewContainer.classList.toggle('hidden', !events.length && !emails.length && !pendingTasks.length);
   }
 
   function generateDailyRecommendations() {
@@ -1043,16 +906,10 @@
         recommendations.push(`- ${task.name}: ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
       });
     }
-    if (emails.length > 0) {
-      recommendations.push('- Verifică e-mailurile recente și prioritizează răspunsurile.');
-    }
-    if (calendarEvents.length > 0) {
-      recommendations.push('- Pregătește-te pentru evenimentele viitoare din calendar.');
-    }
     dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
     if (window.innerWidth <= 1024) {
-      recommendationsToggle.classList.toggle('hidden', pendingTasks.length === 0 && emails.length === 0 && calendarEvents.length === 0);
-      if ((pendingTasks.length > 0 || emails.length > 0 || calendarEvents.length > 0) && !isRecommendationsVisible) {
+      recommendationsToggle.classList.toggle('hidden', pendingTasks.length === 0);
+      if (pendingTasks.length > 0 && !isRecommendationsVisible) {
         isRecommendationsVisible = true;
         recommendationsContainer.style.display = 'block';
         recommendationsToggle.textContent = 'Hide Recommendations';
@@ -1222,24 +1079,7 @@
       return;
     }
 
-    // Google-related commands
-    if (message.includes('show emails') || message.includes('arată e-mailuri')) {
-      if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        listMessages();
-        addMessage('E-mailurile recente au fost actualizate în secțiunea „Daily Overview”.', 'ai');
-      } else {
-        addMessage('Te rog conectează-te cu Google pentru a vedea e-mailurile.', 'ai');
-      }
-      typingIndicator.classList.add('hidden');
-    } else if (message.includes('show calendar') || message.includes('arată calendar')) {
-      if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        listEvents();
-        addMessage('Evenimentele viitoare au fost actualizate în secțiunea „Daily Overview”.', 'ai');
-      } else {
-        addMessage('Te rog conectează-te cu Google pentru a vedea calendarul.', 'ai');
-      }
-      typingIndicator.classList.add('hidden');
-    } else if (message.includes('start pomodoro')) {
+    if (message.includes('start pomodoro')) {
       startPomodoro();
       addMessage('Pomodoro timer a fost pornit! Te rog apasă „Start” pentru a începe.', 'ai');
       typingIndicator.classList.add('hidden');
@@ -1263,6 +1103,16 @@
         if (deadlineMatch && deadlineMatch[1] !== 'fără dată limită') {
           const parsedDeadline = new Date(deadlineMatch[1]);
           if (!isNaN(parsedDeadline.getTime())) deadline = parsedDeadline;
+        }
+
+        // For the specific request "creaza un task pentru crearea uni document"
+        if (message.includes('crearea uni document')) {
+          name = 'Crearea unui document';
+          description = 'Crearea unui document';
+          // Let's set a default deadline for testing reminder functionality, e.g., 1 hour from now
+          const now = new Date();
+          now.setHours(now.getHours() + 1);
+          deadline = now;
         }
 
         const task = await addTask(name, description, deadline);
@@ -1354,7 +1204,7 @@
           messages: [
             {
               role: 'system',
-              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului.'
+              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului. Afișează secțiunile (Pomodoro, Tasks, Recommendations) doar pe mobil (≤ 1024px) când utilizatorul cere „start Pomodoro”, „create a task”, sau „show recommendations”.'
             },
             { role: 'user', content: message }
           ],
