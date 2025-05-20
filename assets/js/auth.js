@@ -1,3 +1,4 @@
+// auth.js
 /**
  * Authentication logic for NEURONEXIS
  * Handles user registration, login, and user data persistence
@@ -5,9 +6,52 @@
 const STORAGE_KEY = 'neuronexis_users';
 const CURRENT_USER_KEY = 'neuronexis_current_user';
 const USER_DATA_KEY = 'neuronexis_user_data';
-let users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-let userData = JSON.parse(localStorage.getItem(USER_DATA_KEY)) || {};
-let currentUser = localStorage.getItem(CURRENT_USER_KEY) || null;
+
+// In-memory fallback if localStorage fails
+let users = {};
+let userData = {};
+let currentUser = null;
+
+// Initialize storage
+function initializeStorage() {
+    try {
+        users = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        userData = JSON.parse(localStorage.getItem(USER_DATA_KEY)) || {};
+        currentUser = localStorage.getItem(CURRENT_USER_KEY) || null;
+    } catch (error) {
+        console.warn('localStorage access failed, using in-memory storage:', error);
+    }
+}
+
+// Save users to localStorage with error handling
+function saveUsers() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+    } catch (error) {
+        console.warn('Failed to save users to localStorage:', error);
+    }
+}
+
+// Save user data to localStorage with error handling
+function saveUserData() {
+    try {
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+    } catch (error) {
+        console.warn('Failed to save user data to localStorage:', error);
+    }
+}
+
+// Save current user to localStorage with error handling
+function saveCurrentUser() {
+    try {
+        localStorage.setItem(CURRENT_USER_KEY, currentUser);
+    } catch (error) {
+        console.warn('Failed to save current user to localStorage:', error);
+    }
+}
+
+// Initialize storage on load
+initializeStorage();
 
 // Migrate existing accounts to new structure
 Object.keys(users).forEach(username => {
@@ -35,16 +79,6 @@ Object.keys(users).forEach(username => {
 });
 saveUsers();
 saveUserData();
-
-// Save users to localStorage
-function saveUsers() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-}
-
-// Save user data to localStorage
-function saveUserData() {
-    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-}
 
 // Register a new user
 function register(username, email, password, name) {
@@ -86,7 +120,7 @@ function register(username, email, password, name) {
 
 // Login with username and password
 function login(username, password) {
-    console.log('Attempting login for:', username); // Debug log
+    console.log('Attempting login for:', username);
     const user = users[username];
     if (!user) {
         console.log('User not found:', username);
@@ -98,6 +132,7 @@ function login(username, password) {
         if (typeof md5 === 'function') {
             hashedPassword = md5(password);
         } else {
+            console.warn('md5 not available, using plain text password for login.');
             hashedPassword = password;
         }
     } catch (error) {
@@ -105,16 +140,18 @@ function login(username, password) {
         hashedPassword = password;
     }
 
-    console.log('Hashed password:', hashedPassword, 'Stored password:', user.password); // Debug log
+    console.log('Hashed password:', hashedPassword, 'Stored password:', user.password);
     if (user.password !== hashedPassword) {
         console.log('Password mismatch for:', username);
         return { success: false, message: 'Incorrect password!' };
     }
     currentUser = username;
-    localStorage.setItem(CURRENT_USER_KEY, currentUser);
+    saveCurrentUser();
     console.log('Login successful for:', currentUser);
     return { success: true, message: 'Login successful!' };
 }
+
+
 
 // Update user profile
 function updateProfile(username, updates) {
