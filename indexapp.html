@@ -27,17 +27,17 @@
       theme: {
         extend: {
           colors: {
-            primary: '#2563EB', // Vibrant blue for primary actions
-            secondary: '#4B5563', // Muted gray for secondary text/icons
-            accent: '#FBBF24', // Warm yellow for highlights
-            success: '#16A34A', // Green for success states
-            danger: '#DC2626', // Red for errors/warnings
-            background: '#F3F4F6', // Light gray background
-            card: '#FFFFFF', // White cards in light mode
-            soft: '#DBEAFE', // Light blue for subtle backgrounds
-            darkBg: '#111827', // Dark gray background in dark mode
-            darkCard: '#1F2937', // Slightly lighter gray for dark mode cards
-            darkText: '#D1D5DB', // Light gray text in dark mode
+            primary: '#4F46E5',
+            secondary: '#6B7280',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            background: '#F9FAFB',
+            card: '#FFFFFF',
+            soft: '#EDE9FE',
+            darkBg: '#1F2937',
+            darkCard: '#374151',
+            darkText: '#D1D5DB',
           },
           borderRadius: {
             'xl': '12px',
@@ -65,18 +65,18 @@
   <!-- Custom Styles -->
   <style>
     [data-theme="dark"] {
-      --bg-background: #111827;
-      --bg-card: #1F2937;
+      --bg-background: #1F2937;
+      --bg-card: #374151;
       --text-primary: #D1D5DB;
       --text-secondary: #9CA3AF;
-      --border-soft: #374151;
+      --border-soft: #4B5563;
     }
     [data-theme="light"] {
-      --bg-background: #F3F4F6;
+      --bg-background: #F9FAFB;
       --bg-card: #FFFFFF;
-      --text-primary: #1F2937;
-      --text-secondary: #4B5563;
-      --border-soft: #DBEAFE;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --border-soft: #EDE9FE;
     }
     body {
       background-color: var(--bg-background);
@@ -343,20 +343,20 @@
       <form id="chat-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
         <textarea id="user-input" placeholder="Type your message..." class="flex-1 w-full bg-input border border-gray-200 rounded-lg px-2 md:p-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary resize-none h-20" data-textarea-placeholder="chat.input-placeholder"></textarea>
         <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple class="hidden">
-        <button type="button" id="upload-btn" title="Upload document" class="bg-accent text-primary rounded-full p-1 md:p-3 hover:bg-yellow-400 transition">
+        <button type="button" id="upload-btn" title="Upload document" class="bg-accent text-primary rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
           <i class="fa fa-upload text-xs md:text-base"></i>
         </button>
         <button type="button" id="mic-btn" title="Speak your message" class="bg-success text-primary rounded-full p-1 md:p-3 hover:bg-green-600 transition">
           <i class="fa fa-microphone text-xs md:text-base"></i>
         </button>
-        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-blue-700 transition">
+        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-indigo-700 transition">
           <i class="fa fa-paper-plane text-xs md:text-base"></i>
         </button>
       </form>
       <div id="mobile-toggles" class="mt-2">
-        <button id="pomodoro-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-blue-700 hidden text-sm" data-translate="chat.show_pomodoro">Show Pomodoro Timer</button>
-        <button id="tasks-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-blue-700 hidden text-sm" data-translate="chat.show_reminders">Show Reminders</button>
-        <button id="recommendations-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-blue-700 hidden text-sm" data-translate="chat.show_recommendations">Show Recommendations</button>
+        <button id="pomodoro-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm" data-translate="chat.show_pomodoro">Show Pomodoro Timer</button>
+        <button id="tasks-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm" data-translate="chat.show_reminders">Show Reminders</button>
+        <button id="recommendations-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm" data-translate="chat.show_recommendations">Show Recommendations</button>
       </div>
     </div>
 
@@ -377,7 +377,9 @@
     <!-- Daily Overview -->
     <div id="daily-overview-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
       <h2 class="text-base md:text-lg font-semibold text-primary mb-2 md:mb-4" data-translate="overview.title">Daily Overview</h2>
-      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-card rounded-none md:rounded-lg shadow-inner"></div>
+      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-card rounded-none md:rounded-lg shadow-inner">
+        <div class="overview-item bg-gray-100 p-2 rounded-lg mb-2 text-sm">Today is Thursday, June 05, 2025 08:53 AM EEST.</div>
+      </div>
     </div>
 
     <!-- Reminders -->
@@ -402,7 +404,7 @@
       <input type="file" id="image-input" accept="image/*">
       <div class="btn-group">
         <button id="image-upload-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600" data-translate="modals.cancel">Cancel</button>
-        <button id="image-upload-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-blue-700" data-translate="modals.save">Save</button>
+        <button id="image-upload-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700" data-translate="modals.save">Save</button>
       </div>
     </div>
   </div>
@@ -416,7 +418,7 @@
       <textarea id="email-body" placeholder="Message" class="h-32 resize-none" data-placeholder="modals.compose_email.body"></textarea>
       <div class="btn-group">
         <button id="email-compose-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600" data-translate="modals.cancel">Cancel</button>
-        <button id="email-compose-send" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-blue-700" data-translate="modals.compose_email.send">Send</button>
+        <button id="email-compose-send" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700" data-translate="modals.compose_email.send">Send</button>
       </div>
     </div>
   </div>
@@ -431,7 +433,7 @@
       <textarea id="event-description" placeholder="Description" class="h-20 resize-none" data-placeholder="modals.create_event.description"></textarea>
       <div class="btn-group">
         <button id="event-create-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600" data-translate="modals.cancel">Cancel</button>
-        <button id="event-create-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-blue-700" data-translate="modals.save">Save</button>
+        <button id="event-create-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700" data-translate="modals.save">Save</button>
       </div>
     </div>
   </div>
@@ -454,7 +456,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzW5hOXy6w7k&libraries=places"></script>
 
 <!-- Template Main JS File -->
-<script>document.addEventListener('DOMContentLoaded', initializeApp);
+<script> document.addEventListener('DOMContentLoaded', initializeApp);
 
 function initializeApp() {
   // Elements
@@ -1226,7 +1228,7 @@ function initializeApp() {
 
   function generateDailyOverview() {
     elements.dailyOverview.innerHTML = '';
-    const now = new Date('2025-06-05T09:10:00+03:00'); // Updated date and time
+    const now = new Date('2025-06-05T08:55:00+03:00'); // Current date and time
     addOverviewItem(`Astăzi este ${now.toLocaleDateString(currentLang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} ${now.toLocaleTimeString(currentLang, { hour: '2-digit', minute: '2-digit' })} EEST.`, 'date');
   }
 
@@ -1235,13 +1237,13 @@ function initializeApp() {
   }
 
   function scheduleWorkReminder() {
-    const now = new Date('2025-06-05T09:10:00+03:00');
+    const now = new Date('2025-06-05T08:55:00+03:00');
     const reminderTime = new Date(now);
-    reminderTime.setHours(10, 0, 0, 0); // 10:00 AM EEST
+    reminderTime.setHours(9, 0, 0, 0); // 9:00 AM EEST
     if (now < reminderTime) {
       setTimeout(() => {
         new Notification('Memento de lucru', { body: 'Timpul să-ți începi ziua de lucru!' });
-        reminders.push({ text: 'Începe ziua de lucru', time: '10:00', created: now.toISOString() });
+        reminders.push({ text: 'Începe ziua de lucru', time: '09:00', created: now.toISOString() });
         userData[currentUser].reminders = reminders;
         saveUserData();
         renderReminders();
@@ -1255,6 +1257,7 @@ function initializeApp() {
   generateDailyRecommendations();
   scheduleWorkReminder();
   addMessage('Bună! Sunt asistentul tău AI. Pot ajuta cu organizarea personală, gestionarea emailurilor, planificarea calendarului și managementul timpului. Încearcă comenzi precum "planifică o întâlnire" sau "recomandări zilnice."', 'ai');
-}</script>
+}
+</script>
 </body>
 </html>
