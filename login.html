@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Login - NEURONEXIS</title>
+  <meta content="Login to your AI Productivity Dashboard" name="description">
+  <meta content="AI, productivity, login, NEURONEXIS" name="keywords">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Google API -->
+  <script src="https://apis.google.com/js/platform.js?onload=initGoogleAPI" async defer></script>
+  <meta name="google-signin-client_id" content="906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com">
+
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#6B7280',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            background: '#F9FAFB',
+            card: '#FFFFFF',
+            soft: '#EDE9FE',
+            darkBg: '#1F2937',
+            darkCard: '#374151',
+            darkText: '#D1D5DB',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    [data-theme="dark"] {
+      --bg-background: #1F2937;
+      --bg-card: #374151;
+      --text-primary: #D1D5DB;
+      --text-secondary: #9CA3AF;
+      --border-soft: #4B5563;
+    }
+    [data-theme="light"] {
+      --bg-background: #F9FAFB;
+      --bg-card: #FFFFFF;
+      --text-primary: #111827;
+      --text-secondary: #6B7280;
+      --border-soft: #EDE9FE;
+    }
+    body {
+      background-color: var(--bg-background);
+      color: var(--text-primary);
+    }
+    .bg-card {
+      background-color: var(--bg-card);
+    }
+    .text-primary {
+      color: var(--text-primary);
+    }
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+
+<body class="font-inter min-h-screen flex items-center justify-center bg-background" data-theme="light">
+<div class="bg-card p-8 rounded-2xl shadow-lg w-full max-w-md">
+  <h2 class="text-2xl font-bold text-primary mb-6 text-center" data-translate="login.title">Login to NEURONEXIS</h2>
+  <form id="login-form" class="space-y-4">
+    <div>
+      <label for="login-email" class="block text-sm font-medium text-secondary" data-translate="login.email">Email</label>
+      <input type="email" id="login-email" class="w-full mt-1 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+    </div>
+    <div>
+      <label for="login-password" class="block text-sm font-medium text-secondary" data-translate="login.password">Password</label>
+      <input type="password" id="login-password" class="w-full mt-1 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" required>
+    </div>
+    <button type="submit" class="w-full bg-primary text-white rounded-lg p-3 hover:bg-indigo-700 transition" data-translate="login.submit">Login</button>
+  </form>
+  <div class="mt-6">
+    <button id="google-signin-btn" class="w-full flex items-center justify-center bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition">
+      <i class="fab fa-google mr-2 text-primary"></i>
+      <span data-translate="login.google_signin">Sign in with Google</span>
+    </button>
+    <button id="facebook-signin-btn" class="w-full flex items-center justify-center bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition mt-2">
+      <i class="fab fa-facebook mr-2 text-primary"></i>
+      <span data-translate="login.facebook_signin">Sign in with Facebook</span>
+    </button>
+    <button id="instagram-signin-btn" class="w-full flex items-center justify-center bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition mt-2">
+      <i class="fab fa-instagram mr-2 text-primary"></i>
+      <span data-translate="login.instagram_signin">Sign in with Instagram</span>
+    </button>
+  </div>
+  <p class="text-center mt-4 text-sm text-secondary">
+    <a href="index.html" class="text-primary hover:underline" data-translate="login.back">Back to Dashboard</a>
+  </p>
+  <select id="lang-select" class="mt-4 w-auto mx-auto block bg-card border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none">
+    <option value="en-US">English</option>
+    <option value="ro-RO">Română</option>
+    <option value="ru-RU">Русский</option>
+    <option value="es-ES">Español</option>
+    <option value="fr-FR">Français</option>
+  </select>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-md5@3.0.2/md5.min.js"></script>
+<script src="assets/js/login.js"></script>
+</body>
+</html>
