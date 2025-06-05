@@ -1,27 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>AI Productivity Dashboard - NEURONEXIS</title>
   <meta content="AI-powered productivity dashboard for tasks, reminders, and calendar management" name="description">
   <meta content="AI, productivity, dashboard, NEURONEXIS" name="keywords">
-
-  <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Font Awesome for Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-  <!-- Custom Tailwind Config -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
     tailwind.config = {
       theme: {
@@ -35,9 +25,6 @@
             background: '#F9FAFB',
             card: '#FFFFFF',
             soft: '#EDE9FE',
-            darkBg: '#1F2937',
-            darkCard: '#374151',
-            darkText: '#D1D5DB',
           },
           borderRadius: {
             'xl': '12px',
@@ -61,39 +48,7 @@
       },
     };
   </script>
-
-  <!-- Custom Styles -->
   <style>
-    [data-theme="dark"] {
-      --bg-background: #1F2937;
-      --bg-card: #374151;
-      --text-primary: #D1D5DB;
-      --text-secondary: #9CA3AF;
-      --border-soft: #4B5563;
-    }
-    [data-theme="light"] {
-      --bg-background: #F9FAFB;
-      --bg-card: #FFFFFF;
-      --text-primary: #111827;
-      --text-secondary: #6B7280;
-      --border-soft: #EDE9FE;
-    }
-    body {
-      background-color: var(--bg-background);
-      color: var(--text-primary);
-    }
-    .bg-card {
-      background-color: var(--bg-card);
-    }
-    .text-primary {
-      color: var(--text-primary);
-    }
-    .text-secondary {
-      color: var(--text-secondary);
-    }
-    .border-soft {
-      border-color: var(--border-soft);
-    }
     .chat-box, .daily-overview, .tasks-reminders {
       scrollbar-width: none;
     }
@@ -105,8 +60,19 @@
       height: auto;
       border-radius: 8px;
     }
+    .forced-colors\:bg-white {
+      background-color: white;
+    }
+    @media (forced-colors: active) {
+      .forced-colors\:bg-white {
+        background-color: Canvas;
+      }
+      .forced-colors\:text-black {
+        color: CanvasText;
+      }
+    }
     .chat-box {
-      background: linear-gradient(145deg, var(--bg-card), var(--border-soft));
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
     }
     body, html {
       height: 100%;
@@ -210,26 +176,23 @@
       align-items: center;
     }
     .modal-content {
-      background: var(--bg-card);
+      background: white;
       padding: 1.5rem;
       border-radius: 12px;
       max-width: 90%;
       width: 400px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      color: var(--text-primary);
     }
     .modal-content h2 {
       font-size: 1.25rem;
       margin-bottom: 1rem;
     }
-    .modal-content input, .modal-content textarea {
+    .modal-content input {
       width: 100%;
       padding: 0.5rem;
       margin-bottom: 1rem;
-      border: 1px solid var(--border-soft);
+      border: 1px solid #ddd;
       border-radius: 8px;
-      background: var(--bg-background);
-      color: var(--text-primary);
     }
     .modal-content .btn-group {
       display: flex;
@@ -238,115 +201,106 @@
     }
   </style>
 </head>
-
-<body class="font-inter min-h-screen flex flex-col" data-theme="light">
-<!-- ======= Header ======= -->
-<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-card shadow-sm flex items-center justify-between px-2 py-2 md:px-6 md:py-3 w-full">
+<body class="bg-background text-gray-900 font-inter min-h-screen flex flex-col">
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm flex items-center justify-between px-2 py-2 md:px-6 md:py-3 w-full">
   <div class="flex items-center">
     <a href="index.html" class="flex items-center space-x-1">
       <img src="assets/img/logo.png" alt="NEURONEXIS" class="h-6 md:h-8">
-      <span class="hidden md:block text-lg md:text-xl font-semibold text-primary" data-translate="header.title">NEURONEXIS</span>
+      <span class="hidden md:block text-lg md:text-xl font-semibold text-primary">NEURONEXIS</span>
     </a>
-    <button id="toggle-sidebar-btn" class="md:hidden ml-2 text-secondary">
+    <button id="toggle-sidebar-btn" class="md:hidden ml-2 text-gray-600">
       <i class="fas fa-bars text-lg md:text-xl"></i>
     </button>
   </div>
   <nav class="flex items-center space-x-2">
     <div class="relative hidden md:block">
-      <input type="text" id="search-input" placeholder="Search..." class="pl-8 pr-3 py-1 md:py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32 md:w-48" data-translate="header.search">
-      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-secondary"></i>
+      <input type="text" id="search-input" placeholder="Search..." class="pl-8 pr-3 py-1 md:py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32 md:w-48">
+      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
     </div>
-    <select id="lang-select" class="bg-card border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-      <option value="en-US">English</option>
-      <option value="ro-RO">Română</option>
-      <option value="ru-RU">Русский</option>
-      <option value="es-ES">Español</option>
-      <option value="fr-FR">Français</option>
-    </select>
-    <button id="theme-toggle" class="text-secondary hover:text-primary">
-      <i class="fas fa-moon text-lg md:text-xl"></i>
-    </button>
     <div class="relative">
-      <button class="flex items-center space-x-1" id="profile-btn" aria-label="Profile menu">
+      <button class="flex items-center space-x-1" data-bs-toggle="dropdown">
         <img id="header-profile-image" src="assets/img/profile-img.jpg" alt="Profile" class="h-6 md:h-8 w-6 md:w-8 rounded-full object-cover">
-        <span id="user-name" class="hidden md:block text-sm font-medium text-secondary">Guest</span>
+        <span id="user-name" class="hidden md:block text-sm font-medium text-gray-700">Guest</span>
       </button>
-      <ul class="dropdown-menu absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-card rounded-xl shadow-lg py-1 hidden" id="profile-dropdown">
+      <ul class="dropdown-menu absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white rounded-xl shadow-lg py-1 hidden">
         <li class="px-3 py-1">
-          <p id="user-fullname" class="font-semibold text-primary text-xs md:text-sm">Guest</p>
-          <p id="user-role" class="text-xs md:text-sm text-secondary">Guest User</p>
+          <p id="user-fullname" class="font-semibold text-gray-800 text-xs md:text-sm">Guest</p>
+          <p id="user-role" class="text-xs md:text-sm text-gray-500">Guest User</p>
         </li>
         <li><hr class="my-1 border-gray-200"></li>
-        <li><a href="#" id="upload-image-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-secondary hover:bg-gray-100" data-translate="profile.upload_image"><i class="fas fa-image mr-1 md:mr-2"></i> Upload Image</a></li>
-        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-secondary hover:bg-gray-100" data-translate="profile.settings"><i class="fas fa-cog mr-1 md:mr-2"></i> Account Settings</a></li>
-        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-secondary hover:bg-gray-100" data-translate="profile.help"><i class="fas fa-question-circle mr-1 md:mr-2"></i> Need Help?</a></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-1 md:mr-2"></i> My Profile</a></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-1 md:mr-2"></i> Account Settings</a></li>
+        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-question-circle mr-1 md:mr-2"></i> Need Help?</a></li>
         <li><hr class="my-1 border-gray-200"></li>
-        <li><a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com&redirect_uri=http://localhost:63342/callback&response_type=code&scope=profile email https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/gmail.send&state=state_token&nonce=nonce_token" target="_blank" id="google-signin-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-secondary hover:bg-gray-100 w-full text-left" data-translate="profile.google_signin"><i class="fab fa-google mr-1 md:mr-2"></i> Sign in with Google</a></li>
-        <li><button id="facebook-signin-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-secondary hover:bg-gray-100 w-full text-left" data-translate="profile.facebook_signin"><i class="fab fa-facebook mr-1 md:mr-2"></i> Sign in with Facebook</button></li>
-        <li><button id="instagram-signin-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-secondary hover:bg-gray-100 w-full text-left" data-translate="profile.instagram_signin"><i class="fab fa-instagram mr-1 md:mr-2"></i> Sign in with Instagram</button></li>
-        <li><a href="#" id="logout-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-danger hover:bg-gray-100" data-translate="profile.signout"><i class="fas fa-sign-out-alt mr-1 md:mr-2"></i> Sign Out</a></li>
+        <li><a href="#" id="logout-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-danger hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-1 md:mr-2"></i> Sign Out</a></li>
       </ul>
     </div>
   </nav>
 </header>
-
-<!-- ======= Sidebar ======= -->
-<aside id="sidebar" class="fixed top-0 left-0 w-48 md:w-64 h-full bg-card shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
+<aside id="sidebar" class="fixed top-0 left-0 w-48 md:w-64 h-full bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
   <div class="flex items-center justify-between p-2 md:p-4 border-b">
-    <span class="text-lg md:text-xl font-semibold text-primary" data-translate="sidebar.menu">Menu</span>
-    <button id="close-sidebar-btn" class="md:hidden text-secondary">
+    <span class="text-lg md:text-xl font-semibold text-primary">Menu</span>
+    <button id="close-sidebar-btn" class="md:hidden text-gray-600">
       <i class="fas fa-times text-lg md:text-xl"></i>
     </button>
   </div>
   <ul class="py-2 md:py-4">
     <li class="px-2 md:px-4 py-1 md:py-2">
-      <a href="index.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2" data-translate="sidebar.dashboard">
+      <a href="index.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
         <i class="fas fa-tachometer-alt mr-1 md:mr-3"></i> Dashboard
       </a>
     </li>
     <li class="px-2 md:px-4 py-1 md:py-2">
-      <a href="document-editor.html" class="flex items-center text-secondary hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2" data-translate="sidebar.doc_editor">
+      <a href="document-editor.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
         <i class="fas fa-file-alt mr-1 md:mr-3"></i> Document Editor
       </a>
     </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="login-nav">
+      <a href="#" id="google-login-btn" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-sign-in-alt mr-1 md:mr-3"></i> Login with Google
+      </a>
+    </li>
     <li class="px-2 md:px-4 py-1 md:py-2" id="profile-nav" style="display: none;">
-      <a href="#" class="flex items-center text-secondary hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2" data-translate="sidebar.profile">
+      <a href="users-profile.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
         <i class="fas fa-user-circle mr-1 md:mr-3"></i> Profile
       </a>
     </li>
   </ul>
 </aside>
-
-<!-- ======= Main Content ======= -->
 <main id="main" class="mt-12 md:mt-20 md:ml-64 p-0 flex-1">
   <div class="p-2 md:p-4">
-    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-primary" data-translate="main.title">AI Productivity Dashboard</h1>
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">AI Productivity Dashboard</h1>
     <nav class="mt-1 md:mt-2">
-      <ol class="flex space-x-1 md:space-x-2 text-xs md:text-sm text-secondary">
-        <li><a href="index.html" class="hover:text-primary" data-translate="main.home">Home</a></li>
+      <ol class="flex space-x-1 md:space-x-2 text-xs md:text-sm text-gray-500">
+        <li><a href="index.html" class="hover:text-primary">Home</a></li>
         <li>/</li>
-        <li class="text-primary" data-translate="main.dashboard">Dashboard</li>
+        <li class="text-primary">Dashboard</li>
       </ol>
     </nav>
   </div>
-
   <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <!-- Chatbot -->
     <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
-      <h2 class="text-base md:text-lg font-semibold text-primary mb-2 md:mb-4" data-translate="chat.title">Chat with AI Assistant</h2>
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
       <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
-        <div class="message ai bg-soft text-primary rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
-          Bună! I'm your AI assistant. I can help with personal organization, email management, calendar scheduling, and time management. Try commands like "schedule a meeting," "send an email," or "get daily recommendations."
+        <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
+          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Spune-mi „start Pomodoro” pentru a începe un timer, „create a task” pentru a adăuga o sarcină, sau „show recommendations” pentru sfaturi. Cum te ajut astăzi?
         </div>
       </div>
-      <div class="typing-indicator text-muted italic hidden mb-2" data-translate="chat.typing">AI is typing...</div>
-      <form id="chat-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
-        <textarea id="user-input" placeholder="Type your message..." class="flex-1 w-full bg-input border border-gray-200 rounded-lg px-2 md:p-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary resize-none h-20" data-textarea-placeholder="chat.input-placeholder"></textarea>
+      <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
+      <form id="input-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
+        <select id="lang-select" class="bg-white border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0">
+          <option value="ro-RO">Română</option>
+          <option value="en-US">English</option>
+          <option value="ru-RU">Русский</option>
+          <option value="es-ES">Español</option>
+          <option value="fr-FR">Français</option>
+        </select>
+        <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-lg px-2 md:px-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary">
         <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple class="hidden">
-        <button type="button" id="upload-btn" title="Upload document" class="bg-accent text-primary rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
+        <button type="button" id="upload-btn" title="Încarcă document" class="bg-accent text-white rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
           <i class="fa fa-upload text-xs md:text-base"></i>
         </button>
-        <button type="button" id="mic-btn" title="Speak your message" class="bg-success text-primary rounded-full p-1 md:p-3 hover:bg-green-600 transition">
+        <button type="button" id="mic-btn" title="Vorbește mesajul tău" class="bg-success text-white rounded-full p-1 md:p-3 hover:bg-green-600 transition">
           <i class="fa fa-microphone text-xs md:text-base"></i>
         </button>
         <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-indigo-700 transition">
@@ -354,611 +308,273 @@
         </button>
       </form>
       <div id="mobile-toggles" class="mt-2">
-        <button id="pomodoro-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm" data-translate="chat.show_pomodoro">Show Pomodoro Timer</button>
-        <button id="tasks-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm" data-translate="chat.show_reminders">Show Reminders</button>
-        <button id="recommendations-toggle-btn" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm" data-translate="chat.show_recommendations">Show Recommendations</button>
+        <button id="pomodoro-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Pomodoro Timer</button>
+        <button id="tasks-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Tasks & Reminders</button>
+        <button id="recommendations-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Recommendations</button>
       </div>
     </div>
-
-    <!-- Pomodoro Timer -->
     <div id="pomodoro-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
-      <h2 class="text-base md:text-lg font-semibold text-primary mb-2 md:mb-4" data-translate="pomodoro.title">Pomodoro Timer</h2>
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Pomodoro Timer</h2>
       <div id="pomodoro-block" class="text-center flex flex-col justify-center">
-        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-primary mb-2 md:mb-4">25:00</div>
-        <div id="pomodoro-session" class="text-xs md:text-sm text-secondary mb-2 md:mb-4" data-translate="pomodoro.work_session">Work Session</div>
+        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-gray-800 mb-2 md:mb-4">25:00</div>
+        <div id="pomodoro-session" class="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">Work Session</div>
         <div class="flex justify-center space-x-1 md:space-x-2">
-          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm" data-translate="pomodoro.start"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
-          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm" data-translate="pomodoro.pause"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
-          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm" data-translate="pomodoro.reset"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
+          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
+          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
+          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
         </div>
       </div>
     </div>
-
-    <!-- Daily Overview -->
     <div id="daily-overview-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
-      <h2 class="text-base md:text-lg font-semibold text-primary mb-2 md:mb-4" data-translate="overview.title">Daily Overview</h2>
-      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-card rounded-none md:rounded-lg shadow-inner">
-        <div class="overview-item bg-gray-100 p-2 rounded-lg mb-2 text-sm">Today is Thursday, June 05, 2025 08:53 AM EEST.</div>
-      </div>
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Overview</h2>
+      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
     </div>
-
-    <!-- Reminders -->
     <div id="tasks-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
-      <h2 class="text-base md:text-lg font-semibold text-primary mb-2 md:mb-4" data-translate="reminders.title">Reminders</h2>
-      <div id="tasks-reminders" class="tasks-reminders flex-1 overflow-y-auto p-2 md:p-4 bg-card rounded-none md:rounded-lg shadow-inner"></div>
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Tasks & Reminders</h2>
+      <div id="tasks-reminders" class="tasks-reminders flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
     </div>
-
-    <!-- Daily Recommendations -->
     <div id="recommendations-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
-      <h2 class="text-base md:text-lg font-semibold text-primary mb-2 md:mb-4" data-translate="recommendations.title">Daily Recommendations</h2>
-      <div id="daily-recommendations" class="p-2 md:p-4 bg-card rounded-none md:rounded-lg shadow-inner flex-1">
-        <p data-translate="recommendations.start_pomodoro">Start a Pomodoro session to focus on your tasks!</p>
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Recommendations</h2>
+      <div id="daily-recommendations" class="p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner flex-1">
+        <p>Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!</p>
       </div>
     </div>
   </section>
-
-  <!-- Image Upload Modal -->
-  <div id="image-upload-modal" class="modal">
+  <div id="task-edit-modal" class="modal">
     <div class="modal-content">
-      <h2 data-translate="modals.upload_image.title">Upload Profile Image</h2>
-      <input type="file" id="image-input" accept="image/*">
+      <h2>Edit Task</h2>
+      <input type="hidden" id="task-edit-id">
+      <input type="text" id="task-edit-name" placeholder="Task Name">
+      <input type="text" id="task-edit-description" placeholder="Task Description">
+      <input type="datetime-local" id="task-edit-deadline" placeholder="Deadline">
       <div class="btn-group">
-        <button id="image-upload-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600" data-translate="modals.cancel">Cancel</button>
-        <button id="image-upload-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700" data-translate="modals.save">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Email Composition Modal -->
-  <div id="email-compose-modal" class="modal">
-    <div class="modal-content">
-      <h2 data-translate="modals.compose_email.title">Compose Email</h2>
-      <input type="text" id="email-to" placeholder="To" data-placeholder="modals.compose_email.to">
-      <input type="text" id="email-subject" placeholder="Subject" data-placeholder="modals.compose_email.subject">
-      <textarea id="email-body" placeholder="Message" class="h-32 resize-none" data-placeholder="modals.compose_email.body"></textarea>
-      <div class="btn-group">
-        <button id="email-compose-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600" data-translate="modals.cancel">Cancel</button>
-        <button id="email-compose-send" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700" data-translate="modals.compose_email.send">Send</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Event Creation Modal -->
-  <div id="event-create-modal" class="modal">
-    <div class="modal-content">
-      <h2 data-translate="modals.create_event.title">Create Calendar Event</h2>
-      <input type="text" id="event-title" placeholder="Event Title" data-placeholder="modals.create_event.title_placeholder">
-      <input type="datetime-local" id="event-start" placeholder="Start Time">
-      <input type="datetime-local" id="event-end" placeholder="End Time">
-      <textarea id="event-description" placeholder="Description" class="h-20 resize-none" data-placeholder="modals.create_event.description"></textarea>
-      <div class="btn-group">
-        <button id="event-create-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600" data-translate="modals.cancel">Cancel</button>
-        <button id="event-create-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700" data-translate="modals.save">Save</button>
+        <button id="task-edit-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600">Cancel</button>
+        <button id="task-edit-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Save</button>
       </div>
     </div>
   </div>
 </main>
-
-<!-- ======= Footer ======= -->
-<footer class="bg-card py-2 md:py-6 text-center text-secondary w-full">
+<footer class="bg-white py-2 md:py-6 text-center text-gray-600 w-full">
   <div class="text-xs md:text-sm">© Copyright <strong>NeuroNexis</strong>. All Rights Reserved</div>
   <div class="text-xs md:text-sm">Designed by <a href="#" class="text-primary hover:underline">Poalelungi Consulting</a></div>
 </footer>
-
-<!-- Vendor JS Files -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzW5hOXy6w7k&libraries=places"></script>
-
-<!-- Template Main JS File -->
-<script> document.addEventListener('DOMContentLoaded', initializeApp);
-
-function initializeApp() {
-  // Elements
-  const elements = {
-    chatBox: document.getElementById('chat-box'),
-    chatForm: document.getElementById('chat-form'),
-    userInput: document.getElementById('user-input'),
-    fileInput: document.getElementById('file-input'),
-    uploadBtn: document.getElementById('upload-btn'),
-    typingIndicator: document.querySelector('.typing-indicator'),
-    micBtn: document.getElementById('mic-btn'),
-    langSelect: document.getElementById('lang-select'),
-    tasksReminders: document.getElementById('tasks-reminders'),
-    dailyRecommendations: document.getElementById('daily-recommendations'),
-    dailyOverview: document.getElementById('daily-overview'),
-    dailyOverviewContainer: document.getElementById('daily-overview-container'),
-    sidebar: document.getElementById('sidebar'),
-    toggleSidebarBtn: document.getElementById('toggle-sidebar-btn'),
-    closeSidebarBtn: document.getElementById('close-sidebar-btn'),
-    pomodoroTimer: document.getElementById('pomodoro-timer'),
-    pomodoroSession: document.getElementById('pomodoro-session'),
-    pomodoroStartBtn: document.getElementById('pomodoro-start-btn'),
-    pomodoroPauseBtn: document.getElementById('pomodoro-pause-btn'),
-    pomodoroResetBtn: document.getElementById('pomodoro-reset-btn'),
-    pomodoroContainer: document.getElementById('pomodoro-container'),
-    tasksContainer: document.getElementById('tasks-container'),
-    recommendationsContainer: document.getElementById('recommendations-container'),
-    pomodoroToggle: document.getElementById('pomodoro-toggle-btn'),
-    tasksToggle: document.getElementById('tasks-toggle-btn'),
-    recommendationsToggle: document.getElementById('recommendations-toggle-btn'),
-    profileBtn: document.getElementById('profile-btn'),
-    profileDropdown: document.getElementById('profile-dropdown'),
-    googleSignInBtn: document.getElementById('google-signin-btn'),
-    facebookSignInBtn: document.getElementById('facebook-signin-btn'),
-    instagramSignInBtn: document.getElementById('instagram-signin-btn'),
-    logoutBtn: document.getElementById('logout-btn'),
-    headerProfileImage: document.getElementById('header-profile-image'),
-    userName: document.getElementById('user-name'),
-    userFullname: document.getElementById('user-fullname'),
-    userRole: document.getElementById('user-role'),
-    profileNav: document.getElementById('profile-nav'),
-    themeToggle: document.getElementById('theme-toggle'),
-    imageUploadModal: document.getElementById('image-upload-modal'),
-    imageInput: document.getElementById('image-input'),
-    imageUploadSave: document.getElementById('image-upload-save'),
-    imageUploadCancel: document.getElementById('image-upload-cancel'),
-    uploadImageBtn: document.getElementById('upload-image-btn'),
-    emailComposeModal: document.getElementById('email-compose-modal'),
-    emailTo: document.getElementById('email-to'),
-    emailSubject: document.getElementById('email-subject'),
-    emailBody: document.getElementById('email-body'),
-    emailComposeSend: document.getElementById('email-compose-send'),
-    emailComposeCancel: document.getElementById('email-compose-cancel'),
-    eventCreateModal: document.getElementById('event-create-modal'),
-    eventTitle: document.getElementById('event-title'),
-    eventStart: document.getElementById('event-start'),
-    eventEnd: document.getElementById('event-end'),
-    eventDescription: document.getElementById('event-description'),
-    eventCreateSave: document.getElementById('event-create-save'),
-    eventCreateCancel: document.getElementById('event-create-cancel')
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  const chatBox = document.getElementById('chat-box');
+  const form = document.getElementById('input-form');
+  const input = document.getElementById('user-input');
+  const fileInput = document.getElementById('file-input');
+  const uploadBtn = document.getElementById('upload-btn');
+  const typingIndicator = document.querySelector('.typing-indicator');
+  const micBtn = document.getElementById('mic-btn');
+  const langSelect = document.getElementById('lang-select');
+  const tasksReminders = document.getElementById('tasks-reminders');
+  const dailyRecommendations = document.getElementById('daily-recommendations');
+  const dailyOverview = document.getElementById('daily-overview');
+  const dailyOverviewContainer = document.getElementById('daily-overview-container');
+  const sidebar = document.getElementById('sidebar');
+  const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const pomodoroTimer = document.getElementById('pomodoro-timer');
+  const pomodoroSession = document.getElementById('pomodoro-session');
+  const pomodoroStartBtn = document.getElementById('pomodoro-start-btn');
+  const pomodoroPauseBtn = document.getElementById('pomodoro-pause-btn');
+  const pomodoroResetBtn = document.getElementById('pomodoro-reset-btn');
+  const pomodoroContainer = document.getElementById('pomodoro-container');
+  const tasksContainer = document.getElementById('tasks-container');
+  const recommendationsContainer = document.getElementById('recommendations-container');
+  const taskEditModal = document.getElementById('task-edit-modal');
+  const taskEditId = document.getElementById('task-edit-id');
+  const taskEditName = document.getElementById('task-edit-name');
+  const taskEditDescription = document.getElementById('task-edit-description');
+  const taskEditDeadline = document.getElementById('task-edit-deadline');
+  const taskEditSave = document.getElementById('task-edit-save');
+  const taskEditCancel = document.getElementById('task-edit-cancel');
+  const pomodoroToggle = document.getElementById('pomodoro-toggle');
+  const tasksToggle = document.getElementById('tasks-toggle');
+  const recommendationsToggle = document.getElementById('recommendations-toggle');
+  const placeholders = {
+    'en-US': { default: 'Type your message...', listening: 'Listening...' },
+    'ro-RO': { default: 'Tastează mesajul tău...', listening: 'Ascult...' },
+    'ru-RU': { default: 'Введите ваше сообщение...', listening: 'Слушаю...' },
+    'es-ES': { default: 'Escribe tu mensaje...', listening: 'Escuchando...' },
+    'fr-FR': { default: 'Tapez votre message...', listening: 'Écoute...' }
   };
-
-  // Check if all elements are found
-  for (const [key, element] of Object.entries(elements)) {
-    if (!element) {
-      console.error(`Element not found: ${key}`);
-      return;
-    }
-  }
-
-  // User Data and Authentication
-  let currentUser = localStorage.getItem('currentUser') || 'guest';
-  let userData = JSON.parse(localStorage.getItem('userData')) || {
-    guest: { name: 'Guest', email: 'guest@example.com', profileImage: 'assets/img/profile-img.jpg', reminders: [], chats: [] }
-  };
-  let users = JSON.parse(localStorage.getItem('users')) || {};
+  let userData = JSON.parse(localStorage.getItem('userData')) || {};
+  let currentUser = localStorage.getItem('currentUser');
+  let tasks = userData[currentUser]?.tasks || [];
   let reminders = userData[currentUser]?.reminders || [];
-  let chats = userData[currentUser]?.chats || [];
-
-  // Theme Management
-  let currentTheme = localStorage.getItem('theme') || 'light';
-  document.body.setAttribute('data-theme', currentTheme);
-  elements.themeToggle.innerHTML = currentTheme === 'light' ? '<i class="fas fa-moon text-lg md:text-xl"></i>' : '<i class="fas fa-sun text-lg md:text-xl"></i>';
-
-  elements.themeToggle.addEventListener('click', () => {
-    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-    document.body.setAttribute('data-theme', currentTheme);
-    localStorage.setItem('theme', currentTheme);
-    elements.themeToggle.innerHTML = currentTheme === 'light' ? '<i class="fas fa-moon text-lg md:text-xl"></i>' : '<i class="fas fa-sun text-lg md:text-xl"></i>';
-  });
-
-  // Translation Data
-  const translations = {
-    'en-US': {
-      'header.title': 'NEURONEXIS',
-      'header.search': 'Search...',
-      'sidebar.menu': 'Menu',
-      'sidebar.dashboard': 'Dashboard',
-      'sidebar.doc_editor': 'Document Editor',
-      'sidebar.profile': 'Profile',
-      'profile.upload_image': 'Upload Image',
-      'profile.settings': 'Account Settings',
-      'profile.help': 'Need Help?',
-      'profile.google_signin': 'Sign in with Google',
-      'profile.facebook_signin': 'Sign in with Facebook',
-      'profile.instagram_signin': 'Sign in with Instagram',
-      'profile.signout': 'Sign Out',
-      'main.title': 'AI Productivity Dashboard',
-      'main.home': 'Home',
-      'main.dashboard': 'Dashboard',
-      'chat.title': 'Chat with AI Assistant',
-      'chat.typing': 'AI is typing...',
-      'chat.input-placeholder': 'Type your message...',
-      'chat.listening': 'Listening...',
-      'chat.show_pomodoro': 'Show Pomodoro Timer',
-      'chat.show_reminders': 'Show Reminders',
-      'chat.show_recommendations': 'Show Recommendations',
-      'pomodoro.title': 'Pomodoro Timer',
-      'pomodoro.work_session': 'Work Session',
-      'pomodoro.break_session': 'Break Session',
-      'pomodoro.start': 'Start',
-      'pomodoro.pause': 'Pause',
-      'pomodoro.reset': 'Reset',
-      'overview.title': 'Daily Overview',
-      'reminders.title': 'Reminders',
-      'recommendations.title': 'Daily Recommendations',
-      'recommendations.start_pomodoro': 'Start a Pomodoro session to focus on your tasks!',
-      'modals.upload_image.title': 'Upload Profile Image',
-      'modals.compose_email.title': 'Compose Email',
-      'modals.compose_email.to': 'To',
-      'modals.compose_email.subject': 'Subject',
-      'modals.compose_email.body': 'Message',
-      'modals.compose_email.send': 'Send',
-      'modals.create_event.title': 'Create Calendar Event',
-      'modals.create_event.title_placeholder': 'Event Title',
-      'modals.create_event.description': 'Description',
-      'modals.cancel': 'Cancel',
-      'modals.save': 'Save'
-    },
-    'ro-RO': {
-      'header.title': 'NEURONEXIS',
-      'header.search': 'Caută...',
-      'sidebar.menu': 'Meniu',
-      'sidebar.dashboard': 'Panou de control',
-      'sidebar.doc_editor': 'Editor de documente',
-      'sidebar.profile': 'Profil',
-      'profile.upload_image': 'Încarcă imagine',
-      'profile.settings': 'Setări cont',
-      'profile.help': 'Ai nevoie de ajutor?',
-      'profile.google_signin': 'Conectează-te cu Google',
-      'profile.facebook_signin': 'Conectează-te cu Facebook',
-      'profile.instagram_signin': 'Conectează-te cu Instagram',
-      'profile.signout': 'Deconectare',
-      'main.title': 'Panou de productivitate AI',
-      'main.home': 'Acasă',
-      'main.dashboard': 'Panou de control',
-      'chat.title': 'Chat cu asistentul AI',
-      'chat.typing': 'AI-ul tastează...',
-      'chat.input-placeholder': 'Tastează mesajul tău...',
-      'chat.listening': 'Ascult...',
-      'chat.show_pomodoro': 'Afișează temporizatorul Pomodoro',
-      'chat.show_reminders': 'Afișează memento-uri',
-      'chat.show_recommendations': 'Afișează recomandări',
-      'pomodoro.title': 'Temporizator Pomodoro',
-      'pomodoro.work_session': 'Sesiune de lucru',
-      'pomodoro.break_session': 'Sesiune de pauză',
-      'pomodoro.start': 'Start',
-      'pomodoro.pause': 'Pauză',
-      'pomodoro.reset': 'Resetare',
-      'overview.title': 'Prezentare zilnică',
-      'reminders.title': 'Memento-uri',
-      'recommendations.title': 'Recomandări zilnice',
-      'recommendations.start_pomodoro': 'Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!',
-      'modals.upload_image.title': 'Încarcă imaginea de profil',
-      'modals.compose_email.title': 'Compune email',
-      'modals.compose_email.to': 'Către',
-      'modals.compose_email.subject': 'Subiect',
-      'modals.compose_email.body': 'Mesaj',
-      'modals.compose_email.send': 'Trimite',
-      'modals.create_event.title': 'Creează eveniment în calendar',
-      'modals.create_event.title_placeholder': 'Titlu eveniment',
-      'modals.create_event.description': 'Descriere',
-      'modals.cancel': 'Anulează',
-      'modals.save': 'Salvează'
-    },
-    'ru-RU': {
-      'header.title': 'NEURONEXIS',
-      'header.search': 'Поиск...',
-      'sidebar.menu': 'Меню',
-      'sidebar.dashboard': 'Панель управления',
-      'sidebar.doc_editor': 'Редактор документов',
-      'sidebar.profile': 'Профиль',
-      'profile.upload_image': 'Загрузить изображение',
-      'profile.settings': 'Настройки аккаунта',
-      'profile.help': 'Нужна помощь?',
-      'profile.google_signin': 'Войти через Google',
-      'profile.facebook_signin': 'Войти через Facebook',
-      'profile.instagram_signin': 'Войти через Instagram',
-      'profile.signout': 'Выйти',
-      'main.title': 'Панель продуктивности AI',
-      'main.home': 'Главная',
-      'main.dashboard': 'Панель управления',
-      'chat.title': 'Чат с AI-ассистентом',
-      'chat.typing': 'AI печатает...',
-      'chat.input-placeholder': 'Введите ваше сообщение...',
-      'chat.listening': 'Слушаю...',
-      'chat.show_pomodoro': 'Показать таймер Помодоро',
-      'chat.show_reminders': 'Показать напоминания',
-      'chat.show_recommendations': 'Показать рекомендации',
-      'pomodoro.title': 'Таймер Помодоро',
-      'pomodoro.work_session': 'Рабочая сессия',
-      'pomodoro.break_session': 'Сессия перерыва',
-      'pomodoro.start': 'Старт',
-      'pomodoro.pause': 'Пауза',
-      'pomodoro.reset': 'Сброс',
-      'overview.title': 'Ежедневный обзор',
-      'reminders.title': 'Напоминания',
-      'recommendations.title': 'Ежедневные рекомендации',
-      'recommendations.start_pomodoro': 'Начните сессию Помодоро, чтобы сосредоточиться на задачах!',
-      'modals.upload_image.title': 'Загрузить изображение профиля',
-      'modals.compose_email.title': 'Написать письмо',
-      'modals.compose_email.to': 'Кому',
-      'modals.compose_email.subject': 'Тема',
-      'modals.compose_email.body': 'Сообщение',
-      'modals.compose_email.send': 'Отправить',
-      'modals.create_event.title': 'Создать событие в календаре',
-      'modals.create_event.title_placeholder': 'Название события',
-      'modals.create_event.description': 'Описание',
-      'modals.cancel': 'Отмена',
-      'modals.save': 'Сохранить'
-    },
-    'es-ES': {
-      'header.title': 'NEURONEXIS',
-      'header.search': 'Buscar...',
-      'sidebar.menu': 'Menú',
-      'sidebar.dashboard': 'Panel de control',
-      'sidebar.doc_editor': 'Editor de documentos',
-      'sidebar.profile': 'Perfil',
-      'profile.upload_image': 'Subir imagen',
-      'profile.settings': 'Configuración de la cuenta',
-      'profile.help': '¿Necesitas ayuda?',
-      'profile.google_signin': 'Iniciar sesión con Google',
-      'profile.facebook_signin': 'Iniciar sesión con Facebook',
-      'profile.instagram_signin': 'Iniciar sesión con Instagram',
-      'profile.signout': 'Cerrar sesión',
-      'main.title': 'Panel de productividad AI',
-      'main.home': 'Inicio',
-      'main.dashboard': 'Panel de control',
-      'chat.title': 'Chatea con el asistente AI',
-      'chat.typing': 'El AI está escribiendo...',
-      'chat.input-placeholder': 'Escribe tu mensaje...',
-      'chat.listening': 'Escuchando...',
-      'chat.show_pomodoro': 'Mostrar temporizador Pomodoro',
-      'chat.show_reminders': 'Mostrar recordatorios',
-      'chat.show_recommendations': 'Mostrar recomendaciones',
-      'pomodoro.title': 'Temporizador Pomodoro',
-      'pomodoro.work_session': 'Sesión de trabajo',
-      'pomodoro.break_session': 'Sesión de descanso',
-      'pomodoro.start': 'Iniciar',
-      'pomodoro.pause': 'Pausar',
-      'pomodoro.reset': 'Reiniciar',
-      'overview.title': 'Resumen diario',
-      'reminders.title': 'Recordatorios',
-      'recommendations.title': 'Recomendaciones diarias',
-      'recommendations.start_pomodoro': '¡Inicia una sesión Pomodoro para enfocarte en tus tareas!',
-      'modals.upload_image.title': 'Subir imagen de perfil',
-      'modals.compose_email.title': 'Redactar correo',
-      'modals.compose_email.to': 'Para',
-      'modals.compose_email.subject': 'Asunto',
-      'modals.compose_email.body': 'Mensaje',
-      'modals.compose_email.send': 'Enviar',
-      'modals.create_event.title': 'Crear evento en el calendario',
-      'modals.create_event.title_placeholder': 'Título del evento',
-      'modals.create_event.description': 'Descripción',
-      'modals.cancel': 'Cancelar',
-      'modals.save': 'Guardar'
-    },
-    'fr-FR': {
-      'header.title': 'NEURONEXIS',
-      'header.search': 'Rechercher...',
-      'sidebar.menu': 'Menu',
-      'sidebar.dashboard': 'Tableau de bord',
-      'sidebar.doc_editor': 'Éditeur de documents',
-      'sidebar.profile': 'Profil',
-      'profile.upload_image': 'Télécharger une image',
-      'profile.settings': 'Paramètres du compte',
-      'profile.help': 'Besoin d’aide ?',
-      'profile.google_signin': 'Se connecter avec Google',
-      'profile.facebook_signin': 'Se connecter avec Facebook',
-      'profile.instagram_signin': 'Se connecter avec Instagram',
-      'profile.signout': 'Se déconnecter',
-      'main.title': 'Tableau de productivité AI',
-      'main.home': 'Accueil',
-      'main.dashboard': 'Tableau de bord',
-      'chat.title': 'Chat avec l’assistant AI',
-      'chat.typing': 'L’AI est en train de taper...',
-      'chat.input-placeholder': 'Tapez votre message...',
-      'chat.listening': 'Écoute...',
-      'chat.show_pomodoro': 'Afficher le minuteur Pomodoro',
-      'chat.show_reminders': 'Afficher les rappels',
-      'chat.show_recommendations': 'Afficher les recommandations',
-      'pomodoro.title': 'Minuteur Pomodoro',
-      'pomodoro.work_session': 'Session de travail',
-      'pomodoro.break_session': 'Session de pause',
-      'pomodoro.start': 'Démarrer',
-      'pomodoro.pause': 'Pause',
-      'pomodoro.reset': 'Réinitialiser',
-      'overview.title': 'Aperçu quotidien',
-      'reminders.title': 'Rappels',
-      'recommendations.title': 'Recommandations quotidiennes',
-      'recommendations.start_pomodoro': 'Commencez une session Pomodoro pour vous concentrer sur vos tâches !',
-      'modals.upload_image.title': 'Télécharger une image de profil',
-      'modals.compose_email.title': 'Rédiger un email',
-      'modals.compose_email.to': 'À',
-      'modals.compose_email.subject': 'Objet',
-      'modals.compose_email.body': 'Message',
-      'modals.compose_email.send': 'Envoyer',
-      'modals.create_event.title': 'Créer un événement dans le calendrier',
-      'modals.create_event.title_placeholder': 'Titre de l’événement',
-      'modals.create_event.description': 'Description',
-      'modals.cancel': 'Annuler',
-      'modals.save': 'Enregistrer'
-    }
-  };
-
-  // Language Management
-  let currentLang = localStorage.getItem('language') || 'ro-RO';
-  elements.langSelect.value = currentLang;
-
-  function updateTranslations() {
-    document.querySelectorAll('[data-translate]').forEach(element => {
-      const key = element.getAttribute('data-translate');
-      element.textContent = translations[currentLang][key] || element.textContent;
-    });
-    document.querySelectorAll('[data-placeholder]').forEach(element => {
-      const key = element.getAttribute('data-placeholder');
-      element.setAttribute('placeholder', translations[currentLang][key] || element.getAttribute('placeholder'));
-    });
-    document.querySelectorAll('[data-textarea-placeholder]').forEach(element => {
-      const key = element.getAttribute('data-textarea-placeholder');
-      element.setAttribute('placeholder', translations[currentLang][key] || element.getAttribute('placeholder'));
-    });
-  }
-
-  elements.langSelect.addEventListener('change', () => {
-    currentLang = elements.langSelect.value;
-    localStorage.setItem('language', currentLang);
-    updateTranslations();
-  });
-
-  updateTranslations();
-
-  // Request Permissions
-  if (Notification.permission !== 'granted') {
-    Notification.requestPermission();
-  }
-
-  // User Data Management
-  function loadProfile() {
-    elements.headerProfileImage.src = userData[currentUser].profileImage || 'assets/img/profile-img.jpg';
-    elements.userName.textContent = userData[currentUser].name || 'Guest';
-    elements.userFullname.textContent = userData[currentUser].name || 'Guest';
-    elements.userRole.textContent = userData[currentUser].email || 'Guest User';
-    renderReminders();
-    generateDailyOverview();
-    generateDailyRecommendations();
-    scheduleWorkReminder();
-  }
-
-  function saveUserData() {
-    localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('users', JSON.stringify(users));
-  }
-
-  // Google OAuth Integration
-  function loadGoogleSignIn() {
-    gapi.load('auth2', () => {
-      gapi.auth2.init({
-        client_id: '906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com',
-        scope: 'profile email openid',
-        redirect_uri: 'http://localhost:3000/callback'
-      }).then(() => {
-        const auth2 = gapi.auth2.getAuthInstance();
-        elements.googleSignInBtn.addEventListener('click', () => {
-          auth2.signIn().then(googleUser => {
-            const profile = googleUser.getBasicProfile();
-            const user = {
-              name: profile.getName(),
-              email: profile.getEmail(),
-              profileImage: profile.getImageUrl(),
-              reminders: [],
-              chats: []
-            };
-            currentUser = user.email;
-            userData[currentUser] = user;
-            users[currentUser] = user;
-            localStorage.setItem('currentUser', currentUser);
-            saveUserData();
-            loadProfile();
-            addMessage('Signed in with Google successfully!', 'ai');
-          }).catch(error => {
-            console.error('Google Sign-In Error:', error);
-            addMessage('Failed to sign in with Google. Please try again.', 'ai');
-          });
-        });
-      });
-    });
-  }
-
-  // xAI Grok API Integration
-  async function callGrokAPI(message) {
-    try {
-      const response = await fetch('https://api.x.ai/v1/grok', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer xai-4Y9VH8C9Se4H5v8FIJrAgDG8UncIiJTq1Y89rPyGS8cBLA7fA2VlpNjVcsC6wODRpAVZ62CSKBODX9u1',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          prompt: message,
-          model: 'grok-3',
-          max_tokens: 500
-        })
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data.choices?.[0]?.text || 'Sorry, I could not process your request.';
-    } catch (error) {
-      console.error('Grok API Error:', error);
-      return 'Error communicating with Grok API. Please try again.';
-    }
-  }
-
-  // Authentication Handlers
-  elements.facebookSignInBtn.addEventListener('click', () => {
-    const mockUser = { name: 'Facebook User', email: 'facebook@example.com', profileImage: 'assets/img/profile-img.jpg', bio: 'Loves traveling and photography' };
-    currentUser = mockUser.email;
-    userData[currentUser] = mockUser;
-    users[currentUser] = mockUser;
-    localStorage.setItem('currentUser', currentUser);
-    saveUserData();
-    loadProfile();
-    addMessage('Signed in with Facebook! Limited features available.', 'ai');
-  });
-
-  elements.instagramSignInBtn.addEventListener('click', () => {
-    const mockUser = { name: 'Instagram User', email: 'instagram@example.com', profileImage: 'assets/img/profile-img.jpg', bio: 'Foodie and fitness enthusiast' };
-    currentUser = mockUser.email;
-    userData[currentUser] = mockUser;
-    users[currentUser] = mockUser;
-    localStorage.setItem('currentUser', currentUser);
-    saveUserData();
-    loadProfile();
-    addMessage('Signed in with Instagram! Limited features available.', 'ai');
-  });
-
-  elements.logoutBtn.addEventListener('click', () => {
-    currentUser = 'guest';
-    userData[currentUser] = { name: 'Guest', email: 'guest@example.com', profileImage: 'assets/img/profile-img.jpg', reminders: [], chats: [] };
-    users = {};
-    localStorage.setItem('currentUser', currentUser);
-    saveUserData();
-    loadProfile();
-    elements.chatBox.innerHTML = '';
-    addMessage('You have been signed out. Hello! I’m Grok, your AI assistant created by xAI. Try commands like "schedule a meeting" or "get daily recommendations."', 'ai');
-  });
-
-  // Sidebar Toggle
-  elements.toggleSidebarBtn.addEventListener('click', () => {
-    elements.sidebar.classList.toggle('-translate-x-full');
-  });
-
-  elements.closeSidebarBtn.addEventListener('click', () => {
-    elements.sidebar.classList.add('-translate-x-full');
-  });
-
-  // Toggle Sections on Mobile
+  let chatHistory = userData[currentUser]?.chats || [];
   let isPomodoroVisible = false;
   let isTasksVisible = false;
   let isRecommendationsVisible = false;
-
-  elements.pomodoroToggle.addEventListener('click', () => {
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
+  function saveUserData() {
+    localStorage.setItem('userData', JSON.stringify(userData));
+  }
+  let accessToken = localStorage.getItem('googleAccessToken');
+  function handleCredentialResponse(response) {
+    const data = JSON.parse(atob(response.credential.split('.')[1]));
+    currentUser = data.email;
+    userData[currentUser] = userData[currentUser] || { tasks: [], reminders: [], chats: [], profile: {} };
+    userData[currentUser].profile = {
+      name: data.name,
+      email: data.email,
+      picture: data.picture
+    };
+    localStorage.setItem('currentUser', currentUser);
+    saveUserData();
+    fetchGoogleData(data.sub);
+    document.getElementById('login-nav').style.display = 'none';
+    document.getElementById('profile-nav').style.display = 'block';
+    loadProfile();
+  }
+  async function fetchGoogleData(userId) {
+    try {
+      const tokenResponse = await fetch('https://www.googleapis.com/oauth2/v3/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: 'YOUR_CLIENT_ID',
+          client_secret: 'YOUR_CLIENT_SECRET',
+          refresh_token: localStorage.getItem('googleRefreshToken'),
+          grant_type: 'refresh_token'
+        })
+      });
+      const tokenData = await tokenResponse.json();
+      accessToken = tokenData.access_token;
+      localStorage.setItem('googleAccessToken', accessToken);
+      fetchEmails();
+      fetchCalendarEvents();
+    } catch (error) {
+      console.error('Google auth error:', error);
+      addMessage('Eroare la conectarea cu Google. Funcționalitatea este temporar indisponibilă.', 'ai');
+    }
+  }
+  async function fetchEmails() {
+    try {
+      const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=5&q=from:* -in:trash', {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+      const data = await response.json();
+      const emails = [];
+      for (const msg of data.messages) {
+        const msgResponse = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        const email = await msgResponse.json();
+        emails.push(email);
+      }
+      userData[currentUser].emails = emails;
+      saveUserData();
+      generateDailyOverview();
+    } catch (error) {
+      console.error('Email fetch error:', error);
+    }
+  }
+  async function fetchCalendarEvents() {
+    try {
+      const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${new Date().toISOString()}&maxResults=10`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+      const data = await response.json();
+      userData[currentUser].calendarEvents = data.items;
+      saveUserData();
+      generateDailyOverview();
+    } catch (error) {
+      console.error('Calendar fetch error:', error);
+    }
+  }
+  function logout() {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('googleAccessToken');
+    localStorage.removeItem('googleRefreshToken');
+    currentUser = null;
+    accessToken = null;
+    document.getElementById('login-nav').style.display = 'block';
+    document.getElementById('profile-nav').style.display = 'none';
+    window.location.href = 'index.html';
+  }
+  if (!currentUser && !accessToken) {
+    document.getElementById('login-nav').style.display = 'block';
+    document.getElementById('profile-nav').style.display = 'none';
+  } else {
+    document.getElementById('login-nav').style.display = 'none';
+    document.getElementById('profile-nav').style.display = 'block';
+    loadProfile();
+  }
+  function loadProfile() {
+    const user = userData[currentUser];
+    if (user && user.profile) {
+      document.getElementById('user-name').textContent = user.profile.name || currentUser;
+      document.getElementById('user-fullname').textContent = user.profile.name || currentUser;
+      document.getElementById('user-role').textContent = user.profile.email;
+      const profileImage = user.profile.picture || 'assets/img/profile-img.jpg';
+      document.getElementById('header-profile-image').src = profileImage;
+      tasks = user.tasks || [];
+      reminders = user.reminders || [];
+      chatHistory = user.chats || [];
+      renderChatHistory();
+      renderTasksReminders();
+      generateDailyOverview();
+      generateDailyRecommendations();
+      scheduleWorkReminder();
+    }
+  }
+  function requestLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+              (position) => {
+                userData[currentUser].location = {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  timestamp: new Date().toISOString()
+                };
+                saveUserData();
+                addMessage('Locația ta a fost salvată pentru a optimiza recomandările.', 'ai');
+              },
+              (error) => {
+                console.error('Location error:', error);
+                addMessage('Nu am putut accesa locația ta. Continuăm fără informații de locație.', 'ai');
+              }
+      );
+    } else {
+      addMessage('Geolocația nu este suportată de browser-ul tău.', 'ai');
+    }
+  }
+  toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+  closeSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+  });
+  document.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', () => {
+    const dropdown = document.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('hidden');
+  });
+  pomodoroToggle.addEventListener('click', () => {
     isPomodoroVisible = !isPomodoroVisible;
-    elements.pomodoroContainer.style.display = isPomodoroVisible ? 'block' : 'none';
-    elements.pomodoroToggle.textContent = isPomodoroVisible ? translations[currentLang]['chat.hide_pomodoro'] || 'Hide Pomodoro Timer' : translations[currentLang]['chat.show_pomodoro'];
+    pomodoroContainer.style.display = isPomodoroVisible ? 'block' : 'none';
+    pomodoroToggle.textContent = isPomodoroVisible ? 'Hide Pomodoro Timer' : 'Show Pomodoro Timer';
   });
-
-  elements.tasksToggle.addEventListener('click', () => {
+  tasksToggle.addEventListener('click', () => {
     isTasksVisible = !isTasksVisible;
-    elements.tasksContainer.style.display = isTasksVisible ? 'block' : 'none';
-    elements.tasksToggle.textContent = isTasksVisible ? translations[currentLang]['chat.hide_reminders'] || 'Hide Reminders' : translations[currentLang]['chat.show_reminders'];
+    tasksContainer.style.display = isTasksVisible ? 'block' : 'none';
+    tasksToggle.textContent = isTasksVisible ? 'Hide Tasks & Reminders' : 'Show Tasks & Reminders';
   });
-
-  elements.recommendationsToggle.addEventListener('click', () => {
+  recommendationsToggle.addEventListener('click', () => {
     isRecommendationsVisible = !isRecommendationsVisible;
-    elements.recommendationsContainer.style.display = isRecommendationsVisible ? 'block' : 'none';
-    elements.recommendationsToggle.textContent = isRecommendationsVisible ? translations[currentLang]['chat.hide_recommendations'] || 'Hide Recommendations' : translations[currentLang]['chat.show_recommendations'];
+    recommendationsContainer.style.display = isRecommendationsVisible ? 'block' : 'none';
+    recommendationsToggle.textContent = isRecommendationsVisible ? 'Hide Recommendations' : 'Show Recommendations';
   });
-
-  // Pomodoro Timer Logic
   let pomodoroState = JSON.parse(localStorage.getItem('pomodoroState')) || {
     active: false,
     paused: false,
@@ -967,62 +583,40 @@ function initializeApp() {
     lastUpdate: Date.now()
   };
   let pomodoroInterval = null;
-
   function updatePomodoroDisplay() {
     const minutes = Math.floor(pomodoroState.time / 60);
     const seconds = Math.floor(pomodoroState.time % 60);
-    elements.pomodoroTimer.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    elements.pomodoroSession.textContent = pomodoroState.isWorkSession ? translations[currentLang]['pomodoro.work_session'] : translations[currentLang]['pomodoro.break_session'];
-    elements.pomodoroStartBtn.classList.toggle('hidden', pomodoroState.active && !pomodoroState.paused);
-    elements.pomodoroPauseBtn.classList.toggle('hidden', !pomodoroState.active || pomodoroState.paused);
+    pomodoroTimer.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    pomodoroSession.textContent = pomodoroState.isWorkSession ? 'Work Session' : 'Break Session';
+    pomodoroStartBtn.classList.toggle('hidden', pomodoroState.active && !pomodoroState.paused);
+    pomodoroPauseBtn.classList.toggle('hidden', !pomodoroState.active || pomodoroState.paused);
   }
-
   function savePomodoroState() {
     localStorage.setItem('pomodoroState', JSON.stringify(pomodoroState));
   }
-
   function startPomodoro() {
-    if (!pomodoroState.active) {
-      pomodoroState.active = true;
-      pomodoroState.paused = false;
-      pomodoroState.lastUpdate = Date.now();
-      pomodoroInterval = setInterval(() => {
-        if (!pomodoroState.paused) {
-          const now = Date.now();
-          const elapsed = (now - pomodoroState.lastUpdate) / 1000;
-          pomodoroState.time -= Math.floor(elapsed);
-          pomodoroState.lastUpdate = now;
-          if (pomodoroState.time <= 0) {
-            clearInterval(pomodoroInterval);
-            pomodoroState.active = false;
-            pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
-            pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
-            savePomodoroState();
-            updatePomodoroDisplay();
-            new Notification('Pomodoro Complete', {
-              body: pomodoroState.isWorkSession ? translations[currentLang]['pomodoro.break_session'] : translations[currentLang]['pomodoro.work_session']
-            });
-            startPomodoro();
-          } else {
-            savePomodoroState();
-            updatePomodoroDisplay();
-          }
-        }
-      }, 1000);
-      savePomodoroState();
-      updatePomodoroDisplay();
+    if (pomodoroState.active && !pomodoroState.paused) return;
+    pomodoroState.active = true;
+    pomodoroState.paused = false;
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+    updatePomodoroDisplay();
+    savePomodoroState();
+    if (window.innerWidth <= 1024) {
+      pomodoroToggle.classList.remove('hidden');
+      if (!isPomodoroVisible) {
+        isPomodoroVisible = true;
+        pomodoroContainer.style.display = 'block';
+        pomodoroToggle.textContent = 'Hide Pomodoro Timer';
+      }
     }
   }
-
   function pausePomodoro() {
-    if (pomodoroState.active && !pomodoroState.paused) {
-      pomodoroState.paused = true;
-      clearInterval(pomodoroInterval);
-      savePomodoroState();
-      updatePomodoroDisplay();
-    }
+    pomodoroState.paused = true;
+    clearInterval(pomodoroInterval);
+    updatePomodoroDisplay();
+    savePomodoroState();
   }
-
   function resetPomodoro() {
     clearInterval(pomodoroInterval);
     pomodoroState = {
@@ -1032,298 +626,590 @@ function initializeApp() {
       isWorkSession: true,
       lastUpdate: Date.now()
     };
-    savePomodoroState();
     updatePomodoroDisplay();
+    savePomodoroState();
   }
-
-  elements.pomodoroStartBtn.addEventListener('click', startPomodoro);
-  elements.pomodoroPauseBtn.addEventListener('click', pausePomodoro);
-  elements.pomodoroResetBtn.addEventListener('click', resetPomodoro);
-
+  function updatePomodoro() {
+    const now = Date.now();
+    const elapsed = (now - pomodoroState.lastUpdate) / 1000;
+    pomodoroState.time -= elapsed;
+    pomodoroState.lastUpdate = now;
+    if (pomodoroState.time <= 0) {
+      pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
+      pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
+      addMessage(`Timpul de ${pomodoroState.isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${pomodoroState.isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`, 'ai');
+      if (!pomodoroState.isWorkSession) {
+        scheduleWorkReminder();
+      }
+    }
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+  pomodoroStartBtn.addEventListener('click', startPomodoro);
+  pomodoroPauseBtn.addEventListener('click', pausePomodoro);
+  pomodoroResetBtn.addEventListener('click', resetPomodoro);
+  if (pomodoroState.active && !pomodoroState.paused) {
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+  }
   updatePomodoroDisplay();
-
-  // Chat Functionality
-  function addMessage(message, sender = 'user', imageUrl = null) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender} ${sender === 'ai' ? 'bg-soft text-primary' : 'bg-gray-200 text-gray-800'} rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm mb-2`;
-    messageDiv.innerHTML = imageUrl ? `<img src="${imageUrl}" alt="Attached image" class="mb-2">` : '';
-    messageDiv.innerHTML += message.replace(/\n/g, '<br>');
-    elements.chatBox.appendChild(messageDiv);
-    elements.chatBox.scrollTop = elements.chatBox.scrollHeight;
-    chats.push({ sender, message, timestamp: new Date().toISOString() });
-    userData[currentUser].chats = chats;
+  async function scheduleWorkReminder() {
+    const delay = Math.random() * (30 - 5) + 5;
+    setTimeout(async () => {
+      if (Notification.permission === 'granted') {
+        new Notification('E timpul să lucrezi!', {
+          body: 'AI-ul tău te îndeamnă să te apuci de lucru. Hai să finalizăm sarcinile!',
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage('E timpul să lucrezi! Hai să ne apucăm de treabă.', 'ai');
+      await scheduleNextReminder();
+    }, delay * 60 * 1000);
+  }
+  async function scheduleNextReminder() {
+    const now = new Date();
+    const pendingTasks = tasks.filter(task => !task.completed && task.deadline);
+    if (pendingTasks.length === 0) {
+      setTimeout(scheduleWorkReminder, 60 * 60 * 1000);
+      return;
+    }
+    pendingTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    const nearestDeadline = new Date(pendingTasks[0].deadline);
+    const timeToDeadline = (nearestDeadline - now) / (1000 * 60);
+    let nextReminderDelay;
+    if (timeToDeadline <= 30) {
+      nextReminderDelay = timeToDeadline / 2;
+    } else if (timeToDeadline <= 60) {
+      nextReminderDelay = 30;
+    } else {
+      nextReminderDelay = 60;
+    }
+    setTimeout(async () => {
+      const task = pendingTasks[0];
+      if (Notification.permission === 'granted') {
+        new Notification(`Memento sarcină: ${task.name}`, {
+          body: `Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`,
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage(`Memento: Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`, 'ai');
+      await scheduleNextReminder();
+    }, nextReminderDelay * 60 * 1000);
+  }
+  async function addTask(name, description, deadline) {
+    const task = { id: Date.now(), name, description, deadline, completed: false };
+    tasks.push(task);
+    userData[currentUser].tasks = tasks;
     saveUserData();
-  }
-
-  function showTypingIndicator(show = true) {
-    elements.typingIndicator.classList.toggle('hidden', !show);
-  }
-
-  elements.uploadBtn.addEventListener('click', () => elements.fileInput.click());
-
-  elements.fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        addMessage(`Uploaded file: ${file.name}\nContent: ${e.target.result.substring(0, 100)}...`, 'user');
-        handleInput(`File uploaded: ${file.name}`);
-      };
-      reader.readAsText(file);
+    renderTasksReminders();
+    if (deadline && !isNaN(new Date(deadline).getTime())) {
+      await addReminder(`Task: ${name}`, deadline);
     }
-  });
-
-  let recognition = null;
-  if ('webkitSpeechRecognition' in window) {
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = currentLang;
-
-    elements.micBtn.addEventListener('click', () => {
-      if (!recognition) {
-        addMessage('Speech recognition not supported in this browser.', 'ai');
-        return;
+    generateDailyOverview();
+    if (window.innerWidth <= 1024) {
+      tasksToggle.classList.remove('hidden');
+      if (!isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
       }
-      recognition.start();
-      addMessage(translations[currentLang]['chat.listening'] || 'Listening...', 'ai');
-      elements.micBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-      elements.micBtn.querySelector('i').classList.remove('fa-microphone');
-      elements.micBtn.querySelector('i').classList.add('fa-microphone-slash');
-    });
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      elements.userInput.value = transcript;
-      addMessage(transcript, 'user');
-      handleInput(transcript);
-      stopRecognition();
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      addMessage('Speech recognition failed. Please try again.', 'ai');
-      stopRecognition();
-    };
-
-    recognition.onend = stopRecognition;
-
-    function stopRecognition() {
-      elements.micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-      elements.micBtn.querySelector('i').classList.remove('fa-microphone-slash');
-      elements.micBtn.querySelector('i').classList.add('fa-microphone');
     }
-  } else {
-    elements.micBtn.style.display = 'none';
-    addMessage('Speech recognition not supported in this browser.', 'ai');
+    return task;
   }
-
-  elements.chatForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const message = elements.userInput.value.trim();
-    if (message) {
-      addMessage(message, 'user');
-      handleInput(message);
-      elements.userInput.value = '';
-    }
-  });
-
-  async function handleInput(message) {
-    showTypingIndicator(true);
-    try {
-      const lowerMessage = message.toLowerCase();
-
-      if (lowerMessage.includes('bună') || lowerMessage.includes('salut')) {
-        addMessage('Bună! Cum pot să te ajut astăzi?', 'ai');
-      } else if (lowerMessage.includes('planifică o întâlnire') || lowerMessage.includes('schedule a meeting')) {
-        if (currentUser !== 'guest') {
-          elements.eventCreateModal.style.display = 'flex';
-          addMessage('Te rog completează detaliile evenimentului în fereastra modală pentru a planifica o întâlnire.', 'ai');
-        } else {
-          addMessage('Te rog conectează-te cu Google pentru a planifica o întâlnire.', 'ai');
+  async function addReminder(description, deadline) {
+    const reminder = { id: Date.now(), description, deadline, notified: false };
+    reminders.push(reminder);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
+    renderTasksReminders();
+    checkReminders();
+    generateDailyOverview();
+    return reminder;
+  }
+  function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
+    renderTasksReminders();
+    generateDailyOverview();
+    scheduleNextReminder();
+  }
+  function deleteReminder(id) {
+    reminders = reminders.filter(reminder => reminder.id !== id);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
+    renderTasksReminders();
+    generateDailyOverview();
+  }
+  async function toggleTaskCompletion(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      if (task.completed) {
+        const feedback = await sendMessageToAI(`Generează feedback pentru sarcina completată: ${task.name} - ${task.description}`);
+        addMessage(`Feedback AI: ${feedback}`, 'ai');
+        if (Notification.permission === 'granted') {
+          new Notification('Sarcină completată!', {
+            body: `Ai finalizat "${task.name}". Feedback: ${feedback}`,
+            icon: 'assets/img/favicon.png'
+          });
         }
-      } else if (lowerMessage.includes('trimite un email') || lowerMessage.includes('send an email')) {
-        if (currentUser !== 'guest') {
-          elements.emailComposeModal.style.display = 'flex';
-          addMessage('Te rog completează detaliile emailului în fereastra modală pentru a-l trimite.', 'ai');
-        } else {
-          addMessage('Te rog conectează-te cu Google pentru a trimite un email.', 'ai');
-        }
-      } else if (lowerMessage.includes('set reminder')) {
-        const timeMatch = message.match(/\s(at|for|la)\s(\d{1,2}:\d{2}\s?(AM|PM)?)/i);
-        if (timeMatch) {
-          const reminderTime = timeMatch[2];
-          reminders.push({ text: message.replace(timeMatch[0], '').trim(), time: reminderTime, created: new Date().toISOString() });
-          userData[currentUser].reminders = reminders;
-          saveUserData();
-          renderReminders();
-          addMessage(`Memento setat pentru ${reminderTime}.`, 'ai');
-        } else {
-          addMessage('Te rog specifică o oră, ex. "set reminder to call John la 15:00".', 'ai');
-        }
-      } else {
-        const grokResponse = await callGrokAPI(message);
-        addMessage(grokResponse, 'ai');
       }
-    } catch (error) {
-      console.error('Error handling input:', error);
-      addMessage('An error occurred. Please try again.', 'ai');
-    } finally {
-      showTypingIndicator(false);
     }
   }
-
-  // Modal Event Handlers
-  elements.imageUploadCancel.addEventListener('click', () => {
-    elements.imageUploadModal.style.display = 'none';
-    elements.imageInput.value = '';
-  });
-
-  elements.imageUploadSave.addEventListener('click', () => {
-    const file = elements.imageInput.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        userData[currentUser].profileImage = e.target.result;
-        saveUserData();
-        loadProfile();
-        elements.imageUploadModal.style.display = 'none';
-        elements.imageInput.value = '';
-        addMessage('Imaginea de profil a fost actualizată cu succes!', 'ai');
-      };
-      reader.readAsDataURL(file);
+  function editTask(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      taskEditId.value = task.id;
+      taskEditName.value = task.name;
+      taskEditDescription.value = task.description;
+      taskEditDeadline.value = task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '';
+      taskEditModal.style.display = 'flex';
+    }
+  }
+  taskEditSave.addEventListener('click', async () => {
+    const id = parseInt(taskEditId.value);
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.name = taskEditName.value.trim();
+      task.description = taskEditDescription.value.trim();
+      task.deadline = taskEditDeadline.value ? new Date(taskEditDeadline.value) : null;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      taskEditModal.style.display = 'none';
+      await scheduleNextReminder();
     }
   });
-
-  elements.emailComposeCancel.addEventListener('click', () => {
-    elements.emailComposeModal.style.display = 'none';
-    elements.emailTo.value = '';
-    elements.emailSubject.value = '';
-    elements.emailBody.value = '';
+  taskEditCancel.addEventListener('click', () => {
+    taskEditModal.style.display = 'none';
   });
-
-  elements.emailComposeSend.addEventListener('click', () => {
-    if (currentUser !== 'guest') {
-      const to = elements.emailTo.value;
-      const subject = elements.emailSubject.value;
-      const body = elements.emailBody.value;
-      if (to && subject && body) {
-        addMessage(`Email trimis către ${to} cu subiectul "${subject}".`, 'ai');
-        elements.emailComposeModal.style.display = 'none';
-        elements.emailTo.value = '';
-        elements.emailSubject.value = '';
-        elements.emailBody.value = '';
-      } else {
-        addMessage('Te rog completează toate câmpurile emailului.', 'ai');
+  function renderTasksReminders() {
+    tasksReminders.innerHTML = '';
+    if (tasks.length > 0) {
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.className = `flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2 ${task.completed ? 'bg-green-50 line-through' : ''}`;
+        div.innerHTML = `
+          <span class="flex items-center text-xs md:text-sm">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})" class="mr-1 md:mr-2">
+            ${task.name}: ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}
+          </span>
+          <div class="flex space-x-2">
+            <i class="fa fa-edit text-primary cursor-pointer text-xs md:text-sm" onclick="editTask(${task.id})"></i>
+            <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteTask(${task.id})"></i>
+          </div>
+        `;
+        tasksReminders.appendChild(div);
+      });
+    }
+    if (reminders.length > 0) {
+      reminders.forEach(reminder => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+          <span class="text-xs md:text-sm">${reminder.description} (${new Date(reminder.deadline).toLocaleString()})</span>
+          <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteReminder(${reminder.id})"></i>
+        `;
+        tasksReminders.appendChild(div);
+      });
+    }
+    if (window.innerWidth <= 1024) {
+      const hasItems = tasks.length > 0 || reminders.length > 0;
+      tasksToggle.classList.toggle('hidden', !hasItems);
+      if (hasItems && !isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      } else if (!hasItems && isTasksVisible) {
+        isTasksVisible = false;
+        tasksContainer.style.display = 'none';
+        tasksToggle.textContent = 'Show Tasks & Reminders';
       }
-    } else {
-      addMessage('Te rog conectează-te cu Google pentru a trimite emailuri.', 'ai');
     }
-  });
-
-  elements.eventCreateCancel.addEventListener('click', () => {
-    elements.eventCreateModal.style.display = 'none';
-    elements.eventTitle.value = '';
-    elements.eventStart.value = '';
-    elements.eventEnd.value = '';
-    elements.eventDescription.value = '';
-  });
-
-  elements.eventCreateSave.addEventListener('click', () => {
-    if (currentUser !== 'guest') {
-      const event = {
-        summary: elements.eventTitle.value,
-        start: { dateTime: elements.eventStart.value, timeZone: 'Europe/Bucharest' },
-        end: { dateTime: elements.eventEnd.value, timeZone: 'Europe/Bucharest' },
-        description: elements.eventDescription.value
-      };
-      if (event.summary && event.start.dateTime && event.end.dateTime) {
-        addMessage(`Eveniment "${event.summary}" creat cu succes.`, 'ai');
-        elements.eventCreateModal.style.display = 'none';
-        elements.eventTitle.value = '';
-        elements.eventStart.value = '';
-        elements.eventEnd.value = '';
-        elements.eventDescription.value = '';
-      } else {
-        addMessage('Te rog completează toate câmpurile obligatorii ale evenimentului.', 'ai');
-      }
-    } else {
-      addMessage('Te rog conectează-te cu Google pentru a crea evenimente.', 'ai');
-    }
-  });
-
-  // Profile and Dropdown
-  elements.profileBtn.addEventListener('click', () => {
-    elements.profileDropdown.classList.toggle('hidden');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!elements.profileBtn.contains(e.target) && !elements.profileDropdown.contains(e.target)) {
-      elements.profileDropdown.classList.add('hidden');
-    }
-  });
-
-  elements.uploadImageBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    elements.imageUploadModal.style.display = 'flex';
-  });
-
-  // Render Reminders and Overview
-  function renderReminders() {
-    elements.tasksReminders.innerHTML = '';
+  }
+  function checkReminders() {
+    const now = new Date();
     reminders.forEach(reminder => {
-      const reminderDiv = document.createElement('div');
-      reminderDiv.className = 'bg-gray-100 p-2 rounded-lg mb-2 text-sm';
-      reminderDiv.textContent = `${reminder.text} (Set for ${reminder.time})`;
-      elements.tasksReminders.appendChild(reminderDiv);
-    });
-  }
-
-  function addOverviewItem(text, type) {
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'overview-item bg-gray-100 p-2 rounded-lg mb-2 text-sm';
-    itemDiv.textContent = text;
-    elements.dailyOverview.appendChild(itemDiv);
-  }
-
-  function generateDailyOverview() {
-    elements.dailyOverview.innerHTML = '';
-    const now = new Date('2025-06-05T11:00:00+03:00');
-    addOverviewItem(`Astăzi este ${now.toLocaleDateString(currentLang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} ${now.toLocaleTimeString(currentLang, { hour: '2-digit', minute: '2-digit' })} EEST.`, 'date');
-  }
-
-  function generateDailyRecommendations() {
-    elements.dailyRecommendations.innerHTML = translations[currentLang]['recommendations.start_pomodoro'] || 'Start a Pomodoro session to focus on your tasks!';
-  }
-
-  function scheduleWorkReminder() {
-    const now = new Date('2025-06-05T11:00:00+03:00');
-    const reminderTime = new Date(now);
-    reminderTime.setHours(12, 0, 0, 0); // 12:00 PM EEST
-    if (now < reminderTime) {
-      setTimeout(() => {
-        new Notification('Memento de lucru', { body: 'Timpul să-ți continui sarcinile!' });
-        reminders.push({ text: 'Continuă sarcinile', time: '12:00', created: now.toISOString() });
+      const deadline = new Date(reminder.deadline);
+      if (deadline <= now && !reminder.notified) {
+        if (Notification.permission === 'granted') {
+          new Notification('Memento!', {
+            body: `Memento: ${reminder.description} este scadent acum!`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
+        addMessage(`Memento: ${reminder.description} este scadent acum!`, 'ai');
+        reminder.notified = true;
         userData[currentUser].reminders = reminders;
         saveUserData();
-        renderReminders();
-      }, reminderTime - now);
+      }
+    });
+  }
+  setInterval(checkReminders, 60000);
+  function generateDailyOverview() {
+    const today = new Date();
+    const emails = userData[currentUser]?.emails || [];
+    const events = userData[currentUser]?.calendarEvents || [];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    dailyOverview.innerHTML = '';
+    if (events.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente de astăzi</h4><ul class="list-disc pl-3 md:pl-5">${events.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleTimeString()} - ${new Date(e.end.dateTime).toLocaleTimeString()})</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+    if (emails.length > 0) {
+      emails.forEach(email => {
+        const from = email.payload?.headers.find(h => h.name === 'From')?.value || 'Unknown';
+        const subject = email.payload?.headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+        const snippet = email.snippet?.substring(0, 100) + (email.snippet?.length > 100 ? '...' : '') || '';
+        const taskSuggestion = `Răspunde la e-mailul de la ${from}: ${subject}`;
+        const div = document.createElement('div');
+        div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+          <p class="text-xs md:text-sm"><strong>De la:</strong> ${from}</p>
+          <p class="text-xs md:text-sm"><strong>Subiect:</strong> ${subject}</p>
+          <p class="text-xs md:text-sm">${snippet}</p>
+          <button onclick="addTask('${taskSuggestion}', null); generateDailyOverview();" class="bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 mt-1 md:mt-2 hover:bg-indigo-700 text-xs md:text-sm">Adaugă ca sarcină</button>
+        `;
+        dailyOverview.appendChild(div);
+      });
+    }
+    if (pendingTasks.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Sarcini pendinte</h4><ul class="list-disc pl-3 md:pl-5">${pendingTasks.map(t => `<li class="text-xs md:text-sm">${t.name}: ${t.description} ${t.deadline ? `(${new Date(t.deadline).toLocaleString()})` : ''}</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+    dailyOverviewContainer.classList.toggle('hidden', !events.length && !emails.length && !pendingTasks.length);
+  }
+  function generateDailyRecommendations() {
+    const today = new Date();
+    const recommendations = ['Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!'];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    if (pendingTasks.length > 0) {
+      pendingTasks.sort((a, b) => new Date(a.deadline || Infinity) - new Date(b.deadline || Infinity));
+      recommendations.push('**Priorități de astăzi:**');
+      pendingTasks.slice(0, 3).forEach(task => {
+        recommendations.push(`- ${task.name}: ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
+      });
+    }
+    if (userData[currentUser].location) {
+      recommendations.push(`**Recomandare locală:** Bazat pe locația ta, prioritizează sarcinile care pot fi realizate în apropiere.`);
+    }
+    dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
+    if (window.innerWidth <= 1024) {
+      recommendationsToggle.classList.toggle('hidden', pendingTasks.length === 0);
+      if (pendingTasks.length > 0 && !isRecommendationsVisible) {
+        isRecommendationsVisible = true;
+        recommendationsContainer.style.display = 'block';
+        recommendationsToggle.textContent = 'Hide Recommendations';
+      }
     }
   }
-
-  // Load Google API Client Library
-  const script = document.createElement('script');
-  script.src = 'https://apis.google.com/js/api.js';
-  script.onload = loadGoogleSignIn;
-  document.head.appendChild(script);
-
-  // Initial Load
-  loadProfile();
-  generateDailyOverview();
-  generateDailyRecommendations();
-  scheduleWorkReminder();
-  addMessage('Bună! Sunt Grok, asistentul tău AI creat de xAI. Pot ajuta cu organizarea personală, gestionarea emailurilor, planificarea calendarului și managementul timpului. Încearcă comenzi precum "planifică o întâlnire" sau "recomandări zilnice."', 'ai');
-}
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = langSelect.value;
+    let finalTranscript = '';
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript = transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      input.value = finalTranscript + interimTranscript;
+    };
+    recognition.onstart = () => {
+      micBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+      input.placeholder = placeholders[langSelect.value].listening;
+    };
+    recognition.onend = () => {
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
+      input.placeholder = placeholders[langSelect.value].default;
+      if (finalTranscript.trim()) {
+        form.dispatchEvent(new Event('submit'));
+      }
+      finalTranscript = '';
+    };
+    recognition.onerror = (event) => {
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
+      input.placeholder = placeholders[langSelect.value].default;
+      console.error('Speech recognition error:', event.error);
+      addMessage('Eroare la intrarea vocală. Te rog încearcă din nou.', 'ai');
+    };
+    micBtn.addEventListener('click', () => {
+      if (!micBtn.classList.contains('bg-red-500')) {
+        finalTranscript = '';
+        recognition.lang = langSelect.value;
+        recognition.start();
+      } else {
+        recognition.stop();
+      }
+    });
+    langSelect.addEventListener('change', () => {
+      input.placeholder = placeholders[langSelect.value].default;
+    });
+  } else {
+    micBtn.style.display = 'none';
+    langSelect.style.display = 'none';
+  }
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+  fileInput.addEventListener('change', async () => {
+    const files = fileInput.files;
+    if (files.length === 0) return;
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+    let fileContents = [];
+    for (const file of files) {
+      let content;
+      if (file.type === 'application/pdf') {
+        content = await extractTextFromPDF(file);
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        content = await extractTextFromDocx(file);
+      } else {
+        content = await readFile(file);
+      }
+      fileContents.push(`**${file.name}**\n${content}`);
+      addMessage(`Încărcat: ${file.name}`, 'user');
+    }
+    const message = input.value.trim() || 'Analizează documentele încărcate.';
+    const combinedMessage = `${message}\n\n${fileContents.join('\n\n')}`;
+    const aiResponse = await sendMessageToAI(combinedMessage);
+    typingIndicator.classList.add('hidden');
+    addMessage(aiResponse, 'ai', true);
+    fileInput.value = '';
+  });
+  async function readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Eroare la citirea fișierului'));
+      reader.readAsText(file);
+    });
+  }
+  async function extractTextFromPDF(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        text += textContent.items.map(item => item.str).join(' ') + '\n';
+      }
+      return text;
+    } catch (error) {
+      console.error('Error extracting PDF text:', error);
+      return 'Eroare la extragerea textului din PDF.';
+    }
+  }
+  async function extractTextFromDocx(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { value } = await mammoth.extractRawText({ arrayBuffer });
+      return value;
+    } catch (error) {
+      console.error('Error extracting DOCX text:', error);
+      return 'Eroare la extragerea textului din DOCX.';
+    }
+  }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim().toLowerCase();
+    if (!message) return;
+    addMessage(input.value, 'user');
+    input.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+    userData[currentUser].chats = userData[currentUser].chats || [];
+    userData[currentUser].chats.push({ type: 'user', text: message });
+    saveUserData();
+    if (message.includes('creează document') || message.includes('create document') ||
+            message.includes('contract') || message.includes('orar') ||
+            message.includes('schedule') || message.includes('excel')) {
+      addMessage('Redirecționez către editorul de documente pentru a crea documentul solicitat.', 'ai');
+      setTimeout(() => {
+        window.location.href = `document-editor.html?query=${encodeURIComponent(message)}`;
+      }, 1000);
+      typingIndicator.classList.add('hidden');
+      return;
+    }
+    if (message.includes('start pomodoro')) {
+      startPomodoro();
+      addMessage('Pomodoro timer a fost pornit! Te rog apasă „Start” pentru a începe.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('create a task') || message.includes('add task') || message.includes('adaugă sarcină') || message.includes('creaza un task')) {
+      typingIndicator.classList.remove('hidden');
+      try {
+        const aiResponse = await sendMessageToAI(`Generează un nume și o descriere pentru o sarcină bazată pe: "${message}". Returnează sub forma: **Nume:** [nume]\n**Descriere:** [descriere]\n**Dată limită (opțional):** [data limită sau "fără dată limită"]`);
+        typingIndicator.classList.add('hidden');
+        let name = 'Default Task';
+        let description = 'No description provided';
+        let deadline = null;
+        const nameMatch = aiResponse.match(/\*\*Nume:\*\* (.*?)(?=\n|$)/);
+        const descMatch = aiResponse.match(/\*\*Descriere:\*\* (.*?)(?=\n|$)/);
+        const deadlineMatch = aiResponse.match(/\*\*Dată limită \(opțional\):\*\* (.*?)(?=\n|$)/);
+        if (nameMatch) name = nameMatch[1].trim();
+        if (descMatch) description = descMatch[1].trim();
+        if (deadlineMatch && deadlineMatch[1] !== 'fără dată limită') {
+          const parsedDeadline = new Date(deadlineMatch[1]);
+          if (!isNaN(parsedDeadline.getTime())) deadline = parsedDeadline;
+        }
+        if (message.includes('crearea uni document')) {
+          name = 'Crearea unui document';
+          description = 'Crearea unui document';
+          const now = new Date();
+          now.setHours(now.getHours() + 1);
+          deadline = now;
+        }
+        const task = await addTask(name, description, deadline);
+        let confirmationMessage = `Sarcină adăugată: ${task.name}: ${task.description}`;
+        if (task.deadline) {
+          confirmationMessage += ` (scadent: ${new Date(task.deadline).toLocaleString()})`;
+        }
+        addMessage(confirmationMessage, 'ai');
+      } catch (error) {
+        typingIndicator.classList.add('hidden');
+        addMessage('Eroare la generarea sarcinii. Te rog încearcă din nou.', 'ai');
+        console.error('Task creation error:', error);
+      }
+    } else if (message.includes('show recommendations')) {
+      generateDailyRecommendations();
+      addMessage('Recomandările zilnice au fost afişate.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('adaugă memento') || message.includes('reminder')) {
+      const parts = message.split('la');
+      const description = parts[0].replace(/adaugă memento|reminder/i, '').trim();
+      const deadline = parts[1] ? new Date(parts[1].trim()) : null;
+      if (description && deadline && !isNaN(deadline.getTime())) {
+        const reminder = await addReminder(description, deadline);
+        addMessage(`Memento adăugat: ${reminder.description} la ${new Date(reminder.deadline).toLocaleString()}`, 'ai');
+      } else {
+        addMessage('Eroare la adăugarea mementoului. Te rog specifică o dată validă.', 'ai');
+      }
+      typingIndicator.classList.add('hidden');
+    } else {
+      const aiResponse = await sendMessageToAI(message);
+      typingIndicator.classList.add('hidden');
+      addMessage(aiResponse, 'ai', true);
+      userData[currentUser].chats.push({ type: 'ai', text: aiResponse });
+      saveUserData();
+    }
+    generateDailyRecommendations();
+    generateDailyOverview();
+  });
+  function addMessage(text, type, isDocument = false) {
+    const div = document.createElement('div');
+    div.className = `message ${type} p-1 md:p-3 rounded-lg max-w-[70%] ${type === 'user' ? 'bg-primary text-white ml-auto rounded-br-none' : 'bg-soft text-gray-800 rounded-bl-none'} animate-slideIn shadow-sm`;
+    let generalContent = text;
+    let documentContent = '';
+    const documentMarker = '===DOCUMENT===';
+    const documentEndMarker = '===END_DOCUMENT===';
+    if (isDocument && text.includes(documentMarker)) {
+      const startIdx = text.indexOf(documentMarker) + documentMarker.length;
+      const endIdx = text.includes(documentEndMarker) ? text.indexOf(documentEndMarker) : text.length;
+      documentContent = text.slice(startIdx, endIdx).trim();
+      generalContent = text.slice(0, startIdx - documentMarker.length).trim() + text.slice(endIdx + documentEndMarker.length).trim();
+      div.classList.add('border-2', 'border-primary');
+    }
+    if (generalContent) {
+      const renderedHtml = marked.parse(generalContent);
+      const contentDiv = document.createElement('div');
+      contentDiv.innerHTML = renderedHtml;
+      contentDiv.className = 'prose prose-sm max-w-none text-xs md:text-sm';
+      div.appendChild(contentDiv);
+    }
+    if (documentContent && type === 'ai') {
+      const openBtn = document.createElement('button');
+      openBtn.className = 'mt-1 md:mt-2 bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 hover:bg-indigo-700 flex items-center text-xs md:text-sm';
+      openBtn.innerHTML = '<i class="fas fa-file-alt mr-1 md:mr-2"></i>Deschide în Editorul de Documente';
+      openBtn.addEventListener('click', () => {
+        window.location.href = `document-editor.html?content=${encodeURIComponent(documentContent)}`;
+      });
+      div.appendChild(openBtn);
+    }
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+  function renderChatHistory() {
+    chatHistory.forEach(chat => {
+      addMessage(chat.text, chat.type, chat.text.includes('===DOCUMENT==='));
+    });
+  }
+  async function sendMessageToAI(message) {
+    try {
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer xai-s5HQ5gNoPDyPp82gCG2dBFhp5r6cBn89w82jPjcc2492CPor5VsKfrofpl53K2H0dZaEtb1fqHKnVgya'
+        },
+        body: JSON.stringify({
+          model: 'grok-3',
+          messages: [
+            {
+              role: 'system',
+              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului și locația acestuia, dacă este disponibilă.'
+            },
+            { role: 'user', content: message }
+          ],
+          stream: false,
+          temperature: 0.7,
+          max_tokens: 4096
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.choices[0].message.content || 'Îmi pare rău, nu am primit un răspuns de la AI.';
+    } catch (error) {
+      console.error('Error:', error);
+      return 'Eroare la conectarea cu API-ul xAI Grok. Cheia API poate fi invalidă sau serviciul indisponibil.';
+    }
+  }
+  window.addEventListener('resize', () => {
+    const height = window.innerHeight - (document.getElementById('header').offsetHeight + document.querySelector('footer').offsetHeight + 20);
+    chatBox.style.maxHeight = `${height * 0.6}px`;
+    dailyOverview.style.maxHeight = `${height * 0.6}px`;
+    tasksReminders.style.maxHeight = `${height * 0.4}px`;
+  });
+  window.dispatchEvent(new Event('resize'));
+  input.placeholder = placeholders[langSelect.value].default;
+  document.getElementById('logout-btn').addEventListener('click', logout);
+  window.addEventListener('load', () => {
+    if (!currentUser) {
+      google.accounts.id.initialize({
+        client_id: 'YOUR_CLIENT_ID',
+        callback: handleCredentialResponse,
+        scope: 'profile email https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly'
+      });
+      google.accounts.id.renderButton(
+              document.getElementById('google-login-btn'),
+              { theme: 'outline', size: 'large' }
+      );
+    } else {
+      requestLocation();
+    }
+  });
 </script>
 </body>
 </html>
