@@ -3,925 +3,705 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEURONEXIS AI Chat</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Grok AI Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <style>
-        :root {
-            --primary: #007aff;
-            --background: #f2f2f7;
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --text: #1c2526;
-            --secondary-text: #6e6e73;
-            --accent: #ff9500;
-            --success: #34c759;
-            --danger: #ff3b30;
-            --border-radius: 16px;
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--background);
-            color: var(--text);
-            margin: 0;
-            overflow-x: hidden;
-        }
-        a { color: var(--primary); text-decoration: none; }
-        a:hover { color: #005bb5; }
-        h1, h2, h3, h4, h5, h6 { font-weight: 600; }
-        .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 1000;
-        }
-        .header .toggle-sidebar-btn {
-            font-size: 24px;
-            color: var(--text);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .header .toggle-sidebar-btn:hover {
-            transform: scale(1.1);
-        }
-        .pagetitle h1 {
-            font-size: 20px;
-            font-weight: 600;
-            margin: 0 0 0 10px;
-            color: var(--text);
-        }
-        .sidebar {
-            position: fixed;
-            top: 60px;
-            left: -260px;
-            width: 260px;
-            height: calc(100% - 60px);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            z-index: 999;
-        }
-        .toggle-sidebar .sidebar {
-            left: 0;
-        }
-        .sidebar-nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .sidebar-nav .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            margin: 8px 0;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text);
-            transition: background 0.2s;
-        }
-        .sidebar-nav .nav-link:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        .sidebar-nav .nav-link i {
-            margin-right: 12px;
-            font-size: 20px;
-            color: var(--primary);
-        }
-        #main {
-            margin-top: 80px;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        #chat-box {
-            height: 500px;
-            overflow-y: auto;
-            padding: 20px;
-            background: transparent;
-            scrollbar-width: none;
-        }
-        #chat-box::-webkit-scrollbar {
-            display: none;
-        }
-        .message {
-            margin: 12px 0;
-            padding: 12px 18px;
-            border-radius: var(--border-radius);
-            max-width: 70%;
-            animation: slideIn 0.3s ease;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .user {
-            background: var(--primary);
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-        .ai {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--text);
-            border-bottom-left-radius: 4px;
-        }
-        .message h1, .message h2, .message h3, .message h4, .message h5, .message h6 {
-            font-weight: 600;
-            margin: 8px 0;
-        }
-        .message p {
-            margin: 4px 0;
-        }
-        .message ul, .message ol {
-            padding-left: 20px;
-            margin: 8px 0;
-        }
-        .message pre, .message code {
-            background: rgba(0, 0, 0, 0.05);
-            padding: 10px;
-            border-radius: 8px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .document-message {
-            position: relative;
-            max-width: 85%;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border: 2px solid var(--primary);
-        }
-        .document-message .open-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            padding: 8px 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 10px;
-        }
-        .document-message .open-btn:hover {
-            transform: scale(1.05);
-            background: #005bb5;
-        }
-        .typing-indicator {
-            display: none;
-            font-style: italic;
-            color: var(--secondary-text);
-            padding: 10px;
-        }
-        #input-form {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-            align-items: center;
-        }
-        #user-input {
-            flex-grow: 1;
-            padding: 12px;
-            border: none;
-            border-radius: var(--border-radius);
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-            transition: box-shadow 0.2s;
-        }
-        #user-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
-        }
-        #file-input {
-            display: none;
-        }
-        #upload-btn, #send-btn, #mic-btn, #tts-btn, #mode-btn, #lang-select {
-            padding: 12px;
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, background 0.2s;
-            cursor: pointer;
-        }
-        #upload-btn {
-            background: var(--accent);
-            color: white;
-        }
-        #upload-btn:hover {
-            transform: scale(1.1);
-            background: #e68a00;
-        }
-        #send-btn {
-            background: var(--primary);
-            color: white;
-        }
-        #send-btn:hover {
-            transform: scale(1.1);
-            background: #005bb5;
-        }
-        #mic-btn {
-            background: var(--success);
-            color: white;
-            position: relative;
-        }
-        #mic-btn:hover {
-            transform: scale(1.1);
-            background: #2ba848;
-        }
-        #mic-btn.listening {
-            background: var(--danger);
-        }
-        #mic-btn.listening::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 12px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            animation: pulse 1s infinite;
-        }
-        #tts-btn {
-            background: var(--accent);
-            color: white;
-        }
-        #tts-btn:hover {
-            transform: scale(1.1);
-            background: #e68a00;
-        }
-        #tts-btn.active {
-            background: var(--success);
-        }
-        #mode-btn {
-            background: var(--accent);
-            color: white;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        #mode-btn:hover {
-            transform: scale(1.1);
-            background: #e68a00;
-        }
-        #lang-select {
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            width: auto;
-            padding: 12px 16px;
-            border-radius: var(--border-radius);
-        }
-        #lang-select:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
-        }
-        /* Live Dialog Mode */
-        .live-dialog #chat-box {
-            height: 400px;
-            background: linear-gradient(135deg, rgba(242, 242, 247, 0.7), rgba(232, 239, 255, 0.7));
-            border-radius: var(--border-radius);
-        }
-        .live-dialog .message {
-            max-width: 60%;
-            backdrop-filter: blur(5px);
-        }
-        .live-dialog .ai {
-            background: rgba(255, 255, 255, 0.95);
-        }
-        .live-dialog .user {
-            background: rgba(0, 122, 255, 0.95);
-        }
-        .live-dialog .document-message {
-            max-width: 80%;
-        }
-        /* Modal for Document Editing */
-        .modal-content {
-            border-radius: var(--border-radius);
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-        }
-        .modal-header {
-            border-bottom: none;
-            padding: 20px;
-        }
-        .modal-title {
-            font-weight: 600;
-            color: var(--text);
-        }
-        .modal-body {
-            padding: 20px;
-        }
-        #document-editor {
-            width: 100%;
-            min-height: 400px;
-            max-height: 600px;
-            overflow-y: auto;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-            resize: none;
-        }
-        #document-editor:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
-        }
-        .modal-footer {
-            border-top: none;
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .modal-footer .btn {
-            border-radius: var(--border-radius);
-            padding: 10px 20px;
-            font-weight: 500;
-        }
-        /* Emoji Avatar Styles */
-        .avatar-container {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .live-dialog .avatar-container {
-            display: block;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            margin: 0 auto;
-            background: #ffd700;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            transition: transform 0.3s;
-        }
-        .avatar:hover {
-            transform: scale(1.05);
-        }
-        .avatar .eyes {
-            position: absolute;
-            top: 30px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .avatar .eye {
-            width: 12px;
-            height: 12px;
-            background: #000;
-            border-radius: 50%;
-            position: relative;
-        }
-        .avatar .mouth {
-            width: 20px;
-            height: 8px;
-            background: #d81b60;
-            border-radius: 10px;
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            transition: all 0.2s;
-        }
-        .avatar.happy .eyes { transform: translateY(-2px); }
-        .avatar.happy .mouth { width: 24px; height: 10px; border-radius: 0 0 24px 24px; }
-        .avatar.sad .eyes { transform: translateY(2px); }
-        .avatar.sad .mouth { width: 20px; height: 8px; border-radius: 10px 10px 0 0; background: #555; }
-        .avatar.surprised .eyes { transform: scale(1.3); }
-        .avatar.surprised .mouth { width: 16px; height: 16px; border-radius: 50%; }
-        .avatar.curious .eyes { transform: translateY(-1px) rotate(10deg); }
-        .avatar.curious .eye.left { transform: translateY(1px) rotate(-10deg); }
-        .avatar.curious .mouth { width: 18px; height: 8px; transform: translateX(-50%) rotate(5deg); }
-        .avatar.speaking .mouth {
-            animation: speak 0.3s infinite alternate;
-        }
-        .avatar.listening .eye {
-            animation: blink 2s infinite;
-        }
-        @keyframes speak {
-            from { height: 8px; }
-            to { height: 12px; }
-        }
-        @keyframes blink {
-            0%, 10%, 100% { height: 12px; }
-            5% { height: 2px; }
-        }
         @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .typing-indicator {
+            display: flex;
+            padding: 8px 12px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: #4b5563;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.3s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.6s; }
+
+        .chat-container {
+            height: calc(100vh - 160px);
+        }
+
+        .message-animation {
+            animation: messageAppear 0.3s ease-out;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .xai-explanation {
+            border-left: 3px solid #6366f1;
+            transition: all 0.3s ease;
+        }
+
+        .xai-explanation:hover {
+            background-color: #f8fafc;
+        }
+
+        .dark .xai-explanation:hover {
+            background-color: #1e293b;
         }
     </style>
 </head>
-<body>
-<!-- Header -->
-<header class="header d-flex align-items-center">
-    <i class="fa fa-bars toggle-sidebar-btn" onclick="toggleSidebar()"></i>
-    <div class="pagetitle">
-        <h1>NEURONEXIS AI</h1>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+<div class="container mx-auto max-w-6xl px-4 py-6">
+    <!-- Login Section (shown when not authenticated) -->
+    <div id="login-section" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md mx-auto my-12 text-center">
+        <h2 class="text-2xl font-bold mb-6">Welcome to Grok AI Assistant</h2>
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleGoogleSignIn"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="pill"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left"
+             data-width="300">
+        </div>
+        <div class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+            <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+        </div>
+        <button id="try-without-login" class="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+            Try Without Login
+        </button>
     </div>
-</header>
 
-<!-- Sidebar -->
-<aside class="sidebar">
-    <ul class="sidebar-nav">
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fa fa-home"></i>
-                <span>Acasă</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fa fa-robot"></i>
-                <span>Vorbește cu AI</span>
-            </a>
-        </li>
-    </ul>
-</aside>
+    <!-- Main App (hidden until authenticated) -->
+    <div id="app-content" class="hidden">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center text-white font-bold text-xl">N</div>
+                <h1 class="text-2xl font-bold">NEURONEXIS</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+                <button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
 
-<!-- Main Content -->
-<main id="main">
-    <div class="card">
-        <div class="card-body">
-            <div class="avatar-container">
-                <div class="avatar">
-                    <div class="eyes">
-                        <div class="eye"></div>
-                        <div class="eye"></div>
-                    </div>
-                    <div class="mouth"></div>
+        <!-- Main Chat Area -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <!-- Chat Header -->
+            <div class="border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-400"></div>
+                    <h2 class="font-semibold">Grok Chat</h2>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
                 </div>
             </div>
-            <div id="chat-box">
-                <div class="message ai">Bună! Cum te pot ajuta astăzi? Poți încărca documente (.txt, .md, .docx, .pdf) sau cere generarea unora noi.</div>
+
+            <!-- Messages Container -->
+            <div class="chat-container overflow-y-auto p-4 space-y-4" id="chat-messages">
+                <!-- Welcome Message -->
+                <div class="flex justify-start">
+                    <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-xl p-4 message-animation">
+                        <div class="flex items-start space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400 mt-1"></div>
+                            <div>
+                                <p class="font-semibold">Grok AI</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Hey there! I'm Grok, your AI assistant. I can explain my reasoning as we chat - just ask me "why" or "how" about any response!</p>
+                                <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    <p><i class="fas fa-lightbulb mr-1 text-yellow-500"></i> Try asking me something like "Explain how you work" or "Why did you say that?"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="typing-indicator">AI-ul tastează...</div>
-            <form id="input-form">
-                <select id="lang-select" title="Selectează limba pentru voce">
-                    <option value="ro-RO">Română</option>
-                    <option value="en-US">English</option>
-                    <option value="ru-RU">Русский</option>
-                    <option value="es-ES">Español</option>
-                    <option value="fr-FR">Français</option>
-                </select>
-                <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off">
-                <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple>
-                <button type="button" id="upload-btn" title="Încarcă document"><i class="fa fa-upload"></i></button>
-                <button type="button" id="mic-btn" title="Vorbește mesajul tău"><i class="fa fa-microphone"></i></button>
-                <button type="button" id="tts-btn" title="Activează vocea AI"><i class="fa fa-volume-up"></i></button>
-                <button type="button" id="mode-btn" title="Comută modul dialog live">Live</button>
-                <button type="submit" id="send-btn"><i class="fa fa-paper-plane"></i></button>
-            </form>
+
+            <!-- Tier Selection and Features -->
+            <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">Select Your Plan:</h3>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button class="tier-btn bg-blue-100 dark:bg-blue-900 px-3 py-2 rounded-lg text-sm" data-tier="basic">Basic+</button>
+                        <button class="tier-btn bg-purple-100 dark:bg-purple-900 px-3 py-2 rounded-lg text-sm" data-tier="pro">Pro+</button>
+                        <button class="tier-btn bg-green-100 dark:bg-green-900 px-3 py-2 rounded-lg text-sm" data-tier="premium">Premium+</button>
+                        <button class="tier-btn bg-red-100 dark:bg-red-900 px-3 py-2 rounded-lg text-sm" data-tier="family">Family+</button>
+                    </div>
+                </div>
+
+                <div id="features-container" class="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <h3 class="font-semibold mb-2">Active Features:</h3>
+                    <div id="basic-features" class="space-y-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="email-mgmt" class="mr-2" checked>
+                            <label for="email-mgmt">Email Management</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="calendar-mgmt" class="mr-2" checked>
+                            <label for="calendar-mgmt">Calendar Management</label>
+                        </div>
+                    </div>
+                    <div id="pro-features" class="space-y-2 hidden">
+                        <!-- Pro features will be shown when Pro tier is selected -->
+                    </div>
+                    <!-- Other tier features would be added similarly -->
+                </div>
+
+                <!-- Input Area -->
+                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                    <div class="flex items-center space-x-2">
+                        <button id="document-creation" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="Create Document">
+                            <i class="fas fa-file-word"></i>
+                        </button>
+                        <button id="social-lookup" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="Find Social Profiles">
+                            <i class="fas fa-user-friends"></i>
+                        </button>
+                        <div class="flex-grow relative">
+                            <textarea id="message-input" rows="1" class="w-full border border-gray-300 dark:border-gray-600 rounded-full py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 resize-none" placeholder="Message Grok..."></textarea>
+                            <button id="send-button" class="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full text-gray-500 hover:text-purple-600 dark:hover:text-purple-400">
+                                <i class="fas fa-paper-plane text-xl"></i>
+                            </button>
+                        </div>
+                        <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center mt-2 px-2">
+                        <div class="flex space-x-1 text-xs text-gray-500 dark:text-gray-400">
+                            <span>Grok may produce inaccurate information</span>
+                        </div>
+                        <button id="xai-toggle" class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full flex items-center space-x-1">
+                            <i class="fas fa-brain"></i>
+                            <span>XAI Mode: On</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</main>
 
-<!-- Document Editor Modal -->
-<div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="documentModalLabel">Editează Document</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <textarea id="document-editor" placeholder="Editează conținutul documentului aici..."></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
-                <button type="button" class="btn btn-primary" id="download-md">Descarcă .md</button>
-                <button type="button" class="btn btn-primary" id="download-txt">Descarcă .txt</button>
-                <button type="button" class="btn btn-primary" id="download-docx">Descarcă .docx</button>
-                <button type="button" class="btn btn-primary" id="download-pdf">Descarcă .pdf</button>
+        <!-- Document Creation Modal -->
+        <div id="document-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Document Editor</h3>
+                    <button id="close-document-modal" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="document-content" class="flex-1 border border-gray-300 dark:border-gray-600 p-4 mb-4 overflow-y-auto"></div>
+                <div class="flex space-x-2">
+                    <select id="document-type" class="bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2">
+                        <option value="docx">Word Document</option>
+                        <option value="pdf">PDF</option>
+                        <option value="txt">Text File</option>
+                    </select>
+                    <button id="download-document" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                        Download
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-<script>
-    // Configure pdf.js worker
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        <script>
+            // Google API configuration
+            const CLIENT_ID = '906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com';
+            const API_KEY = 'AIzaSyD1vYQ9j2x4J6Xh5q7v8w9z0x1y2z3a4b5c';
+            const SCOPES = [
+                'https://www.googleapis.com/auth/calendar',
+                'https://www.googleapis.com/auth/gmail.readonly',
+                'https://www.googleapis.com/auth/userinfo.profile'
+            ];
 
-    // Sidebar Toggle
-    function toggleSidebar() {
-        document.body.classList.toggle('toggle-sidebar');
-    }
+            let currentUser = null;
+            let currentTier = 'basic';
+            let gapiInited = false;
+            let gisInited = false;
 
-    // Chat Functionality
-    const chatBox = document.getElementById('chat-box');
-    const form = document.getElementById('input-form');
-    const input = document.getElementById('user-input');
-    const fileInput = document.getElementById('file-input');
-    const uploadBtn = document.getElementById('upload-btn');
-    const typingIndicator = document.querySelector('.typing-indicator');
-    const micBtn = document.getElementById('mic-btn');
-    const ttsBtn = document.getElementById('tts-btn');
-    const modeBtn = document.getElementById('mode-btn');
-    const langSelect = document.getElementById('lang-select');
-    const avatar = document.querySelector('.avatar');
-    const documentEditor = document.getElementById('document-editor');
-    const documentModal = new bootstrap.Modal(document.getElementById('documentModal'));
-
-    // Language-specific placeholders
-    const placeholders = {
-        'en-US': { default: 'Type your message...', listening: 'Listening...' },
-        'ro-RO': { default: 'Tastează mesajul tău...', listening: 'Ascult...' },
-        'ru-RU': { default: 'Введите ваше сообщение...', listening: 'Слушаю...' },
-        'es-ES': { default: 'Escribe tu mensaje...', listening: 'Escuchando...' },
-        'fr-FR': { default: 'Tapez votre message...', listening: 'Écoute...' }
-    };
-
-    // Emotion Detection
-    function detectEmotion(text) {
-        const lowerText = text.toLowerCase();
-        const positiveWords = ['super', 'minunat', 'fericit', 'bravo', 'excelent', 'bucur', 'frumos', 'perfect', 'îmi place', 'mulțumesc'];
-        const negativeWords = ['îmi pare rău', 'trist', 'prost', 'greșit', 'problemă', 'scuze', 'dificil', 'nu pot'];
-        const surpriseWords = ['uau', 'incredibil', 'surprinzător', 'șocant', 'nebunie'];
-        const questionWords = ['ce', 'cum', 'de ce', 'unde', 'când', 'cine', 'care', '?'];
-
-        if (questionWords.some(word => lowerText.includes(word))) return 'curious';
-        if (positiveWords.some(word => lowerText.includes(word))) return 'happy';
-        if (negativeWords.some(word => lowerText.includes(word))) return 'sad';
-        if (surpriseWords.some(word => lowerText.includes(word))) return 'surprised';
-        return 'neutral';
-    }
-
-    // Voice Recognition Setup
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = langSelect.value;
-
-        let finalTranscript = '';
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript = transcript;
-                } else {
-                    interimTranscript += transcript;
+            document.addEventListener('DOMContentLoaded', function() {
+                // Check if we're running on GitHub Pages
+                if (window.location.hostname.includes('github.io')) {
+                    document.body.classList.add('github-pages');
                 }
-            }
-            input.value = finalTranscript + interimTranscript;
-        };
 
-        recognition.onstart = () => {
-            micBtn.classList.add('listening');
-            avatar.classList.add('listening');
-            input.placeholder = placeholders[langSelect.value].listening;
-        };
+                // Google API initialization
+                function gapiLoaded() {
+                    gapi.load('client', initializeGapiClient);
+                }
 
-        recognition.onend = () => {
-            micBtn.classList.remove('listening');
-            avatar.classList.remove('listening');
-            input.placeholder = placeholders[langSelect.value].default;
-            if (finalTranscript.trim()) {
-                form.dispatchEvent(new Event('submit'));
-            }
-            finalTranscript = '';
-        };
+                async function initializeGapiClient() {
+                    await gapi.client.init({
+                        apiKey: API_KEY,
+                        discoveryDocs: [
+                            'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
+                            'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'
+                        ],
+                    });
+                    gapiInited = true;
+                    maybeEnableApp();
+                }
 
-        recognition.onerror = (event) => {
-            micBtn.classList.remove('listening');
-            avatar.classList.remove('listening');
-            input.placeholder = placeholders[langSelect.value].default;
-            console.error('Speech recognition error:', event.error);
-            const errorMessages = {
-                'en-US': 'Sorry, there was an error with voice input. Please try again.',
-                'ro-RO': 'Îmi pare rău, a apărut o eroare la intrarea vocală. Te rog încearcă din nou.',
-                'ru-RU': 'Извините, произошла ошибка при голосовом вводе. Пожалуйста, попробуйте снова.',
-                'es-ES': 'Lo siento, hubo un error con la entrada de voz. Por favor, intenta de nuevo.',
-                'fr-FR': 'Désolé, il y a eu une erreur avec l’entrée vocale. Veuillez réessayer.'
-            };
-            addMessage(errorMessages[langSelect.value], 'ai');
-        };
+                function gisLoaded() {
+                    gisInited = true;
+                    maybeEnableApp();
+                }
 
-        micBtn.addEventListener('click', () => {
-            if (!micBtn.classList.contains('listening')) {
-                finalTranscript = '';
-                recognition.lang = langSelect.value;
-                recognition.start();
-            } else {
-                recognition.stop();
-            }
-        });
+                function maybeEnableApp() {
+                    if (gapiInited && gisInited) {
+                        document.getElementById('login-section').classList.remove('hidden');
+                    }
+                }
 
-        langSelect.addEventListener('change', () => {
-            input.placeholder = placeholders[langSelect.value].default;
-        });
-    } else {
-        micBtn.style.display = 'none';
-        langSelect.style.display = 'none';
-    }
+                async function lookupSocialProfile(username) {
+                    try {
+                        // This would connect to your backend service for social profile lookup
+                        const response = await fetch('/api/social-lookup', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username })
+                        });
 
-    // Text-to-Speech Setup
-    let ttsEnabled = false;
-    ttsBtn.addEventListener('click', () => {
-        ttsEnabled = !ttsEnabled;
-        ttsBtn.classList.toggle('active');
-        ttsBtn.setAttribute('title', ttsEnabled ? 'Dezactivează vocea AI' : 'Activează vocea AI');
-    });
+                        const data = await response.json();
+                        return data.profile;
+                    } catch (error) {
+                        console.error('Profile lookup error:', error);
+                        return null;
+                    }
+                }
 
-    function speak(text) {
-        if (!ttsEnabled) return;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ro-RO';
-        const voices = speechSynthesis.getVoices();
-        const roVoice = voices.find(voice => voice.lang === 'ro-RO') || voices.find(voice => voice.lang.includes('ro'));
-        utterance.voice = roVoice || null;
-        utterance.onstart = () => avatar.classList.add('speaking');
-        utterance.onend = () => avatar.classList.remove('speaking');
-        speechSynthesis.speak(utterance);
-    }
+                function handleGoogleSignIn(response) {
+                    if (response.credential) {
+                        // Decode JWT token to get user info
+                        const userInfo = parseJwt(response.credential);
+                        currentUser = {
+                            name: userInfo.name,
+                            email: userInfo.email,
+                            picture: userInfo.picture
+                        };
 
-    // Live Dialog Mode Toggle
-    modeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('live-dialog');
-        modeBtn.textContent = document.body.classList.contains('live-dialog') ? 'Chat' : 'Live';
-        modeBtn.setAttribute('title', document.body.classList.contains('live-dialog') ? 'Comută la modul chat' : 'Comută la modul dialog live');
-        avatar.className = 'avatar'; // Reset emotion
-        window.dispatchEvent(new Event('resize')); // Adjust chat box height
-    });
+                        // Show app content
+                        document.getElementById('login-section').classList.add('hidden');
+                        document.getElementById('app-content').classList.remove('hidden');
 
-    // File Upload Handling
-    uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
+                        // Load user data and initialize features
+                        loadUserData();
+                    }
+                }
 
-    fileInput.addEventListener('change', async () => {
-        const files = fileInput.files;
-        if (files.length === 0) return;
+                function parseJwt(token) {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    return JSON.parse(jsonPayload);
+                }
 
-        typingIndicator.style.display = 'block';
-        chatBox.scrollTop = chatBox.scrollHeight;
+                function loadUserData() {
+                    // Request location access
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            position => {
+                                userLocation = {
+                                    lat: position.coords.latitude,
+                                    lng: position.coords.longitude
+                                };
+                                addMessage(`I've detected you're near ${position.coords.latitude}, ${position.coords.longitude}. I can provide location-specific recommendations.`, 'ai');
+                            },
+                            error => {
+                                addMessage('Location access denied. Some features may be limited.', 'ai');
+                            }
+                        );
+                    }
 
-        let fileContents = [];
-        for (const file of files) {
-            let content;
-            if (file.type === 'application/pdf') {
-                content = await extractTextFromPDF(file);
-            } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-                content = await extractTextFromDocx(file);
-            } else {
-                content = await readFile(file);
-            }
-            fileContents.push(`**${file.name}**\n${content}`);
-            addMessage(`Încărcat: ${file.name}`, 'user');
-        }
+                    // Load user's calendar and email data if logged in
+                    if (currentUser) {
+                        loadCalendarEvents();
+                        loadEmails();
 
-        const message = input.value.trim() || 'Analizează documentele încărcate.';
-        const combinedMessage = `${message}\n\n${fileContents.join('\n\n')}`;
-        const aiResponse = await sendMessageToAI(combinedMessage);
-        typingIndicator.style.display = 'none';
-        const emotion = detectEmotion(aiResponse);
-        avatar.className = `avatar ${emotion}`;
-        addMessage(aiResponse, 'ai', true);
-        speak(aiResponse);
-        fileInput.value = ''; // Clear file input
-    });
+                        // Update UI with user info
+                        const userAvatar = document.createElement('div');
+                        userAvatar.className = 'w-8 h-8 rounded-full bg-cover bg-center';
+                        userAvatar.style.backgroundImage = `url(${currentUser.picture})`;
+                        document.querySelector('header').prepend(userAvatar);
+                    }
+                }
 
-    async function readFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(new Error('Eroare la citirea fișierului'));
-            reader.readAsText(file);
-        });
-    }
+                // Try without login functionality
+                document.getElementById('try-without-login').addEventListener('click', function() {
+                    currentUser = {
+                        name: 'Guest User',
+                        email: 'guest@neuronexis.com',
+                        picture: 'https://via.placeholder.com/150'
+                    };
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('app-content').classList.remove('hidden');
+                    loadUserData();
+                });
 
-    async function extractTextFromPDF(file) {
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            let text = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                text += textContent.items.map(item => item.str).join(' ') + '\n';
-            }
-            return text;
-        } catch (error) {
-            console.error('Error extracting PDF text:', error);
-            return 'Eroare la extragerea textului din PDF.';
-        }
-    }
+                async function loadCalendarEvents() {
+                    try {
+                        const response = await gapi.client.calendar.events.list({
+                            calendarId: 'primary',
+                            timeMin: new Date().toISOString(),
+                            showDeleted: false,
+                            singleEvents: true,
+                            maxResults: 10,
+                            orderBy: 'startTime'
+                        });
+                        const events = response.result.items;
+                        console.log('Upcoming events:', events);
+                        // Process events and display them
+                    } catch (err) {
+                        console.error('Error loading calendar events:', err);
+                    }
+                }
 
-    async function extractTextFromDocx(file) {
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const { value } = await mammoth.extractRawText({ arrayBuffer });
-            return value;
-        } catch (error) {
-            console.error('Error extracting DOCX text:', error);
-            return 'Eroare la extragerea textului din DOCX.';
-        }
-    }
+                async function loadEmails() {
+                    try {
+                        const response = await gapi.client.gmail.users.messages.list({
+                            userId: 'me',
+                            maxResults: 10
+                        });
+                        const messages = response.result.messages;
+                        console.log('Recent emails:', messages);
+                        // Process emails and display them
+                    } catch (err) {
+                        console.error('Error loading emails:', err);
+                    }
+                }
 
-    // Form Submission
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const message = input.value.trim();
-        if (!message) return;
+                // Theme toggle
+                const themeToggle = document.getElementById('theme-toggle');
+                themeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+                    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+                });
 
-        addMessage(message, 'user');
-        input.value = '';
-        typingIndicator.style.display = 'block';
-        chatBox.scrollTop = chatBox.scrollHeight;
+                // Check for saved theme preference
+                if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                }
 
-        const aiResponse = await sendMessageToAI(message);
-        typingIndicator.style.display = 'none';
-        const emotion = detectEmotion(aiResponse);
-        avatar.className = `avatar ${emotion}`;
-        addMessage(aiResponse, 'ai', true);
-        speak(aiResponse);
-    });
+                // Chat functionality
+                const messageInput = document.getElementById('message-input');
+                const sendButton = document.getElementById('send-button');
+                const chatMessages = document.getElementById('chat-messages');
+                const xaiToggle = document.getElementById('xai-toggle');
+                let xaiMode = true;
 
-    function addMessage(text, type, isDocument = false) {
-        const div = document.createElement('div');
-        div.classList.add('message', type);
+                // Auto-resize textarea
+                messageInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
 
-        // Separate document content if present
-        let generalContent = text;
-        let documentContent = '';
-        const documentMarker = '===DOCUMENT===';
-        const documentEndMarker = '===END_DOCUMENT===';
-        if (isDocument && text.includes(documentMarker)) {
-            const startIdx = text.indexOf(documentMarker) + documentMarker.length;
-            const endIdx = text.includes(documentEndMarker) ? text.indexOf(documentEndMarker) : text.length;
-            documentContent = text.slice(startIdx, endIdx).trim();
-            generalContent = text.slice(0, startIdx - documentMarker.length).trim() + text.slice(endIdx + documentEndMarker.length).trim();
-            div.classList.add('document-message');
-        }
+                // Send message on Enter (but allow Shift+Enter for new line)
+                messageInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
 
-        // Render markdown for general content
-        if (generalContent) {
-            const renderedHtml = marked.parse(generalContent);
-            const contentDiv = document.createElement('div');
-            contentDiv.innerHTML = renderedHtml;
-            div.appendChild(contentDiv);
-        }
+                sendButton.addEventListener('click', sendMessage);
 
-        // Add document open button if document content exists
-        if (documentContent && type === 'ai') {
-            const openBtn = document.createElement('button');
-            openBtn.classList.add('open-btn');
-            openBtn.textContent = 'Deschide Document';
-            openBtn.addEventListener('click', () => {
-                documentEditor.value = documentContent;
-                documentModal.show();
+                // XAI mode toggle
+                xaiToggle.addEventListener('click', function() {
+                    xaiMode = !xaiMode;
+                    this.innerHTML = xaiMode ?
+                        '<i class="fas fa-brain"></i><span>XAI Mode: On</span>' :
+                        '<i class="fas fa-brain"></i><span>XAI Mode: Off</span>';
+                    this.classList.toggle('bg-purple-100', xaiMode);
+                    this.classList.toggle('dark:bg-purple-900', xaiMode);
+                    this.classList.toggle('bg-gray-200', !xaiMode);
+                    this.classList.toggle('dark:bg-gray-700', !xaiMode);
+                });
+
+                function sendMessage() {
+                    const message = messageInput.value.trim();
+                    if (message === '') return;
+
+                    // Add user message to chat
+                    addMessage(message, 'user');
+                    messageInput.value = '';
+                    messageInput.style.height = 'auto';
+
+                    // Show typing indicator
+                    showTypingIndicator();
+
+                    // Simulate AI response after a delay
+                    setTimeout(() => {
+                        removeTypingIndicator();
+                        const aiResponse = generateAIResponse(message);
+                        addMessage(aiResponse.response, 'ai');
+
+                        // If XAI mode is on and the response has an explanation, add it
+                        if (xaiMode && aiResponse.explanation) {
+                            setTimeout(() => {
+                                addMessage(aiResponse.explanation, 'ai', true);
+                            }, 500);
+                        }
+                    }, 1500 + Math.random() * 2000);
+                }
+
+                function addMessage(text, sender, isExplanation = false, documentContent = null) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('flex', 'message-animation');
+
+                    if (sender === 'user') {
+                        messageDiv.classList.add('justify-end');
+                        messageDiv.innerHTML = `
+                        <div class="max-w-[80%] bg-purple-600 text-white rounded-xl p-4">
+                            <p>${text}</p>
+                        </div>
+                    `;
+                    } else {
+                        messageDiv.classList.add('justify-start');
+                        if (isExplanation) {
+                            messageDiv.innerHTML = `
+                            <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-xl p-4 xai-explanation">
+                                <div class="flex items-start space-x-2">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400 mt-1 flex items-center justify-center text-white text-xs">X</div>
+                                    <div>
+                                        <p class="font-semibold text-purple-600 dark:text-purple-400">Explanation</p>
+                                        <p>${text}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        } else {
+                            messageDiv.innerHTML = `
+                            <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-xl p-4">
+                                <div class="flex items-start space-x-2">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400 mt-1"></div>
+                                    <div>
+                                        <p class="font-semibold">Grok AI</p>
+                                        <p>${text}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        }
+                    }
+
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                function showTypingIndicator() {
+                    const typingDiv = document.createElement('div');
+                    typingDiv.classList.add('flex', 'justify-start');
+                    typingDiv.id = 'typing-indicator';
+                    typingDiv.innerHTML = `
+                    <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-xl p-2">
+                        <div class="flex items-center space-x-2 pl-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400"></div>
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    chatMessages.appendChild(typingDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                function removeTypingIndicator() {
+                    const typingIndicator = document.getElementById('typing-indicator');
+                    if (typingIndicator) {
+                        typingIndicator.remove();
+                    }
+                }
+
+                async function generateAIResponse(userMessage) {
+                    const lowerMessage = userMessage.toLowerCase();
+                    let response = "";
+                    let explanation = "";
+                    let documentContent = "";
+
+                    try {
+                        // Connect to Grok API
+                        const apiResponse = await fetch('https://api.x.ai/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer YOUR_GROK_API_KEY'
+                            },
+                            body: JSON.stringify({
+                                model: 'grok-1',
+                                messages: [
+                                    {
+                                        role: 'system',
+                                        content: `You are NEURONEXIS, a highly intelligent AI assistant.
+                                    Current user location: ${userLocation ? `${userLocation.lat}, ${userLocation.lng}` : 'unknown'}.
+                                    Provide detailed, location-aware responses. For document creation, wrap content between ===DOCUMENT=== markers.`
+                                    },
+                                    {role: 'user', content: userMessage}
+                                ],
+                                temperature: 0.7,
+                                max_tokens: 4000
+                            })
+                        });
+
+                        const data = await apiResponse.json();
+                        const fullResponse = data.choices[0].message.content;
+
+                        // Check for document content
+                        if (fullResponse.includes('===DOCUMENT===')) {
+                            const docStart = fullResponse.indexOf('===DOCUMENT===') + 14;
+                            const docEnd = fullResponse.indexOf('===END_DOCUMENT===');
+                            documentContent = fullResponse.substring(docStart, docEnd).trim();
+                            response = fullResponse.substring(0, fullResponse.indexOf('===DOCUMENT===')).trim();
+                        } else {
+                            response = fullResponse;
+                        }
+
+                        // Generate explanation if in XAI mode
+                        if (xaiMode) {
+                            const explainResponse = await fetch('https://api.x.ai/v1/chat/completions', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': 'Bearer YOUR_GROK_API_KEY'
+                                },
+                                body: JSON.stringify({
+                                    model: 'grok-1',
+                                    messages: [
+                                        {
+                                            role: 'system',
+                                            content: 'Explain the reasoning behind this response in detail, including any location-based considerations.'
+                                        },
+                                        {role: 'user', content: `Original query: ${userMessage}\n\nResponse: ${response}`}
+                                    ],
+                                    temperature: 0.5,
+                                    max_tokens: 1000
+                                })
+                            });
+
+                            const explainData = await explainResponse.json();
+                            explanation = explainData.choices[0].message.content;
+                        }
+
+                    } catch (error) {
+                        console.error('API Error:', error);
+                        response = "I'm having trouble connecting to the NEURONEXIS servers. Please try again later.";
+                        explanation = "The API request failed. This could be due to network issues or server problems.";
+                    }
+                else if (lowerMessage.includes('how are you')) {
+                        response = "I'm functioning optimally, thank you for asking! As an AI, I don't have feelings, but I'm always ready to help.";
+                        explanation = "You asked about my state, so I provided information about my operational status while clarifying that I don't experience emotions like humans do.";
+                    }
+                    else if (lowerMessage.includes('explain') || lowerMessage.includes('how you work') || lowerMessage.includes('why did you say')) {
+                        response = "I'm happy to explain!";
+                        explanation = "I'm designed to process your input, analyze patterns, and generate relevant responses based on my training data. When you ask for explanations, I can provide insights into my reasoning process.";
+                    }
+                    else if (lowerMessage.includes('weather')) {
+                        response = "I can't access real-time weather data, but I can tell you that weather patterns are influenced by atmospheric conditions, temperature, and humidity.";
+                        explanation = "You mentioned 'weather', so I explained my limitations regarding real-time data while providing general information about weather patterns.";
+                    }
+                    else if (lowerMessage.includes('joke')) {
+                        response = "Why don't scientists trust atoms? Because they make up everything!";
+                        explanation = "You asked for a joke, so I selected a scientifically-themed pun from my training data that typically elicits positive engagement.";
+                    }
+                    else {
+                        response = "I'm designed to assist with a wide range of topics. Could you clarify or ask me something more specific?";
+                        explanation = "Your message didn't match my predefined response patterns, so I prompted for clarification to better understand your needs and provide more accurate assistance.";
+                    }
+
+                    // Randomly add more technical details to explanations
+                    if (Math.random() > 0.5 && xaiMode) {
+                        explanation += "\n\n[Technical Note: My response was generated by analyzing word patterns and selecting the most statistically likely appropriate response based on my training corpus.]";
+                    }
+
+                    return {
+                        response: response,
+                        explanation: explanation
+                    };
+                }
+
+                // Add some sample conversation starters
+                const sampleQuestions = [
+                    "Explain how you generate responses",
+                    "What's the weather like today?",
+                    "Tell me a joke",
+                    "How does XAI work?",
+                    "Why did you say that?"
+                ];
+
+                // Tier selection functionality
+                document.querySelectorAll('.tier-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        currentTier = this.dataset.tier;
+                        updateActiveFeatures();
+                    });
+                });
+
+                function updateActiveFeatures() {
+                    // Hide all feature sections first
+                    document.querySelectorAll('#features-container > div').forEach(section => {
+                        section.classList.add('hidden');
+                    });
+
+                    // Show features based on selected tier
+                    document.getElementById(`${currentTier}-features`).classList.remove('hidden');
+
+                    // Enable/disable features based on tier
+                    // This would be expanded based on your actual feature implementation
+                }
+
+                // Feature toggle functionality
+                document.querySelectorAll('#features-container input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const featureId = this.id;
+                        // Implement feature enable/disable logic here
+                        console.log(`Feature ${featureId} ${this.checked ? 'enabled' : 'disabled'}`);
+                    });
+                });
+
+                // Add sample questions to the input placeholder on focus
+                messageInput.addEventListener('focus', function() {
+                    const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+                    this.placeholder = `Try: "${randomQuestion}"`;
+                });
+
+                messageInput.addEventListener('blur', function() {
+                    this.placeholder = "Message Grok...";
+                });
             });
-            div.appendChild(openBtn);
-        }
-
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // Document Download Functions
-    function downloadFile(content, filename, type) {
-        const blob = new Blob([content], { type });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    document.getElementById('download-md').addEventListener('click', () => {
-        const content = documentEditor.value;
-        downloadFile(content, `AI_Document_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
-        documentModal.hide();
-    });
-
-    document.getElementById('download-txt').addEventListener('click', () => {
-        const content = documentEditor.value;
-        downloadFile(content, `AI_Document_${new Date().toISOString().slice(0, 10)}.txt`, 'text/plain');
-        documentModal.hide();
-    });
-
-    document.getElementById('download-docx').addEventListener('click', async () => {
-        const content = documentEditor.value;
-        const doc = new docx.Document({
-            sections: [{
-                properties: {},
-                children: content.split('\n').map(line => new docx.Paragraph({
-                    text: line,
-                    bold: line.startsWith('**') && line.endsWith('**'),
-                    heading: line.startsWith('**') ? docx.HeadingLevel.HEADING_1 : undefined
-                }))
-            }]
-        });
-        const blob = await docx.Packer.toBlob(doc);
-        downloadFile(blob, `AI_Document_${new Date().toISOString().slice(0, 10)}.docx`, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        documentModal.hide();
-    });
-
-    document.getElementById('download-pdf').addEventListener('click', () => {
-        const content = documentEditor.value;
-        const element = document.createElement('div');
-        element.innerHTML = marked.parse(content);
-        element.style.padding = '20px';
-        element.style.fontFamily = 'Inter, sans-serif';
-        element.style.fontSize = '16px';
-        html2pdf()
-            .from(element)
-            .set({
-                margin: 1,
-                filename: `AI_Document_${new Date().toISOString().slice(0, 10)}.pdf`,
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            })
-            .save();
-        documentModal.hide();
-    });
-
-    async function sendMessageToAI(message) {
-        try {
-            const response = await fetch('https://api.x.ai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer xai-s5HQ5gNoPDyPp82gCG2dBFhp5r6cBn89w82jPjcc2492CPor5VsKfrofpl53K2H0dZaEtb1fqHKnVgya'
-                },
-                body: JSON.stringify({
-                    model: 'grok-3',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Ești un asistent util care răspunde natural și prietenos în română. Formatează răspunsurile folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (cum ar fi recipise, contracte etc.), include conținutul documentului între marcajele ===DOCUMENT=== și ===END_DOCUMENT=== pentru a-l separa de restul răspunsului. Asigură-te că documentele sunt bine structurate și pot fi mai lungi decât o pagină A4.'
-                        },
-                        { role: 'user', content: message }
-                    ],
-                    stream: false,
-                    temperature: 0.7,
-                    max_tokens: 4096
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.choices[0].message.content || 'Îmi pare rău, nu am primit un răspuns de la AI.';
-        } catch (error) {
-            console.error('Error:', error);
-            return 'Eroare la conectarea cu API-ul xAI Grok. Cheia API poate fi invalidă sau serviciul indisponibil.';
-        }
-    }
-
-    // Adjust chat box height for mobile
-    window.addEventListener('resize', () => {
-        chatBox.style.height = window.innerWidth < 768 ? `${window.innerHeight - (document.body.classList.contains('live-dialog') ? 350 : 250)}px` : document.body.classList.contains('live-dialog') ? '400px' : '500px';
-    });
-    window.dispatchEvent(new Event('resize'));
-
-    // Set initial placeholder
-    input.placeholder = placeholders[langSelect.value].default;
-
-    // Ensure voices are loaded for TTS
-    speechSynthesis.onvoiceschanged = () => {};
-</script>
-<!-- Mammoth.js for DOCX text extraction -->
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+        </script>
 </body>
 </html>
