@@ -18,307 +18,211 @@
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@google-cloud/translate@2.2.0/build/src/index.min.js"></script>
   <style>
-    .chat-box, .daily-overview {
-      scrollbar-width: none;
-    }
-    .chat-box::-webkit-scrollbar, .daily-overview::-webkit-scrollbar {
-      display: none;
-    }
-    .message img, .overview-item img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-    }
-    .forced-colors\:bg-white {
-      background-color: white;
-    }
-    @media (forced-colors: active) {
-      .forced-colors\:bg-white {
-        background-color: Canvas;
-      }
-      .forced-colors\:text-black {
-        color: CanvasText;
-      }
-    }
-    .chat-box {
-      background: linear-gradient(145deg, #ffffff, #f0f4ff);
-    }
     body, html {
       height: 100%;
       margin: 0;
       padding: 0;
+      font-family: 'Inter', sans-serif;
     }
-    #main {
-      padding-bottom: 80px;
-    }
-    section {
-      gap: 1rem;
-    }
-    @media (max-width: 1024px) {
-      #daily-overview-container, #recommendations-container {
-        display: none;
-      }
-      #recommendations-toggle {
-        display: block;
-      }
-    }
-    @media (min-width: 1024px) {
-      .lg\:grid-cols-3 {
-        grid-template-columns: 1fr 2fr 1fr;
-      }
-      #daily-overview-container, #recommendations-container {
-        display: block;
-      }
-      #recommendations-toggle {
-        display: none;
-      }
-    }
-    @media (max-width: 640px) {
-      #main {
-        margin-top: 60px;
-        padding-bottom: 100px;
-      }
-      #header {
-        padding: 0.5rem 1rem;
-      }
-      #sidebar {
-        width: 75%;
-      }
-      .chat-box {
-        max-height: 50vh;
-      }
-      .daily-overview {
-        max-height: 30vh;
-      }
-      .text-xs {
-        font-size: 0.875rem;
-      }
-      .p-2 {
-        padding: 0.75rem;
-      }
-      .py-1 {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-      }
-      .px-2 {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-      }
-      .rounded-full {
-        min-width: 44px;
-        min-height: 44px;
-      }
-      #input-form {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      #input-form > *:not(:last-child) {
-        margin-bottom: 0.5rem;
-      }
-      #lang-select, #user-input {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-      }
-      #input-form button {
-        padding: 0.75rem;
-        width: 100%;
-        display: inline-flex;
-        justify-content: center;
-      }
-      #recommendations-container {
-        margin-top: 1rem;
-      }
-      .toggle-section {
-        margin-bottom: 0.5rem;
-      }
-    }
-    .modal {
-      display: none;
+    #header {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
+      right: 0;
+      z-index: 50;
       background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      max-width: 90%;
-      width: 400px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 10px 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .modal-content h2 {
-      font-size: 1.25rem;
-      margin-bottom: 1rem;
+    #sidebar {
+      width: 250px;
+      background: #f8f9fa;
+      position: fixed;
+      top: 60px;
+      bottom: 0;
+      padding-top: 10px;
+      transition: transform 0.3s ease;
+      z-index: 40;
     }
-    .modal-content input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+    #sidebar.active {
+      transform: translateX(0);
     }
-    .modal-content .btn-group {
+    #main {
+      margin-top: 60px;
+      margin-left: 250px;
+      height: calc(100vh - 60px);
       display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
+      flex-direction: column;
+    }
+    #chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    }
+    #chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .message {
+      max-width: 60%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .message.user {
+      background: #075e54;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+    .message.ai {
+      background: #e8eaf6;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+    #input-area {
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #ddd;
+      display: flex;
+      gap: 10px;
+      position: sticky;
+      bottom: 0;
+      z-index: 30;
+    }
+    #user-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      outline: none;
+    }
+    #send-btn {
+      background: #075e54;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    #send-btn:hover {
+      background: #054d44;
+    }
+    .dialog-item {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .dialog-item:hover {
+      background: #f0f0f0;
+    }
+    @media (max-width: 768px) {
+      #sidebar {
+        transform: translateX(-250px);
+      }
+      #main {
+        margin-left: 0;
+      }
+      #chat-container {
+        margin-left: 0;
+      }
+      .message {
+        max-width: 80%;
+      }
     }
   </style>
 </head>
-<body class="bg-background text-gray-900 font-inter min-h-screen flex flex-col">
-<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm flex items-center justify-between px-2 py-2 md:px-6 md:py-3 w-full">
-  <div class="flex items-center">
-    <a href="index.html" class="flex items-center space-x-1">
-      <img src="assets/img/logo.png" alt="NEURONEXIS" class="h-6 md:h-8">
-      <span class="hidden md:block text-lg md:text-xl font-semibold text-primary">NEURONEXIS</span>
-    </a>
-    <button id="toggle-sidebar-btn" class="md:hidden ml-2 text-gray-600">
-      <i class="fas fa-bars text-lg md:text-xl"></i>
+<body class="bg-gray-100">
+<header id="header">
+  <div class="flex items-center justify-between">
+    <button id="toggle-sidebar-btn" class="md:hidden mr-2 text-gray-600">
+      <i class="fas fa-bars"></i>
+    </button>
+    <span class="text-xl font-semibold text-gray-800">NEURONEXIS</span>
+    <button id="profile-btn" class="flex items-center space-x-2 text-gray-700">
+      <span id="user-name">Guest</span>
+      <i class="fas fa-user-circle"></i>
     </button>
   </div>
-  <nav class="flex items-center space-x-2">
-    <div class="relative hidden md:block">
-      <input type="text" id="search-input" placeholder="Search..." class="pl-8 pr-3 py-1 md:py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32 md:w-48">
-      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-    </div>
-    <div class="relative">
-      <button class="flex items-center space-x-1" data-bs-toggle="dropdown">
-        <img id="header-profile-image" src="assets/img/profile-img.jpg" alt="Profile" class="h-6 md:h-8 w-6 md:w-8 rounded-full object-cover">
-        <span id="user-name" class="hidden md:block text-sm font-medium text-gray-700">Guest</span>
-      </button>
-      <ul class="dropdown-menu absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white rounded-xl shadow-lg py-1 hidden">
-        <li class="px-3 py-1">
-          <p id="user-fullname" class="font-semibold text-gray-800 text-xs md:text-sm">Guest</p>
-          <p id="user-role" class="text-xs md:text-sm text-gray-500">Guest User</p>
-        </li>
-        <li><hr class="my-1 border-gray-200"></li>
-        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-1 md:mr-2"></i> My Profile</a></li>
-        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-1 md:mr-2"></i> Account Settings</a></li>
-        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-question-circle mr-1 md:mr-2"></i> Need Help?</a></li>
-        <li><hr class="my-1 border-gray-200"></li>
-        <li><a href="#" id="logout-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-danger hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-1 md:mr-2"></i> Sign Out</a></li>
-      </ul>
-    </div>
-  </nav>
 </header>
-<aside id="sidebar" class="fixed top-0 left-0 w-48 md:w-64 h-full bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
-  <div class="flex items-center justify-between p-2 md:p-4 border-b">
-    <span class="text-lg md:text-xl font-semibold text-primary">Menu</span>
-    <button id="close-sidebar-btn" class="md:hidden text-gray-600">
-      <i class="fas fa-times text-lg md:text-xl"></i>
-    </button>
+<aside id="sidebar">
+  <div class="p-4 border-b">
+    <h2 class="text-lg font-semibold">Menu</h2>
   </div>
-  <ul class="py-2 md:py-4">
-    <li class="px-2 md:px-4 py-1 md:py-2">
-      <a href="index.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
-        <i class="fas fa-tachometer-alt mr-1 md:mr-3"></i> Dashboard
+  <ul class="p-4 space-y-2">
+    <li>
+      <a href="index.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="dashboard">
+        <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
       </a>
     </li>
-    <li class="px-2 md:px-4 py-1 md:py-2">
-      <a href="document-editor.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
-        <i class="fas fa-file-alt mr-1 md:mr-3"></i> Document Editor
+    <li>
+      <a href="document-editor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="document-editor">
+        <i class="fas fa-file-alt mr-2"></i> Document Editor
       </a>
     </li>
-    <li class="px-2 md:px-4 py-1 md:py-2" id="login-nav">
-      <a href="#" id="google-login-btn" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
-        <i class="fas fa-sign-in-alt mr-1 md:mr-3"></i> Login with Google
+    <li id="login-nav">
+      <a id="google-login-btn" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="login-with-google">
+        <i class="fas fa-sign-in-alt mr-2"></i> Login with Google
       </a>
     </li>
-    <li class="px-2 md:px-4 py-1 md:py-2" id="profile-nav" style="display: none;">
-      <a href="users-profile.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
-        <i class="fas fa-user-circle mr-1 md:mr-3"></i> Profile
+    <li id="profile-nav" style="display: none;">
+      <a href="users-profile.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="profile">
+        <i class="fas fa-user-circle mr-2"></i> Profile
       </a>
+    </li>
+    <li>
+      <select id="lang-select" class="w-full p-2 border rounded">
+        <option value="ro-RO">Română</option>
+        <option value="en-US">English</option>
+        <option value="ru-RU">Русский</option>
+        <option value="es-ES">Español</option>
+        <option value="fr-FR">Français</option>
+      </select>
+    </li>
+    <li class="mt-4">
+      <h3 class="text-md font-semibold">Dialogs</h3>
+      <div id="dialog-menu" class="space-y-1"></div>
     </li>
   </ul>
 </aside>
-<main id="main" class="mt-12 md:mt-20 md:ml-64 p-0 flex-1">
-  <div class="p-2 md:p-4">
-    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">AI Productivity Dashboard</h1>
-    <nav class="mt-1 md:mt-2">
-      <ol class="flex space-x-1 md:space-x-2 text-xs md:text-sm text-gray-500">
-        <li><a href="index.html" class="hover:text-primary">Home</a></li>
-        <li>/</li>
-        <li class="text-primary">Dashboard</li>
-      </ol>
-    </nav>
+<main id="main">
+  <div id="chat-container">
+    <div id="chat-box"></div>
+    <div id="input-area">
+      <input type="text" id="user-input" placeholder="Type a message...">
+      <button id="send-btn" data-translate="send">Send</button>
+    </div>
   </div>
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
-      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
-      <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
-        <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm text-xs md:text-sm">
-          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile și îți ofer recomandări zilnice bazate pe locația ta. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Cum te ajut astăzi?
-        </div>
-      </div>
-      <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
-      <form id="input-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
-        <select id="lang-select" class="bg-white border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0">
-          <option value="ro-RO">Română</option>
-          <option value="en-US">English</option>
-          <option value="ru-RU">Русский</option>
-          <option value="es-ES">Español</option>
-          <option value="fr-FR">Français</option>
-        </select>
-        <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-lg px-2 md:px-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary text-xs md:text-sm">
-        <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple class="hidden">
-        <button type="button" id="upload-btn" title="Încarcă document" class="bg-accent text-white rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
-          <i class="fa fa-upload text-xs md:text-base"></i>
-        </button>
-        <button type="button" id="mic-btn" title="Vorbește mesajul tău" class="bg-success text-white rounded-full p-1 md:p-3 hover:bg-green-600 transition">
-          <i class="fa fa-microphone text-xs md:text-base"></i>
-        </button>
-        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-indigo-700 transition">
-          <i class="fa fa-paper-plane text-xs md:text-base"></i>
-        </button>
-      </form>
-      <div id="mobile-toggles" class="mt-2">
-        <button id="recommendations-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Recommendations</button>
-      </div>
-    </div>
-    <div id="daily-overview-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
-      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Overview</h2>
-      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
-    </div>
-    <div id="recommendations-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
-      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Recommendations</h2>
-      <div id="daily-recommendations" class="p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner flex-1">
-        <p>Întreabă-mă despre calendarul tău sau cere-mi să creez un document!</p>
-      </div>
-    </div>
-  </section>
 </main>
-<footer class="bg-white py-2 md:py-6 text-center text-gray-600 w-full">
-  <div class="text-xs md:text-sm">© Copyright <strong>NeuroNexis</strong>. All Rights Reserved</div>
-  <div class="text-xs md:text-sm">Designed by <a href="#" class="text-primary hover:underline">Poalelungi Consulting</a></div>
-</footer>
+<input type="file" id="file-input" accept="image/*,.pdf,.docx,.txt" style="display: none;">
 <script>
   (function() {
-    const pdfjsLib = window['pdfjs-dist/build/pdf'];
     const chatBox = document.getElementById('chat-box');
-    const form = document.getElementById('input-form');
-    const input = document.getElementById('user-input');
-    const fileInput = document.getElementById('file-input');
-    const uploadBtn = document.getElementById('upload-btn');
-    const typingIndicator = document.querySelector('.typing-indicator');
-    const micBtn = document.getElementById('mic-btn');
-    const langSelect = document.getElementById('lang-select');
-    const dailyRecommendations = document.getElementById('daily-recommendations');
-    const dailyOverview = document.getElementById('daily-overview');
-    const dailyOverviewContainer = document.getElementById('daily-overview-container');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
     const sidebar = document.getElementById('sidebar');
     const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
-    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-    const recommendationsContainer = document.getElementById('recommendations-container');
-    const recommendationsToggle = document.getElementById('recommendations-toggle');
-    const googleLoginBtn = document.getElementById('google-login-btn');
+    const langSelect = document.getElementById('lang-select');
+    const loginNav = document.getElementById('login-nav');
+    const profileNav = document.getElementById('profile-nav');
+    const profileBtn = document.getElementById('profile-btn');
+    const userName = document.getElementById('user-name');
+    const dialogMenu = document.getElementById('dialog-menu');
+    const fileInput = document.getElementById('file-input');
+    let userData = JSON.parse(localStorage.getItem('userData')) || {};
+    let currentUser = localStorage.getItem('currentUser');
+    let currentDialog = localStorage.getItem('currentDialog') || 'default';
+    let chatHistory = userData[currentUser]?.chats?.[currentDialog] || [];
+    let accessToken = localStorage.getItem('googleAccessToken');
 
-    // Split API keys into parts to avoid GitHub secret scanning
+    // Split API keys
     const CLIENT_ID_PART1 = '906465572275';
     const CLIENT_ID_PART2 = '-hanrq89dvi0a8bpf2benqdq7quu3njtc';
     const CLIENT_ID = CLIENT_ID_PART1 + CLIENT_ID_PART2 + '.apps.googleusercontent.com';
@@ -332,26 +236,9 @@
     const XAI_API_KEY = XAI_API_KEY_PART1 + XAI_API_KEY_PART2 + XAI_API_KEY_PART3;
     const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar';
 
-    const placeholders = {
-      'en-US': { default: 'Type your message...', listening: 'Listening...' },
-      'ro-RO': { default: 'Tastează mesajul tău...', listening: 'Ascult...' },
-      'ru-RU': { default: 'Введите ваше сообщение...', listening: 'Слушаю...' },
-      'es-ES': { default: 'Escribe tu mensaje...', listening: 'Escuchando...' },
-      'fr-FR': { default: 'Tapez votre message...', listening: 'Écoute...' }
-    };
-
-    let userData = JSON.parse(localStorage.getItem('userData')) || {};
-    let currentUser = localStorage.getItem('currentUser');
-    let chatHistory = userData[currentUser]?.chats || [];
-    let isRecommendationsVisible = false;
-    let accessToken = localStorage.getItem('googleAccessToken');
-
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission();
-    }
-
     function saveUserData() {
       localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem('currentDialog', currentDialog);
     }
 
     function initGoogleClient() {
@@ -368,11 +255,8 @@
           const authInstance = gapi.auth2.getAuthInstance();
           authInstance.isSignedIn.listen(updateSigninStatus);
           updateSigninStatus(authInstance.isSignedIn.get());
-          googleLoginBtn.addEventListener('click', () => authInstance.signIn());
-        }, (error) => {
-          console.error('Error initializing Google client:', error);
-          addMessage('Eroare la inițializarea clientului Google. Verifică cheia API.', 'ai');
-        });
+          document.getElementById('google-login-btn').addEventListener('click', () => authInstance.signIn());
+        }, (error) => console.error('Error initializing Google client:', error));
       });
     }
 
@@ -382,7 +266,7 @@
         accessToken = user.getAuthResponse().access_token;
         localStorage.setItem('googleAccessToken', accessToken);
         currentUser = user.getBasicProfile().getEmail();
-        userData[currentUser] = userData[currentUser] || { chats: [], profile: {} };
+        userData[currentUser] = userData[currentUser] || { chats: { default: [] }, profile: {} };
         userData[currentUser].profile = {
           name: user.getBasicProfile().getName(),
           email: currentUser,
@@ -390,468 +274,251 @@
         };
         localStorage.setItem('currentUser', currentUser);
         saveUserData();
-        document.getElementById('login-nav').style.display = 'none';
-        document.getElementById('profile-nav').style.display = 'block';
+        loginNav.style.display = 'none';
+        profileNav.style.display = 'block';
+        userName.textContent = userData[currentUser].profile.name || currentUser;
         loadProfile();
-        fetchEmails();
-        fetchCalendarEvents();
       } else {
-        document.getElementById('login-nav').style.display = 'block';
-        document.getElementById('profile-nav').style.display = 'none';
+        loginNav.style.display = 'block';
+        profileNav.style.display = 'none';
+        userName.textContent = 'Guest';
       }
-    }
-
-    async function fetchEmails() {
-      try {
-        const response = await gapi.client.gmail.users.messages.list({
-          userId: 'me',
-          maxResults: 5,
-          q: 'from:* -in:trash'
-        });
-        const emails = [];
-        for (const msg of response.result.messages) {
-          const msgResponse = await gapi.client.gmail.users.messages.get({
-            userId: 'me',
-            id: msg.id
-          });
-          emails.push(msgResponse.result);
-        }
-        userData[currentUser].emails = emails;
-        saveUserData();
-        generateDailyOverview();
-      } catch (error) {
-        console.error('Email fetch error:', error);
-        addMessage('Eroare la preluarea e-mailurilor. Verifică permisiunile.', 'ai');
-      }
-    }
-
-    async function fetchCalendarEvents() {
-      try {
-        const response = await gapi.client.calendar.events.list({
-          calendarId: 'primary',
-          timeMin: new Date().toISOString(),
-          maxResults: 10,
-          singleEvents: true,
-          orderBy: 'startTime'
-        });
-        userData[currentUser].calendarEvents = response.result.items || [];
-        saveUserData();
-        generateDailyOverview();
-      } catch (error) {
-        console.error('Calendar fetch error:', error);
-        addMessage('Eroare la preluarea evenimentelor din calendar.', 'ai');
-      }
-    }
-
-    async function createCalendarEvent(summary, description, startTime, endTime) {
-      try {
-        const event = {
-          summary: summary,
-          description: description,
-          start: {
-            dateTime: startTime.toISOString(),
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-          },
-          end: {
-            dateTime: endTime.toISOString(),
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-          }
-        };
-        const response = await gapi.client.calendar.events.insert({
-          calendarId: 'primary',
-          resource: event
-        });
-        addMessage(`Eveniment creat: ${summary} la ${startTime.toLocaleString()}`, 'ai');
-        fetchCalendarEvents();
-        return response.result;
-      } catch (error) {
-        console.error('Error creating calendar event:', error);
-        addMessage('Eroare la crearea evenimentului în calendar.', 'ai');
-      }
-    }
-
-    function logout() {
-      gapi.auth2.getAuthInstance().signOut().then(() => {
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('googleAccessToken');
-        currentUser = null;
-        accessToken = null;
-        document.getElementById('login-nav').style.display = 'block';
-        document.getElementById('profile-nav').style.display = 'none';
-        window.location.href = 'index.html';
-      });
     }
 
     function loadProfile() {
-      const user = userData[currentUser];
-      if (user && user.profile) {
-        document.getElementById('user-name').textContent = user.profile.name || currentUser;
-        document.getElementById('user-fullname').textContent = user.profile.name || currentUser;
-        document.getElementById('user-role').textContent = user.profile.email;
-        document.getElementById('header-profile-image').src = user.profile.picture || 'assets/img/profile-img.jpg';
-        chatHistory = user.chats || [];
-        renderChatHistory();
-        generateDailyOverview();
-        generateDailyRecommendations();
-      }
+      chatHistory = userData[currentUser]?.chats?.[currentDialog] || [];
+      renderChatHistory();
+      updateDialogMenu();
     }
 
-    function requestLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-                (position) => {
-                  userData[currentUser].location = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    timestamp: new Date().toISOString()
-                  };
-                  saveUserData();
-                  addMessage('Locația ta a fost salvată pentru a optimiza recomandările.', 'ai');
-                },
-                (error) => {
-                  console.error('Location error:', error);
-                  addMessage('Nu am putut accesa locația ta. Continuăm fără informații de locație.', 'ai');
-                }
-        );
-      } else {
-        addMessage('Geolocația nu este suportată de browser-ul tău.', 'ai');
-      }
-    }
-
-    toggleSidebarBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('-translate-x-full');
-    });
-
-    closeSidebarBtn.addEventListener('click', () => {
-      sidebar.classList.add('-translate-x-full');
-    });
-
-    document.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', () => {
-      document.querySelector('.dropdown-menu').classList.toggle('hidden');
-    });
-
-    recommendationsToggle.addEventListener('click', () => {
-      isRecommendationsVisible = !isRecommendationsVisible;
-      recommendationsContainer.style.display = isRecommendationsVisible ? 'block' : 'none';
-      recommendationsToggle.textContent = isRecommendationsVisible ? 'Hide Recommendations' : 'Show Recommendations';
-    });
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = langSelect.value;
-      let finalTranscript = '';
-      recognition.onresult = (event) => {
-        let interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-        input.value = finalTranscript + interimTranscript;
-      };
-      recognition.onstart = () => {
-        micBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-        input.placeholder = placeholders[langSelect.value].listening;
-      };
-      recognition.onend = () => {
-        micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-        micBtn.classList.add('bg-success', 'hover:bg-green-600');
-        input.placeholder = placeholders[langSelect.value].default;
-        if (finalTranscript.trim()) {
-          form.dispatchEvent(new Event('submit'));
-        }
-        finalTranscript = '';
-      };
-      recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        addMessage('Eroare la intrarea vocală. Te rog încearcă din nou.', 'ai');
-        micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-        micBtn.classList.add('bg-success', 'hover:bg-green-600');
-        input.placeholder = placeholders[langSelect.value].default;
-      };
-      micBtn.addEventListener('click', () => {
-        if (!micBtn.classList.contains('bg-red-500')) {
-          finalTranscript = '';
-          recognition.lang = langSelect.value;
-          recognition.start();
-        } else {
-          recognition.stop();
-        }
-      });
-      langSelect.addEventListener('change', () => {
-        recognition.lang = langSelect.value;
-        input.placeholder = placeholders[langSelect.value].default;
-      });
-    } else {
-      micBtn.style.display = 'none';
-      langSelect.style.display = 'none';
-    }
-
-    uploadBtn.addEventListener('click', () => {
-      fileInput.click();
-    });
-
-    fileInput.addEventListener('change', async () => {
-      const files = fileInput.files;
-      if (files.length === 0) return;
-      typingIndicator.classList.remove('hidden');
-      chatBox.scrollTop = chatBox.scrollHeight;
-      let fileContents = [];
-      for (const file of files) {
-        let content;
-        if (file.type === 'application/pdf') {
-          content = await extractTextFromPDF(file);
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-          content = await extractTextFromDocx(file);
-        } else {
-          content = await readFile(file);
-        }
-        fileContents.push(`**${file.name}**\n${content}`);
-        addMessage(`Încărcat: ${file.name}`, 'user');
-      }
-      const message = input.value.trim() || 'Analizează documentele încărcate.';
-      const combinedMessage = `${message}\n\n${fileContents.join('\n\n')}`;
-      const aiResponse = await sendMessageToAI(combinedMessage);
-      typingIndicator.classList.add('hidden');
-      addMessage(aiResponse, 'ai', true);
-      fileInput.value = '';
-    });
-
-    async function readFile(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error('Eroare la citirea fișierului'));
-        reader.readAsText(file);
-      });
-    }
-
-    async function extractTextFromPDF(file) {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        let text = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          text += textContent.items.map(item => item.str).join(' ') + '\n';
-        }
-        return text;
-      } catch (error) {
-        console.error('Error extracting PDF text:', error);
-        return 'Eroare la extragerea textului din PDF.';
-      }
-    }
-
-    async function extractTextFromDocx(file) {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const { value } = await mammoth.extractRawText({ arrayBuffer });
-        return value;
-      } catch (error) {
-        console.error('Error extracting DOCX text:', error);
-        return 'Eroare la extragerea textului din DOCX.';
-      }
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = input.value.trim().toLowerCase();
-      if (!message) return;
-      addMessage(input.value, 'user');
-      input.value = '';
-      typingIndicator.classList.remove('hidden');
-      chatBox.scrollTop = chatBox.scrollHeight;
-      userData[currentUser].chats = userData[currentUser].chats || [];
-      userData[currentUser].chats.push({ type: 'user', text: message });
-      saveUserData();
-
-      if (message.includes('crează document') || message.includes('create document') ||
-              message.includes('contract') || message.includes('orar') ||
-              message.includes('schedule') || message.includes('excel')) {
-        addMessage('Redirecționez către editorul de documente pentru a crea documentul solicitat.', 'ai');
-        setTimeout(() => {
-          window.location.href = `document-editor.html?query=${encodeURIComponent(message)}`;
-        }, 1000);
-        typingIndicator.classList.add('hidden');
-        return;
-      }
-
-      if (message.includes('create event') || message.includes('adaugă eveniment')) {
-        const parts = message.split('la');
-        const description = parts[0].replace(/create event|adaugă eveniment/i, '').trim();
-        const timePart = parts[1]?.trim();
-        if (description && timePart) {
-          const startTime = new Date(timePart);
-          if (!isNaN(startTime.getTime())) {
-            const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour later
-            await createCalendarEvent(description, '', startTime, endTime);
-          } else {
-            addMessage('Data specificată nu este validă. Folosește un format valid, ex. "crează eveniment meeting la 15 mai 2023 14:00".', 'ai');
-          }
-        } else {
-          addMessage('Te rog specifică un titlu și o dată pentru eveniment.', 'ai');
-        }
-        typingIndicator.classList.add('hidden');
-        return;
-      }
-
-      const aiResponse = await sendMessageToAI(message);
-      typingIndicator.classList.add('hidden');
-      addMessage(aiResponse, 'ai', true);
-      userData[currentUser].chats.push({ type: 'ai', text: aiResponse });
-      saveUserData();
-      generateDailyOverview();
-      generateDailyRecommendations();
-    });
-
-    function addMessage(text, type, isDocument = false) {
+    function addMessage(text, type, isImage = false, imageUrl = null) {
       const div = document.createElement('div');
-      div.className = `message ${type} p-1 md:p-3 rounded-lg max-w-[70%] ${type === 'user' ? 'bg-primary text-white ml-auto rounded-br-none' : 'bg-soft text-gray-800 rounded-bl-none'} animate-slideIn shadow-sm text-xs md:text-sm`;
-      let generalContent = text;
-      let documentContent = '';
-      const documentMarker = '===DOCUMENT===';
-      const documentEndMarker = '===END_DOCUMENT===';
-      if (isDocument && text.includes(documentMarker)) {
-        const startIdx = text.indexOf(documentMarker) + documentMarker.length;
-        const endIdx = text.indexOf(documentEndMarker);
-        documentContent = text.slice(startIdx, endIdx).trim();
-        generalContent = text.slice(0, startIdx - documentMarker.length).trim() + (endIdx > -1 ? text.slice(endIdx + documentEndMarker.length).trim() : '');
-        div.classList.add('border-2', 'border-primary');
-      }
-      if (generalContent) {
-        const renderedHtml = marked.parse(generalContent);
-        const contentDiv = document.createElement('div');
-        contentDiv.innerHTML = renderedHtml;
-        contentDiv.className = 'prose prose-sm max-w-none text-xs md:text-sm';
-        div.appendChild(contentDiv);
-      }
-      if (documentContent && type === 'ai') {
-        const openBtn = document.createElement('button');
-        openBtn.className = 'mt-1 md:mt-2 bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 hover:bg-indigo-700 flex items-center text-xs md:text-sm';
-        openBtn.innerHTML = '<i class="fas fa-file-alt mr-1 md:mr-2"></i>Deschide în Editorul de Documente';
-        openBtn.addEventListener('click', () => {
-          window.location.href = `document-editor.html?content=${encodeURIComponent(documentContent)}`;
-        });
-        div.appendChild(openBtn);
+      div.className = `message ${type}`;
+      if (isImage && imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.maxWidth = '100%';
+        img.style.borderRadius = '10px';
+        div.appendChild(img);
+      } else {
+        div.innerHTML = marked.parse(text);
       }
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function renderChatHistory() {
+      chatBox.innerHTML = '';
       chatHistory.forEach(chat => {
-        addMessage(chat.text, chat.type, chat.text.includes('===DOCUMENT==='));
+        if (chat.imageUrl) {
+          addMessage(chat.text, chat.type, true, chat.imageUrl);
+        } else {
+          addMessage(chat.text, chat.type);
+        }
       });
     }
 
-    async function sendMessageToAI(message) {
-      try {
-        const location = userData[currentUser]?.location || { latitude: null, longitude: null, timestamp: null };
-        const requestBody = {
-          model: 'grok-3',
-          messages: [
-            {
-              role: 'system',
-              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor și oferă recomandări zilnice. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Folosește informațiile despre locație pentru a personaliza răspunsurile, dacă sunt disponibile.'
-            },
-            {
-              role: 'user',
-              content: `${message}\n\n**Locație utilizator:** Latitudine: ${location.latitude || 'necunoscută'}, Longitudine: ${location.longitude || 'necunoscută'}, Timestamp: ${location.timestamp || 'necunoscut'}`
-            }
-          ],
-          stream: false,
-          temperature: 0.7,
-          max_tokens: 4096
-        };
-        const response = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${XAI_API_KEY}`
-          },
-          body: JSON.stringify(requestBody)
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.choices[0].message.content || 'Îmi pare rău, nu am primit un răspuns de la AI.';
-      } catch (error) {
-        console.error('Error with xAI API:', error);
-        return 'Eroare la conectarea cu API-ul xAI Grok. Verifică cheia API.';
-      }
+    async function sendMessageToAI(message, options = {}) {
+      const location = userData[currentUser]?.location || { latitude: null, longitude: null };
+      const systemPrompt = `Ești Grok 3, creat de xAI. Ai memorie (conversații anterioare), analiză profiluri X/postări/linkuri, procesare imagini, generare imagini, procesare documente (PDF, DOCX, TXT), generare documente, căutare web/X, DeepSearch, Think mode (activează cu buton), și voce (doar app). Răspunde în limba selectată. Include linkuri Google Maps (https://maps.google.com/?q=lat,lng) dacă relevant.`;
+      const requestBody = {
+        model: 'grok-3',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `${message}\nLocație: Lat ${location.latitude || 'N/A'}, Long ${location.longitude || 'N/A'}` }
+        ],
+        stream: false,
+        temperature: 0.7,
+        ...options
+      };
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${XAI_API_KEY}` },
+        body: JSON.stringify(requestBody)
+      });
+      const data = await response.json();
+      return data.choices[0].message.content || 'No response';
     }
 
-    function generateDailyOverview() {
-      const today = new Date();
-      const emails = userData[currentUser]?.emails || [];
-      const events = userData[currentUser]?.calendarEvents || [];
-      dailyOverview.innerHTML = '';
-      if (events.length > 0) {
-        const div = document.createElement('div');
-        div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
-        div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente de astăzi</h4><ul class="list-disc pl-3 md:pl-5">${events.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleTimeString()} - ${new Date(e.end.dateTime).toLocaleTimeString()})</li>`).join('')}</ul>`;
-        dailyOverview.appendChild(div);
-      }
-      if (emails.length > 0) {
-        emails.forEach(email => {
-          const from = email.payload?.headers.find(h => h.name === 'From')?.value || 'Unknown';
-          const subject = email.payload?.headers.find(h => h.name === 'Subject')?.value || 'No Subject';
-          const snippet = email.snippet?.substring(0, 100) + (email.snippet?.length > 100 ? '...' : '') || '';
-          const div = document.createElement('div');
-          div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
-          div.innerHTML = `
-                    <p class="text-xs md:text-sm"><strong>De la:</strong> ${from}</p>
-                    <p class="text-xs md:text-sm"><strong>Subiect:</strong> ${subject}</p>
-                    <p class="text-xs md:text-sm">${snippet}</p>
-                `;
-          dailyOverview.appendChild(div);
-        });
-      }
-      dailyOverviewContainer.classList.toggle('hidden', !events.length && !emails.length);
-    }
-
-    function generateDailyRecommendations() {
-      const recommendations = ['Întreabă-mă despre calendarul tău sau cere-mi să creez un document!'];
-      if (userData[currentUser].location) {
-        recommendations.push(`**Recomandare locală:** Bazat pe locația ta, verifică-ți calendarul pentru evenimentele de astăzi.`);
-      }
-      dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
-      if (window.innerWidth <= 1024) {
-        recommendationsToggle.classList.toggle('hidden', recommendations.length <= 1);
-        if (recommendations.length > 1 && !isRecommendationsVisible) {
-          isRecommendationsVisible = true;
-          recommendationsContainer.style.display = 'block';
-          recommendationsToggle.textContent = 'Hide Recommendations';
-        }
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      const height = window.innerHeight - (document.getElementById('header').offsetHeight + document.querySelector('footer').offsetHeight + 20);
-      chatBox.style.maxHeight = `${height * 0.6}px`;
-      dailyOverview.style.maxHeight = `${height * 0.6}px`;
+    sendBtn.addEventListener('click', async () => {
+      const message = userInput.value.trim();
+      if (!message) return;
+      addMessage(message, 'user');
+      userInput.value = '';
+      const aiResponse = await sendMessageToAI(message);
+      addMessage(aiResponse, 'ai');
+      chatHistory.push({ type: 'user', text: message }, { type: 'ai', text: aiResponse });
+      saveUserData();
     });
 
-    window.dispatchEvent(new Event('resize'));
-    input.placeholder = placeholders[langSelect.value].default;
-    document.getElementById('logout-btn').addEventListener('click', logout);
+    toggleSidebarBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
 
-    window.addEventListener('load', () => {
+    const translations = {
+      'ro-RO': { dashboard: 'Tablou de bord', 'document-editor': 'Editor de documente', 'login-with-google': 'Conectare cu Google', profile: 'Profil', send: 'Trimite' },
+      'en-US': { dashboard: 'Dashboard', 'document-editor': 'Document Editor', 'login-with-google': 'Login with Google', profile: 'Profile', send: 'Send' },
+      'ru-RU': { dashboard: 'Панель управления', 'document-editor': 'Редактор документов', 'login-with-google': 'Вход через Google', profile: 'Профиль', send: 'Отправить' },
+      'es-ES': { dashboard: 'Tablero', 'document-editor': 'Editor de documentos', 'login-with-google': 'Iniciar sesión con Google', profile: 'Perfil', send: 'Enviar' },
+      'fr-FR': { dashboard: 'Tableau de bord', 'document-editor': 'Éditeur de documents', 'login-with-google': 'Connexion avec Google', profile: 'Profil', send: 'Envoyer' }
+    };
+
+    function translatePage(lang) {
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        el.textContent = translations[lang][key] || el.textContent;
+      });
+      userInput.placeholder = `Type a message in ${lang === 'ro-RO' ? 'Română' : lang === 'en-US' ? 'English' : lang === 'ru-RU' ? 'Русский' : lang === 'es-ES' ? 'Español' : 'Français'}...`;
+      if (chatHistory.length) renderChatHistory();
+    }
+
+    langSelect.addEventListener('change', (e) => {
+      const lang = e.target.value;
+      translatePage(lang);
+      localStorage.setItem('lang', lang);
+    });
+
+    function updateDialogMenu() {
+      dialogMenu.innerHTML = '';
+      const dialogs = Object.keys(userData[currentUser]?.chats || { default: [] });
+      dialogs.forEach(dialog => {
+        const div = document.createElement('div');
+        div.className = 'dialog-item';
+        div.textContent = dialog;
+        if (dialog === currentDialog) div.classList.add('bg-blue-100');
+        div.addEventListener('click', () => {
+          currentDialog = dialog;
+          chatHistory = userData[currentUser].chats[currentDialog] || [];
+          renderChatHistory();
+          updateDialogMenu();
+          saveUserData();
+        });
+        dialogMenu.appendChild(div);
+      });
+      const newDialogBtn = document.createElement('div');
+      newDialogBtn.className = 'dialog-item';
+      newDialogBtn.textContent = 'New Dialog';
+      newDialogBtn.addEventListener('click', () => {
+        const newDialog = `dialog_${Date.now()}`;
+        userData[currentUser].chats[newDialog] = [];
+        currentDialog = newDialog;
+        chatHistory = [];
+        renderChatHistory();
+        updateDialogMenu();
+        saveUserData();
+      });
+      dialogMenu.appendChild(newDialogBtn);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedLang = localStorage.getItem('lang') || 'ro-RO';
+      langSelect.value = savedLang;
+      translatePage(savedLang);
       initGoogleClient();
-      if (currentUser) {
-        requestLocation();
+      if (currentUser) updateSigninStatus(true);
+      updateDialogMenu();
+      if (!userData[currentUser]?.chats) userData[currentUser].chats = { default: [] };
+      if (!userData[currentUser]?.chats[currentDialog]) userData[currentUser].chats[currentDialog] = [];
+      renderChatHistory();
+    });
+
+    // Image Generation and Processing
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) sendBtn.click();
+      if (e.ctrlKey && e.key === 'g') { // Image Generation
+        if (confirm('Do you want to generate an image?')) {
+          const prompt = prompt('Enter image generation prompt:');
+          if (prompt) {
+            // Placeholder for xAI image generation API
+            // Actual call: fetch('https://api.x.ai/v1/images/generations', { method: 'POST', body: JSON.stringify({ prompt }) })
+            addMessage(`Generating image for: ${prompt} (API call placeholder)`, 'ai');
+            // Simulated response
+            const imageUrl = `https://via.placeholder.com/300?text=${encodeURIComponent(prompt)}`;
+            addMessage('', 'ai', true, imageUrl);
+            chatHistory.push({ type: 'ai', text: `Image generated for: ${prompt}`, imageUrl });
+            saveUserData();
+          }
+        }
+      }
+      if (e.ctrlKey && e.key === 'i') { // Image Processing
+        fileInput.click();
+      }
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        let content = '';
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const imageUrl = event.target.result;
+            addMessage('', 'user', true, imageUrl);
+            // Placeholder for xAI image processing API
+            // Actual call: fetch('https://api.x.ai/v1/images/process', { method: 'POST', body: JSON.stringify({ image: imageUrl }) })
+            sendMessageToAI(`Analizează această imagine: ${imageUrl}`).then(response => {
+              addMessage(response, 'ai');
+              chatHistory.push({ type: 'user', text: 'Image uploaded', imageUrl }, { type: 'ai', text: response });
+              saveUserData();
+            });
+          };
+          reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            content += textContent.items.map(item => item.str).join(' ') + '\n';
+          }
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          const arrayBuffer = await file.arrayBuffer();
+          const { value } = await mammoth.extractRawText({ arrayBuffer });
+          content = value;
+        } else if (file.type === 'text/plain') {
+          content = await file.text();
+        }
+        if (content) {
+          addMessage(`Procesare document: ${file.name}\n${content.substring(0, 200)}${content.length > 200 ? '...' : ''}`, 'user');
+          const response = await sendMessageToAI(`Analizează acest document: ${content}`);
+          addMessage(response, 'ai');
+          chatHistory.push({ type: 'user', text: `Document: ${file.name}`, content }, { type: 'ai', text: response });
+          saveUserData();
+        }
+        fileInput.value = '';
+      }
+    });
+
+    // Document Generation
+    userInput.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'd') { // Document Generation
+        const prompt = prompt('Enter document generation prompt (e.g., "Create a contract"):');
+        if (prompt) {
+          sendMessageToAI(`Generează un document: ${prompt}`).then(response => {
+            const doc = new docx.Document();
+            doc.addSection({
+              properties: {},
+              children: [new docx.Paragraph(response)]
+            });
+            docx.Packer.toBlob(doc).then(blob => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `document_${Date.now()}.docx`;
+              a.click();
+              addMessage(`Document generat: <a href="${url}" download>Descarcă aici</a>`, 'ai');
+              chatHistory.push({ type: 'ai', text: `Document generated for: ${prompt}`, url });
+              saveUserData();
+            });
+          });
+        }
       }
     });
   })();
 </script>
 </body>
 </html>
+
+
+
+
