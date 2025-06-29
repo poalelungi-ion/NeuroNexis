@@ -1,227 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>AI Productivity Dashboard - NEURONEXIS</title>
-  <meta content="AI-powered productivity dashboard for calendar and email management" name="description">
-  <meta content="AI, productivity, dashboard, NEURONEXIS" name="keywords">
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEURONEXIS AI Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@google-cloud/translate@2.2.0/build/src/index.min.js"></script>
   <style>
-    body, html {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-    }
-    #header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      background: white;
-      padding: 10px 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    #sidebar {
-      width: 250px;
-      background: #f8f9fa;
-      position: fixed;
-      top: 60px;
-      bottom: 0;
-      padding-top: 10px;
-      transition: transform 0.3s ease;
-      z-index: 40;
-    }
-    #sidebar.active {
-      transform: translateX(0);
-    }
-    #main {
-      margin-top: 60px;
-      margin-left: 250px;
-      height: calc(100vh - 60px);
-      display: flex;
-      flex-direction: column;
-    }
-    #chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(135deg, #e0eafc, #cfdef3);
-    }
-    #chat-box {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .message {
-      max-width: 60%;
-      padding: 10px 15px;
-      border-radius: 15px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .message.user {
-      background: #075e54;
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 0;
-    }
-    .message.ai {
-      background: #e8eaf6;
-      color: #333;
-      align-self: flex-start;
-      border-bottom-left-radius: 0;
-    }
-    #input-area {
-      padding: 10px;
-      background: white;
-      border-top: 1px solid #ddd;
-      display: flex;
-      gap: 10px;
-      position: sticky;
-      bottom: 0;
-      z-index: 30;
-    }
-    #user-input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      outline: none;
-    }
-    #send-btn {
-      background: #075e54;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-    #send-btn:hover {
-      background: #054d44;
-    }
-    .dialog-item {
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-    .dialog-item:hover {
-      background: #f0f0f0;
-    }
-    @media (max-width: 768px) {
-      #sidebar {
-        transform: translateX(-250px);
-      }
-      #main {
-        margin-left: 0;
-      }
-      #chat-container {
-        margin-left: 0;
-      }
-      .message {
-        max-width: 80%;
-      }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .typing-indicator { display: flex; padding: 8px 12px; }
+    .typing-dot { width: 8px; height: 8px; margin: 0 2px; background: #4b5563; border-radius: 50%; animation: pulse 1.5s infinite ease-in-out; }
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.3s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.6s; }
+    .chat-container { height: calc(100vh - 180px); }
+    .message-animation { animation: messageAppear 0.3s ease-out; }
+    @keyframes messageAppear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .xai-explanation { border-left: 3px solid #6366f1; transition: all 0.3s ease; }
+    .xai-explanation:hover { background: #f8fafc; }
+    .dark .xai-explanation:hover { background: #1e293b; }
+    .sidebar { transition: transform 0.3s ease; }
+    .dark .bg-gray-100 { background: #1f2937; }
   </style>
 </head>
-<body class="bg-gray-100">
-<header id="header">
-  <div class="flex items-center justify-between">
-    <button id="toggle-sidebar-btn" class="md:hidden mr-2 text-gray-600">
-      <i class="fas fa-bars"></i>
-    </button>
-    <span class="text-xl font-semibold text-gray-800">NEURONEXIS</span>
-    <button id="profile-btn" class="flex items-center space-x-2 text-gray-700">
-      <span id="user-name">Guest</span>
-      <i class="fas fa-user-circle"></i>
-    </button>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<div class="container mx-auto max-w-6xl px-4 py-6">
+  <!-- Login Section -->
+  <div id="login-section" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md mx-auto my-12 text-center">
+    <h2 class="text-2xl font-bold mb-6">Welcome to NEURONEXIS AI</h2>
+    <div id="g_id_onload" data-client_id="906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleGoogleSignIn" data-auto_prompt="false"></div>
+    <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="300"></div>
+    <div class="mt-6 text-sm text-gray-500 dark:text-gray-400">By signing in, you agree to our Terms.</div>
+    <button id="try-without-login" class="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">Try Without Login</button>
   </div>
-</header>
-<aside id="sidebar">
-  <div class="p-4 border-b">
-    <h2 class="text-lg font-semibold">Menu</h2>
-  </div>
-  <ul class="p-4 space-y-2">
-    <li>
-      <a href="index.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="dashboard">
-        <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
-      </a>
-    </li>
-    <li>
-      <a href="document-editor.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="document-editor">
-        <i class="fas fa-file-alt mr-2"></i> Document Editor
-      </a>
-    </li>
-    <li id="login-nav">
-      <a id="google-login-btn" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="login-with-google">
-        <i class="fas fa-sign-in-alt mr-2"></i> Login with Google
-      </a>
-    </li>
-    <li id="profile-nav" style="display: none;">
-      <a href="users-profile.html" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded" data-translate="profile">
-        <i class="fas fa-user-circle mr-2"></i> Profile
-      </a>
-    </li>
-    <li>
-      <select id="lang-select" class="w-full p-2 border rounded">
-        <option value="ro-RO">Română</option>
-        <option value="en-US">English</option>
-        <option value="ru-RU">Русский</option>
-        <option value="es-ES">Español</option>
-        <option value="fr-FR">Français</option>
-      </select>
-    </li>
-    <li class="mt-4">
-      <h3 class="text-md font-semibold">Dialogs</h3>
-      <div id="dialog-menu" class="space-y-1"></div>
-    </li>
-  </ul>
-</aside>
-<main id="main">
-  <div id="chat-container">
-    <div id="chat-box"></div>
-    <div id="input-area">
-      <input type="text" id="user-input" placeholder="Type a message...">
-      <button id="send-btn" data-translate="send">Send</button>
+
+  <!-- Main App -->
+  <div id="app-content" class="hidden">
+    <header class="flex justify-between items-center mb-6">
+      <div class="flex items-center space-x-2">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center text-white font-bold text-xl">N</div>
+        <h1 class="text-2xl font-bold">NEURONEXIS</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+          <i class="fas fa-moon dark:hidden"></i>
+          <i class="fas fa-sun hidden dark:block"></i>
+        </button>
+        <button id="profile-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+          <i class="fas fa-user"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex">
+      <div class="w-full">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+          <div class="border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-400"></div>
+              <h2 class="font-semibold">NEURONEXIS Chat</h2>
+            </div>
+            <button id="toggle-sidebar-btn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <div class="chat-container overflow-y-auto p-4 space-y-4" id="chat-box"></div>
+          <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-center space-x-2">
+              <button id="document-creation" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="Create Document">
+                <i class="fas fa-file-word"></i>
+              </button>
+              <div class="flex-grow relative">
+                <textarea id="user-input" rows="1" class="w-full border border-gray-300 dark:border-gray-600 rounded-full py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 resize-none" placeholder="Message NEURONEXIS..."></textarea>
+                <button id="send-btn" class="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full text-gray-500 hover:text-purple-600 dark:hover:text-purple-400">
+                  <i class="fas fa-paper-plane text-xl"></i>
+                </button>
+              </div>
+              <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-microphone"></i>
+              </button>
+            </div>
+            <div class="flex justify-between items-center mt-2 px-2">
+              <div class="text-xs text-gray-500 dark:text-gray-400">NEURONEXIS may produce inaccurate info</div>
+              <button id="xai-toggle" class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full flex items-center space-x-1">
+                <i class="fas fa-brain"></i><span>XAI Mode: On</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-gray-100 dark:bg-gray-800 shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50 p-4">
+        <h3 class="text-lg font-semibold mb-4">Settings</h3>
+        <select id="lang-select" class="w-full p-2 mb-4 bg-white dark:bg-gray-700 rounded">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+        </select>
+        <div id="login-nav" class="mb-4">
+          <button id="login-btn" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login</button>
+        </div>
+        <div id="profile-nav" class="hidden mb-4">
+          <p id="user-name" class="mb-2"></p>
+          <input id="instagram" class="w-full p-2 mb-2 bg-white dark:bg-gray-700 rounded" placeholder="Instagram Handle">
+          <input id="facebook" class="w-full p-2 mb-2 bg-white dark:bg-gray-700 rounded" placeholder="Facebook Name">
+          <button id="logout-btn" class="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
+        </div>
+        <div class="mt-4">
+          <label class="block mb-2">Upload File</label>
+          <input type="file" id="file-input" class="w-full p-2 bg-white dark:bg-gray-700 rounded">
+        </div>
+        <div id="dialog-menu" class="mt-4">
+          <select id="dialog-select" class="w-full p-2 bg-white dark:bg-gray-700 rounded">
+            <option value="default">Default</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Document Modal -->
+    <div id="document-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">Document Editor</h3>
+          <button id="close-document-modal" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="document-content" class="flex-1 border border-gray-300 dark:border-gray-600 p-4 mb-4 overflow-y-auto"></div>
+        <div class="flex space-x-2">
+          <select id="document-type" class="bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2">
+            <option value="docx">Word Document</option>
+            <option value="pdf">PDF</option>
+            <option value="txt">Text File</option>
+          </select>
+          <button id="download-document" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+            Download
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-</main>
-<input type="file" id="file-input" accept="image/*,.pdf,.docx,.txt" style="display: none;">
-<script>
-  (function() {
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    const sidebar = document.getElementById('sidebar');
-    const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
-    const langSelect = document.getElementById('lang-select');
-    const loginNav = document.getElementById('login-nav');
-    const profileNav = document.getElementById('profile-nav');
-    const profileBtn = document.getElementById('profile-btn');
-    const userName = document.getElementById('user-name');
-    const dialogMenu = document.getElementById('dialog-menu');
-    const fileInput = document.getElementById('file-input');
-    let userData = JSON.parse(localStorage.getItem('userData')) || {};
-    let currentUser = localStorage.getItem('currentUser');
-    let currentDialog = localStorage.getItem('currentDialog') || 'default';
-    let chatHistory = userData[currentUser]?.chats?.[currentDialog] || [];
-    let accessToken = localStorage.getItem('googleAccessToken');
 
+  <script>
     // Split API keys
     const CLIENT_ID_PART1 = '906465572275';
     const CLIENT_ID_PART2 = '-hanrq89dvi0a8bpf2benqdq7quu3njtc';
@@ -236,285 +158,330 @@
     const XAI_API_KEY = XAI_API_KEY_PART1 + XAI_API_KEY_PART2 + XAI_API_KEY_PART3;
     const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar';
 
-    function saveUserData() {
-      localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('currentDialog', currentDialog);
-    }
-
-    function initGoogleClient() {
-      gapi.load('client:auth2', () => {
-        gapi.client.init({
-          apiKey: API_KEY,
-          clientId: CLIENT_ID,
-          scope: SCOPES,
-          discoveryDocs: [
-            'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest',
-            'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'
-          ]
-        }).then(() => {
-          const authInstance = gapi.auth2.getAuthInstance();
-          authInstance.isSignedIn.listen(updateSigninStatus);
-          updateSigninStatus(authInstance.isSignedIn.get());
-          document.getElementById('google-login-btn').addEventListener('click', () => authInstance.signIn());
-        }, (error) => console.error('Error initializing Google client:', error));
-      });
-    }
-
-    function updateSigninStatus(isSignedIn) {
-      if (isSignedIn) {
-        const user = gapi.auth2.getAuthInstance().currentUser.get();
-        accessToken = user.getAuthResponse().access_token;
-        localStorage.setItem('googleAccessToken', accessToken);
-        currentUser = user.getBasicProfile().getEmail();
-        userData[currentUser] = userData[currentUser] || { chats: { default: [] }, profile: {} };
-        userData[currentUser].profile = {
-          name: user.getBasicProfile().getName(),
-          email: currentUser,
-          picture: user.getBasicProfile().getImageUrl()
-        };
-        localStorage.setItem('currentUser', currentUser);
-        saveUserData();
-        loginNav.style.display = 'none';
-        profileNav.style.display = 'block';
-        userName.textContent = userData[currentUser].profile.name || currentUser;
-        loadProfile();
-      } else {
-        loginNav.style.display = 'block';
-        profileNav.style.display = 'none';
-        userName.textContent = 'Guest';
-      }
-    }
-
-    function loadProfile() {
-      chatHistory = userData[currentUser]?.chats?.[currentDialog] || [];
-      renderChatHistory();
-      updateDialogMenu();
-    }
-
-    function addMessage(text, type, isImage = false, imageUrl = null) {
-      const div = document.createElement('div');
-      div.className = `message ${type}`;
-      if (isImage && imageUrl) {
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        img.style.maxWidth = '100%';
-        img.style.borderRadius = '10px';
-        div.appendChild(img);
-      } else {
-        div.innerHTML = marked.parse(text);
-      }
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function renderChatHistory() {
-      chatBox.innerHTML = '';
-      chatHistory.forEach(chat => {
-        if (chat.imageUrl) {
-          addMessage(chat.text, chat.type, true, chat.imageUrl);
-        } else {
-          addMessage(chat.text, chat.type);
-        }
-      });
-    }
-
-    async function sendMessageToAI(message, options = {}) {
-      const location = userData[currentUser]?.location || { latitude: null, longitude: null };
-      const systemPrompt = `Ești Grok 3, creat de xAI. Ai memorie (conversații anterioare), analiză profiluri X/postări/linkuri, procesare imagini, generare imagini, procesare documente (PDF, DOCX, TXT), generare documente, căutare web/X, DeepSearch, Think mode (activează cu buton), și voce (doar app). Răspunde în limba selectată. Include linkuri Google Maps (https://maps.google.com/?q=lat,lng) dacă relevant.`;
-      const requestBody = {
-        model: 'grok-3',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `${message}\nLocație: Lat ${location.latitude || 'N/A'}, Long ${location.longitude || 'N/A'}` }
-        ],
-        stream: false,
-        temperature: 0.7,
-        ...options
-      };
-      const response = await fetch('https://api.x.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${XAI_API_KEY}` },
-        body: JSON.stringify(requestBody)
-      });
-      const data = await response.json();
-      return data.choices[0].message.content || 'No response';
-    }
-
-    sendBtn.addEventListener('click', async () => {
-      const message = userInput.value.trim();
-      if (!message) return;
-      addMessage(message, 'user');
-      userInput.value = '';
-      const aiResponse = await sendMessageToAI(message);
-      addMessage(aiResponse, 'ai');
-      chatHistory.push({ type: 'user', text: message }, { type: 'ai', text: aiResponse });
-      saveUserData();
-    });
-
-    toggleSidebarBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-    });
-
-    const translations = {
-      'ro-RO': { dashboard: 'Tablou de bord', 'document-editor': 'Editor de documente', 'login-with-google': 'Conectare cu Google', profile: 'Profil', send: 'Trimite' },
-      'en-US': { dashboard: 'Dashboard', 'document-editor': 'Document Editor', 'login-with-google': 'Login with Google', profile: 'Profile', send: 'Send' },
-      'ru-RU': { dashboard: 'Панель управления', 'document-editor': 'Редактор документов', 'login-with-google': 'Вход через Google', profile: 'Профиль', send: 'Отправить' },
-      'es-ES': { dashboard: 'Tablero', 'document-editor': 'Editor de documentos', 'login-with-google': 'Iniciar sesión con Google', profile: 'Perfil', send: 'Enviar' },
-      'fr-FR': { dashboard: 'Tableau de bord', 'document-editor': 'Éditeur de documents', 'login-with-google': 'Connexion avec Google', profile: 'Profil', send: 'Envoyer' }
-    };
-
-    function translatePage(lang) {
-      document.querySelectorAll('[data-translate]').forEach(el => {
-        const key = el.getAttribute('data-translate');
-        el.textContent = translations[lang][key] || el.textContent;
-      });
-      userInput.placeholder = `Type a message in ${lang === 'ro-RO' ? 'Română' : lang === 'en-US' ? 'English' : lang === 'ru-RU' ? 'Русский' : lang === 'es-ES' ? 'Español' : 'Français'}...`;
-      if (chatHistory.length) renderChatHistory();
-    }
-
-    langSelect.addEventListener('change', (e) => {
-      const lang = e.target.value;
-      translatePage(lang);
-      localStorage.setItem('lang', lang);
-    });
-
-    function updateDialogMenu() {
-      dialogMenu.innerHTML = '';
-      const dialogs = Object.keys(userData[currentUser]?.chats || { default: [] });
-      dialogs.forEach(dialog => {
-        const div = document.createElement('div');
-        div.className = 'dialog-item';
-        div.textContent = dialog;
-        if (dialog === currentDialog) div.classList.add('bg-blue-100');
-        div.addEventListener('click', () => {
-          currentDialog = dialog;
-          chatHistory = userData[currentUser].chats[currentDialog] || [];
-          renderChatHistory();
-          updateDialogMenu();
-          saveUserData();
-        });
-        dialogMenu.appendChild(div);
-      });
-      const newDialogBtn = document.createElement('div');
-      newDialogBtn.className = 'dialog-item';
-      newDialogBtn.textContent = 'New Dialog';
-      newDialogBtn.addEventListener('click', () => {
-        const newDialog = `dialog_${Date.now()}`;
-        userData[currentUser].chats[newDialog] = [];
-        currentDialog = newDialog;
-        chatHistory = [];
-        renderChatHistory();
-        updateDialogMenu();
-        saveUserData();
-      });
-      dialogMenu.appendChild(newDialogBtn);
-    }
+    let currentUser = localStorage.getItem('currentUser');
+    let currentDialog = localStorage.getItem('currentDialog') || 'default';
+    let chatHistory = JSON.parse(localStorage.getItem('userData'))?.[currentUser]?.chats?.[currentDialog] || [];
+    let accessToken = localStorage.getItem('googleAccessToken');
+    let userData = JSON.parse(localStorage.getItem('userData')) || {};
+    let userLocation = null;
+    let gapiInited = false;
+    let gisInited = false;
+    let instagram = localStorage.getItem('instagram') || '';
+    let facebook = localStorage.getItem('facebook') || '';
+    let xaiMode = true;
 
     document.addEventListener('DOMContentLoaded', () => {
-      const savedLang = localStorage.getItem('lang') || 'ro-RO';
-      langSelect.value = savedLang;
-      translatePage(savedLang);
-      initGoogleClient();
-      if (currentUser) updateSigninStatus(true);
-      updateDialogMenu();
-      if (!userData[currentUser]?.chats) userData[currentUser].chats = { default: [] };
-      if (!userData[currentUser]?.chats[currentDialog]) userData[currentUser].chats[currentDialog] = [];
-      renderChatHistory();
-    });
+      const chatBox = document.getElementById('chat-box');
+      const userInput = document.getElementById('user-input');
+      const sendBtn = document.getElementById('send-btn');
+      const sidebar = document.getElementById('sidebar');
+      const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+      const langSelect = document.getElementById('lang-select');
+      const loginNav = document.getElementById('login-nav');
+      const profileNav = document.getElementById('profile-nav');
+      const profileBtn = document.getElementById('profile-btn');
+      const userName = document.getElementById('user-name');
+      const dialogMenu = document.getElementById('dialog-menu');
+      const fileInput = document.getElementById('file-input');
+      const documentModal = document.getElementById('document-modal');
+      const documentContent = document.getElementById('document-content');
+      const closeDocumentModal = document.getElementById('close-document-modal');
+      const documentType = document.getElementById('document-type');
+      const downloadDocument = document.getElementById('download-document');
+      const xaiToggle = document.getElementById('xai-toggle');
+      const instagramInput = document.getElementById('instagram');
+      const facebookInput = document.getElementById('facebook');
+      const loginBtn = document.getElementById('login-btn');
+      const logoutBtn = document.getElementById('logout-btn');
 
-    // Image Generation and Processing
-    userInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) sendBtn.click();
-      if (e.ctrlKey && e.key === 'g') { // Image Generation
-        if (confirm('Do you want to generate an image?')) {
-          const prompt = prompt('Enter image generation prompt:');
-          if (prompt) {
-            // Placeholder for xAI image generation API
-            // Actual call: fetch('https://api.x.ai/v1/images/generations', { method: 'POST', body: JSON.stringify({ prompt }) })
-            addMessage(`Generating image for: ${prompt} (API call placeholder)`, 'ai');
-            // Simulated response
-            const imageUrl = `https://via.placeholder.com/300?text=${encodeURIComponent(prompt)}`;
-            addMessage('', 'ai', true, imageUrl);
-            chatHistory.push({ type: 'ai', text: `Image generated for: ${prompt}`, imageUrl });
-            saveUserData();
+      // Google API Initialization
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
+
+      async function initializeGapiClient() {
+        await gapi.client.init({ apiKey: API_KEY, discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest', 'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'] });
+        gapiInited = true;
+        maybeEnableApp();
+      }
+
+      function gisLoaded() {
+        gisInited = true;
+        maybeEnableApp();
+      }
+
+      function maybeEnableApp() {
+        if (gapiInited && gisInited && currentUser) {
+          document.getElementById('login-section').classList.add('hidden');
+          document.getElementById('app-content').classList.remove('hidden');
+          loadUserData();
+        }
+      }
+
+      window.gapiLoaded = gapiLoaded;
+      window.gisLoaded = gisLoaded;
+
+      function handleGoogleSignIn(response) {
+        const userInfo = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        currentUser = userInfo.email;
+        accessToken = response.credential;
+        localStorage.setItem('currentUser', currentUser);
+        localStorage.setItem('googleAccessToken', accessToken);
+        userData[currentUser] = userData[currentUser] || { chats: {}, instagram: '', facebook: '' };
+        localStorage.setItem('userData', JSON.stringify(userData));
+        updateUI();
+      }
+
+      function loadUserData() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(pos => {
+            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            addMessage(`Located near ${userLocation.lat}, ${userLocation.lng}. How can I assist?`, 'ai');
+          }, err => console.error('Geolocation error:', err));
+        }
+        if (userData[currentUser]) {
+          instagram = userData[currentUser].instagram || '';
+          facebook = userData[currentUser].facebook || '';
+          instagramInput.value = instagram;
+          facebookInput.value = facebook;
+          userName.textContent = currentUser === 'guest@neuronexis.com' ? 'Guest User' : userInfo.name || currentUser;
+          chatHistory.forEach(msg => addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai'));
+        }
+      }
+
+      function updateUI() {
+        loginNav.classList.add('hidden');
+        profileNav.classList.remove('hidden');
+        userName.textContent = currentUser === 'guest@neuronexis.com' ? 'Guest User' : userData[currentUser]?.name || currentUser;
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('app-content').classList.remove('hidden');
+        const avatar = document.createElement('div');
+        avatar.className = 'w-8 h-8 rounded-full bg-cover bg-center';
+        avatar.style.backgroundImage = `url(https://via.placeholder.com/150)`;
+        document.querySelector('header').prepend(avatar);
+      }
+
+      document.getElementById('try-without-login').addEventListener('click', () => {
+        currentUser = 'guest@neuronexis.com';
+        userData[currentUser] = userData[currentUser] || { chats: {}, instagram: '', facebook: '' };
+        localStorage.setItem('currentUser', currentUser);
+        localStorage.setItem('userData', JSON.stringify(userData));
+        updateUI();
+      });
+
+      loginBtn.addEventListener('click', () => {
+        // Trigger Google Sign-In manually if needed
+        google.accounts.id.prompt();
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        currentUser = null;
+        accessToken = null;
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('googleAccessToken');
+        loginNav.classList.remove('hidden');
+        profileNav.classList.add('hidden');
+        chatBox.innerHTML = '';
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('app-content').classList.add('hidden');
+        addMessage('You have been logged out.', 'ai');
+      });
+
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      });
+
+      if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+
+      toggleSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('translate-x-full');
+        sidebar.classList.toggle('translate-x-0');
+      });
+
+      profileBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('translate-x-full');
+        sidebar.classList.toggle('translate-x-0');
+      });
+
+      langSelect.addEventListener('change', e => console.log('Language changed to:', e.target.value));
+
+      userInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      });
+
+      userInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+
+      xaiToggle.addEventListener('click', () => {
+        xaiMode = !xaiMode;
+        xaiToggle.innerHTML = xaiMode ? '<i class="fas fa-brain"></i><span>XAI Mode: On</span>' : '<i class="fas fa-brain"></i><span>XAI Mode: Off</span>';
+        xaiToggle.classList.toggle('bg-purple-100', xaiMode);
+        xaiToggle.classList.toggle('dark:bg-purple-900', xaiMode);
+        xaiToggle.classList.toggle('bg-gray-200', !xaiMode);
+        xaiToggle.classList.toggle('dark:bg-gray-700', !xaiMode);
+      });
+
+      instagramInput.addEventListener('change', e => {
+        instagram = e.target.value;
+        userData[currentUser].instagram = instagram;
+        localStorage.setItem('userData', JSON.stringify(userData));
+      });
+
+      facebookInput.addEventListener('change', e => {
+        facebook = e.target.value;
+        userData[currentUser].facebook = facebook;
+        localStorage.setItem('userData', JSON.stringify(userData));
+      });
+
+      function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        userInput.value = '';
+        userInput.style.height = 'auto';
+
+        showTypingIndicator();
+
+        setTimeout(async () => {
+          removeTypingIndicator();
+          const aiResponse = await generateAIResponse(message);
+          addMessage(aiResponse.response, 'ai');
+          if (xaiMode && aiResponse.explanation) {
+            setTimeout(() => addMessage(aiResponse.explanation, 'ai', true), 500);
           }
-        }
+          chatHistory.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
+          chatHistory.push({ role: 'ai', content: aiResponse.response, timestamp: new Date().toISOString() });
+          userData[currentUser] = userData[currentUser] || { chats: {}, instagram, facebook };
+          userData[currentUser].chats[currentDialog] = chatHistory;
+          localStorage.setItem('userData', JSON.stringify(userData));
+        }, 1500 + Math.random() * 2000);
       }
-      if (e.ctrlKey && e.key === 'i') { // Image Processing
-        fileInput.click();
-      }
-    });
 
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        let content = '';
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const imageUrl = event.target.result;
-            addMessage('', 'user', true, imageUrl);
-            // Placeholder for xAI image processing API
-            // Actual call: fetch('https://api.x.ai/v1/images/process', { method: 'POST', body: JSON.stringify({ image: imageUrl }) })
-            sendMessageToAI(`Analizează această imagine: ${imageUrl}`).then(response => {
-              addMessage(response, 'ai');
-              chatHistory.push({ type: 'user', text: 'Image uploaded', imageUrl }, { type: 'ai', text: response });
-              saveUserData();
-            });
-          };
-          reader.readAsDataURL(file);
-        } else if (file.type === 'application/pdf') {
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            content += textContent.items.map(item => item.str).join(' ') + '\n';
-          }
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-          const arrayBuffer = await file.arrayBuffer();
-          const { value } = await mammoth.extractRawText({ arrayBuffer });
-          content = value;
-        } else if (file.type === 'text/plain') {
-          content = await file.text();
+      function addMessage(text, sender, isExplanation = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('flex', 'message-animation');
+        if (sender === 'user') {
+          messageDiv.classList.add('justify-end');
+          messageDiv.innerHTML = `<div class="max-w-[80%] bg-purple-600 text-white rounded-lg p-3 shadow-md"><p>${text}</p></div>`;
+        } else {
+          messageDiv.classList.add('justify-start');
+          messageDiv.innerHTML = isExplanation ? `
+                        <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-lg p-3 shadow-md xai-explanation">
+                            <div class="flex items-start space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400 mt-1 flex items-center justify-center text-white text-xs">N</div>
+                                <div><p class="font-semibold text-purple-600 dark:text-purple-400">Explanation</p><p>${text}</p></div>
+                            </div>
+                        </div>` : `
+                        <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-lg p-3 shadow-md">
+                            <div class="flex items-start space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400 mt-1"></div>
+                                <div><p class="font-semibold">NEURONEXIS AI</p><p>${text}</p></div>
+                            </div>
+                        </div>`;
         }
-        if (content) {
-          addMessage(`Procesare document: ${file.name}\n${content.substring(0, 200)}${content.length > 200 ? '...' : ''}`, 'user');
-          const response = await sendMessageToAI(`Analizează acest document: ${content}`);
-          addMessage(response, 'ai');
-          chatHistory.push({ type: 'user', text: `Document: ${file.name}`, content }, { type: 'ai', text: response });
-          saveUserData();
-        }
-        fileInput.value = '';
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
       }
-    });
 
-    // Document Generation
-    userInput.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.key === 'd') { // Document Generation
-        const prompt = prompt('Enter document generation prompt (e.g., "Create a contract"):');
-        if (prompt) {
-          sendMessageToAI(`Generează un document: ${prompt}`).then(response => {
-            const doc = new docx.Document();
-            doc.addSection({
-              properties: {},
-              children: [new docx.Paragraph(response)]
-            });
-            docx.Packer.toBlob(doc).then(blob => {
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `document_${Date.now()}.docx`;
-              a.click();
-              addMessage(`Document generat: <a href="${url}" download>Descarcă aici</a>`, 'ai');
-              chatHistory.push({ type: 'ai', text: `Document generated for: ${prompt}`, url });
-              saveUserData();
-            });
+      function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('flex', 'justify-start');
+        typingDiv.id = 'typing-indicator';
+        typingDiv.innerHTML = `
+                    <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-lg p-2 shadow-md">
+                        <div class="flex items-center space-x-2 pl-2">
+                            <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400"></div>
+                            <div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+                        </div>
+                    </div>`;
+        chatBox.appendChild(typingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) typingIndicator.remove();
+      }
+
+      async function generateAIResponse(userMessage) {
+        try {
+          const response = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${XAI_API_KEY}` },
+            body: JSON.stringify({
+              model: 'grok-3',
+              messages: [{ role: 'system', content: `You are NEURONEXIS AI. Use location: ${userLocation ? `${userLocation.lat}, ${userLocation.lng}` : 'unknown'}. Include Instagram: ${instagram}, Facebook: ${facebook} in responses if relevant.` }, { role: 'user', content: userMessage }],
+              temperature: 0.7,
+              max_tokens: 4000
+            })
           });
+          const data = await response.json();
+          const fullResponse = data.choices[0].message.content;
+          let explanation = xaiMode ? 'Response crafted based on your input and location.' : '';
+          return { response: fullResponse, explanation };
+        } catch (error) {
+          console.error('xAI API Error:', error);
+          let response = `Sorry, I couldn’t connect. Based on your location ${userLocation ? `near ${userLocation.lat}, ${userLocation.lng}` : 'unknown'}, how can I help?`;
+          let explanation = "API failed; using local logic with location.";
+          if (userMessage.toLowerCase().includes('how are you')) {
+            response = "I'm running smoothly! Ready to assist from your area.";
+            explanation += " You checked my status, so I confirmed my readiness.";
+          }
+          return { response, explanation };
         }
       }
+
+      document.getElementById('document-creation').addEventListener('click', () => {
+        documentModal.classList.remove('hidden');
+        documentContent.textContent = `Location: ${userLocation ? `${userLocation.lat}, ${userLocation.lng}` : 'Unknown'}\nInstagram: ${instagram}\nFacebook: ${facebook}\n\nAdd your message here...`;
+      });
+
+      closeDocumentModal.addEventListener('click', () => documentModal.classList.add('hidden'));
+
+      downloadDocument.addEventListener('click', () => {
+        const content = documentContent.textContent;
+        const type = documentType.value;
+        const blob = new Blob([content], { type: type === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : type === 'pdf' ? 'application/pdf' : 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `document.${type}`;
+        a.click();
+        URL.revokeObjectURL(url);
+        documentModal.classList.add('hidden');
+      });
+
+      fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = event => addMessage(`Uploaded: ${event.target.result.substring(0, 100)}${event.target.result.length > 100 ? '...' : ''}`, 'ai');
+          reader.readAsText(file);
+        }
+      });
+
+      const dialogSelect = document.getElementById('dialog-select');
+      dialogSelect.addEventListener('change', e => {
+        currentDialog = e.target.value;
+        localStorage.setItem('currentDialog', currentDialog);
+        chatHistory = userData[currentUser]?.chats?.[currentDialog] || [];
+        chatBox.innerHTML = '';
+        chatHistory.forEach(msg => addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai'));
+      });
+
+      if (currentUser) updateUI();
     });
-  })();
-</script>
+  </script>
 </body>
 </html>
