@@ -4,818 +4,1238 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title>Pages / F.A.Q - NiceAdmin Bootstrap Template</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+  <title>AI Productivity Dashboard - NEURONEXIS</title>
+  <meta content="AI-powered productivity dashboard for tasks, reminders, and calendar management" name="description">
+  <meta content="AI, productivity, dashboard, NEURONEXIS" name="keywords">
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
-  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
-  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Template Main CSS File -->
-  <link href="assets/css/style.css" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: NiceAdmin
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Updated: Apr 20 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            secondary: '#6B7280',
+            accent: '#F59E0B',
+            success: '#10B981',
+            danger: '#EF4444',
+            background: '#F9FAFB',
+            card: '#FFFFFF',
+            soft: '#EDE9FE',
+          },
+          borderRadius: {
+            'xl': '12px',
+            '2xl': '16px',
+          },
+          animation: {
+            slideIn: 'slideIn 0.3s ease-in-out',
+            pulse: 'pulse 1s infinite',
+          },
+          keyframes: {
+            slideIn: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulse: {
+              '0%': { transform: 'scale(1)', opacity: '1' },
+              '100%': { transform: 'scale(2)', opacity: '0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .chat-box, .daily-overview, .tasks-reminders {
+      scrollbar-width: none;
+    }
+    .chat-box::-webkit-scrollbar, .daily-overview::-webkit-scrollbar, .tasks-reminders::-webkit-scrollbar {
+      display: none;
+    }
+    .message img, .overview-item img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .forced-colors\:bg-white {
+      background-color: white;
+    }
+    @media (forced-colors: active) {
+      .forced-colors\:bg-white {
+        background-color: Canvas;
+      }
+      .forced-colors\:text-black {
+        color: CanvasText;
+      }
+    }
+    .chat-box {
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
+    }
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #main {
+      padding-bottom: 80px;
+    }
+    section {
+      gap: 1rem;
+    }
+    @media (max-width: 1024px) {
+      #pomodoro-container, #daily-overview-container, #tasks-container, #recommendations-container {
+        display: none;
+      }
+      #pomodoro-toggle, #tasks-toggle, #recommendations-toggle {
+        display: block;
+      }
+    }
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-3 {
+        grid-template-columns: 1fr 2fr 1fr;
+      }
+      #pomodoro-container, #daily-overview-container, #tasks-container, #recommendations-container {
+        display: block;
+      }
+      #pomodoro-toggle, #tasks-toggle, #recommendations-toggle {
+        display: none;
+      }
+    }
+    @media (max-width: 640px) {
+      #main {
+        margin-top: 60px;
+        padding-bottom: 100px;
+      }
+      #header {
+        padding: 0.5rem 1rem;
+      }
+      #sidebar {
+        width: 75%;
+      }
+      .chat-box {
+        max-height: 50vh;
+      }
+      .daily-overview, .tasks-reminders {
+        max-height: 30vh;
+      }
+      .text-xs {
+        font-size: 0.875rem;
+      }
+      .p-2 {
+        padding: 0.75rem;
+      }
+      .py-1 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+      .px-2 {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+      .rounded-full {
+        min-width: 44px;
+        min-height: 44px;
+      }
+      #input-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #input-form > *:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+      #lang-select, #user-input {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      #input-form button {
+        padding: 0.75rem;
+        width: 100%;
+        display: inline-flex;
+        justify-content: center;
+      }
+      #pomodoro-container, #tasks-container, #recommendations-container {
+        margin-top: 1rem;
+      }
+      .toggle-section {
+        margin-bottom: 0.5rem;
+      }
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 90%;
+      width: 400px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .modal-content h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .modal-content .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+  </style>
 </head>
 
-<body>
-
-  <!-- ======= Header ======= -->
-  <header id="header" class="header fixed-top d-flex align-items-center">
-
-    <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
-        <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">NiceAdmin</span>
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div><!-- End Logo -->
-
-    <div class="search-bar">
-      <form class="search-form d-flex align-items-center" method="POST" action="#">
-        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
-        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
-      </form>
-    </div><!-- End Search Bar -->
-
-    <nav class="header-nav ms-auto">
-      <ul class="d-flex align-items-center">
-
-        <li class="nav-item d-block d-lg-none">
-          <a class="nav-link nav-icon search-bar-toggle " href="#">
-            <i class="bi bi-search"></i>
-          </a>
-        </li><!-- End Search Icon-->
-
-        <li class="nav-item dropdown">
-
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number">4</span>
-          </a><!-- End Notification Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-            <li class="dropdown-header">
-              You have 4 new notifications
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-exclamation-circle text-warning"></i>
-              <div>
-                <h4>Lorem Ipsum</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>30 min. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-x-circle text-danger"></i>
-              <div>
-                <h4>Atque rerum nesciunt</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>1 hr. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-check-circle text-success"></i>
-              <div>
-                <h4>Sit rerum fuga</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>2 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-info-circle text-primary"></i>
-              <div>
-                <h4>Dicta reprehenderit</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>4 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li class="dropdown-footer">
-              <a href="#">Show all notifications</a>
-            </li>
-
-          </ul><!-- End Notification Dropdown Items -->
-
-        </li><!-- End Notification Nav -->
-
-        <li class="nav-item dropdown">
-
-          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-            <i class="bi bi-chat-left-text"></i>
-            <span class="badge bg-success badge-number">3</span>
-          </a><!-- End Messages Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-            <li class="dropdown-header">
-              You have 3 new messages
-              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="assets/img/messages-1.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Maria Hudson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>4 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="assets/img/messages-2.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>Anna Nelson</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>6 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="message-item">
-              <a href="#">
-                <img src="assets/img/messages-3.jpg" alt="" class="rounded-circle">
-                <div>
-                  <h4>David Muldon</h4>
-                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                  <p>8 hrs. ago</p>
-                </div>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="dropdown-footer">
-              <a href="#">Show all messages</a>
-            </li>
-
-          </ul><!-- End Messages Dropdown Items -->
-
-        </li><!-- End Messages Nav -->
-
-        <li class="nav-item dropdown pe-3">
-
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">K. Anderson</span>
-          </a><!-- End Profile Iamge Icon -->
-
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <li class="dropdown-header">
-              <h6>Kevin Anderson</h6>
-              <span>Web Designer</span>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-person"></i>
-                <span>My Profile</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                <i class="bi bi-gear"></i>
-                <span>Account Settings</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>Need Help?</span>
-              </a>
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="#">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
-              </a>
-            </li>
-
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
-
+<body class="bg-background text-gray-900 font-inter min-h-screen flex flex-col">
+<!-- ======= Header ======= -->
+<header id="header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm flex items-center justify-between px-2 py-2 md:px-6 md:py-3 w-full">
+  <div class="flex items-center">
+    <a href="index.html" class="flex items-center space-x-1">
+      <img src="assets/img/logo.png" alt="NEURONEXIS" class="h-6 md:h-8">
+      <span class="hidden md:block text-lg md:text-xl font-semibold text-primary">NEURONEXIS</span>
+    </a>
+    <button id="toggle-sidebar-btn" class="md:hidden ml-2 text-gray-600">
+      <i class="fas fa-bars text-lg md:text-xl"></i>
+    </button>
+  </div>
+  <nav class="flex items-center space-x-2">
+    <div class="relative hidden md:block">
+      <input type="text" id="search-input" placeholder="Search..." class="pl-8 pr-3 py-1 md:py-2 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32 md:w-48">
+      <i class="fas fa-search absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+    </div>
+    <div class="relative">
+      <button class="flex items-center space-x-1" data-bs-toggle="dropdown">
+        <img id="header-profile-image" src="assets/img/profile-img.jpg" alt="Profile" class="h-6 md:h-8 w-6 md:w-8 rounded-full object-cover">
+        <span id="user-name" class="hidden md:block text-sm font-medium text-gray-700">Guest</span>
+      </button>
+      <ul class="dropdown-menu absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white rounded-xl shadow-lg py-1 hidden">
+        <li class="px-3 py-1">
+          <p id="user-fullname" class="font-semibold text-gray-800 text-xs md:text-sm">Guest</p>
+          <p id="user-role" class="text-xs md:text-sm text-gray-500">Guest User</p>
+        </li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-1 md:mr-2"></i> My Profile</a></li>
+        <li><a href="users-profile.html" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-1 md:mr-2"></i> Account Settings</a></li>
+        <li><a href="#" class="flex items-center px-3 py-1 text-xs md:text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-question-circle mr-1 md:mr-2"></i> Need Help?</a></li>
+        <li><hr class="my-1 border-gray-200"></li>
+        <li><a href="#" id="logout-btn" class="flex items-center px-3 py-1 text-xs md:text-sm text-danger hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-1 md:mr-2"></i> Sign Out</a></li>
       </ul>
-    </nav><!-- End Icons Navigation -->
+    </div>
+  </nav>
+</header>
 
-  </header><!-- End Header -->
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="fixed top-0 left-0 w-48 md:w-64 h-full bg-white shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40">
+  <div class="flex items-center justify-between p-2 md:p-4 border-b">
+    <span class="text-lg md:text-xl font-semibold text-primary">Menu</span>
+    <button id="close-sidebar-btn" class="md:hidden text-gray-600">
+      <i class="fas fa-times text-lg md:text-xl"></i>
+    </button>
+  </div>
+  <ul class="py-2 md:py-4">
+    <li class="px-2 md:px-4 py-1 md:py-2">
+      <a href="index.html" class="flex items-center text-primary bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-tachometer-alt mr-1 md:mr-3"></i> Dashboard
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2">
+      <a href="document-editor.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-file-alt mr-1 md:mr-3"></i> Document Editor
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="login-nav">
+      <a href="pages-login.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-sign-in-alt mr-1 md:mr-3"></i> Login
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="register-nav">
+      <a href="pages-register.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
+        <i class="fas fa-user-plus mr-1 md:mr-3"></i> Register
+      </a>
+    </li>
+    <li class="px-2 md:px-4 py-1 md:py-2" id="profile-nav" style="display: none;">
+      <a href="users-profile.html" class="flex items-center text-gray-700 hover:text-primary hover:bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2">
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
+        <i class="fas fa-user-circle mr-1 md:mr-3"></i> Profile
+      </a>
+    </li>
+  </ul>
+</aside>
 
-    <ul class="sidebar-nav" id="sidebar-nav">
+<!-- ======= Main Content ======= -->
+<main id="main" class="mt-12 md:mt-20 md:ml-64 p-0 flex-1">
+  <div class="p-2 md:p-4">
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">AI Productivity Dashboard</h1>
+    <nav class="mt-1 md:mt-2">
+      <ol class="flex space-x-1 md:space-x-2 text-xs md:text-sm text-gray-500">
+        <li><a href="index.html" class="hover:text-primary">Home</a></li>
+        <li>/</li>
+        <li class="text-primary">Dashboard</li>
+      </ol>
+    </nav>
+  </div>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="index.html">
-          <i class="bi bi-grid"></i>
-          <span>Dashboard</span>
-        </a>
-      </li><!-- End Dashboard Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="components-alerts.html">
-              <i class="bi bi-circle"></i><span>Alerts</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-accordion.html">
-              <i class="bi bi-circle"></i><span>Accordion</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-badges.html">
-              <i class="bi bi-circle"></i><span>Badges</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-breadcrumbs.html">
-              <i class="bi bi-circle"></i><span>Breadcrumbs</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-buttons.html">
-              <i class="bi bi-circle"></i><span>Buttons</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-cards.html">
-              <i class="bi bi-circle"></i><span>Cards</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-carousel.html">
-              <i class="bi bi-circle"></i><span>Carousel</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-list-group.html">
-              <i class="bi bi-circle"></i><span>List group</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-modal.html">
-              <i class="bi bi-circle"></i><span>Modal</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-tabs.html">
-              <i class="bi bi-circle"></i><span>Tabs</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-pagination.html">
-              <i class="bi bi-circle"></i><span>Pagination</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-progress.html">
-              <i class="bi bi-circle"></i><span>Progress</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-spinners.html">
-              <i class="bi bi-circle"></i><span>Spinners</span>
-            </a>
-          </li>
-          <li>
-            <a href="components-tooltips.html">
-              <i class="bi bi-circle"></i><span>Tooltips</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Components Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="forms-elements.html">
-              <i class="bi bi-circle"></i><span>Form Elements</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-layouts.html">
-              <i class="bi bi-circle"></i><span>Form Layouts</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-editors.html">
-              <i class="bi bi-circle"></i><span>Form Editors</span>
-            </a>
-          </li>
-          <li>
-            <a href="forms-validation.html">
-              <i class="bi bi-circle"></i><span>Form Validation</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Forms Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="tables-general.html">
-              <i class="bi bi-circle"></i><span>General Tables</span>
-            </a>
-          </li>
-          <li>
-            <a href="tables-data.html">
-              <i class="bi bi-circle"></i><span>Data Tables</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Tables Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-bar-chart"></i><span>Charts</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="charts-chartjs.html">
-              <i class="bi bi-circle"></i><span>Chart.js</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-apexcharts.html">
-              <i class="bi bi-circle"></i><span>ApexCharts</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-echarts.html">
-              <i class="bi bi-circle"></i><span>ECharts</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Charts Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Icons</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="icons-bootstrap.html">
-              <i class="bi bi-circle"></i><span>Bootstrap Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-remix.html">
-              <i class="bi bi-circle"></i><span>Remix Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-boxicons.html">
-              <i class="bi bi-circle"></i><span>Boxicons</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Icons Nav -->
-
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link " href="pages-faq.html">
-          <i class="bi bi-question-circle"></i>
-          <span>F.A.Q</span>
-        </a>
-      </li><!-- End F.A.Q Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-register.html">
-          <i class="bi bi-card-list"></i>
-          <span>Register</span>
-        </a>
-      </li><!-- End Register Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li><!-- End Login Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-dash-circle"></i>
-          <span>Error 404</span>
-        </a>
-      </li><!-- End Error 404 Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-blank.html">
-          <i class="bi bi-file-earmark"></i>
-          <span>Blank</span>
-        </a>
-      </li><!-- End Blank Page Nav -->
-
-    </ul>
-
-  </aside><!-- End Sidebar-->
-
-  <main id="main" class="main">
-
-    <div class="pagetitle">
-      <h1>Frequently Asked Questions</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Pages</li>
-          <li class="breadcrumb-item active">Frequently Asked Questions</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section faq">
-      <div class="row">
-        <div class="col-lg-6">
-
-          <div class="card basic">
-            <div class="card-body">
-              <h5 class="card-title">Basic Questions</h5>
-
-              <div>
-                <h6>1. Nisi ut ut exercitationem voluptatem esse sunt rerum?</h6>
-                <p>Saepe perspiciatis ea. Incidunt blanditiis enim mollitia qui voluptates. Id rem nulla tenetur nihil in unde rerum. Quae consequatur placeat qui cumque earum eius omnis quos.</p>
-              </div>
-
-              <div class="pt-2">
-                <h6>2. Reiciendis dolores repudiandae?</h6>
-                <p>Id ipsam non ut. Placeat doloremque deserunt quia tenetur inventore laboriosam dolores totam odio. Aperiam incidunt et. Totam ut quos sunt atque modi molestiae dolorem.</p>
-              </div>
-
-              <div class="pt-2">
-                <h6>3. Qui qui reprehenderit ut est illo numquam voluptatem?</h6>
-                <p>Enim inventore in consequuntur ipsam voluptatem consequatur beatae. Nostrum consequuntur voluptates et blanditiis.</p>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- F.A.Q Group 1 -->
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Laborum dolorem quam porro</h5>
-
-              <div class="accordion accordion-flush" id="faq-group-1">
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-1" type="button" data-bs-toggle="collapse">
-                      Debitis adipisci eius?
-                    </button>
-                  </h2>
-                  <div id="faqsOne-1" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
-                    <div class="accordion-body">
-                      Ut quasi odit odio totam accusamus vero eius. Nostrum asperiores voluptatem eos nulla ab dolores est asperiores iure. Quo est quis praesentium aut maiores. Corrupti sed aut expedita fugit vero dolorem. Nemo rerum sapiente. A quaerat dignissimos.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-2" type="button" data-bs-toggle="collapse">
-                      Omnis fugiat quis repellendus?
-                    </button>
-                  </h2>
-                  <div id="faqsOne-2" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
-                    <div class="accordion-body">
-                      In minus quia impedit est quas deserunt deserunt et. Nulla non quo dolores minima fugiat aut saepe aut inventore. Qui nesciunt odio officia beatae iusto sed voluptatem possimus quas. Officia vitae sit voluptatem nostrum a.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-3" type="button" data-bs-toggle="collapse">
-                      Et occaecati praesentium aliquam modi incidunt?
-                    </button>
-                  </h2>
-                  <div id="faqsOne-3" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
-                    <div class="accordion-body">
-                      Voluptates magni amet enim perspiciatis atque excepturi itaque est. Sit beatae animi incidunt eum repellat sequi ea saepe inventore. Id et vel et et. Nesciunt itaque corrupti quia ducimus. Consequatur maiores voluptatum fuga quod ut non fuga.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-4" type="button" data-bs-toggle="collapse">
-                      Quo unde eaque vero dolor quis ipsam?
-                    </button>
-                  </h2>
-                  <div id="faqsOne-4" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
-                    <div class="accordion-body">
-                      Numquam ut reiciendis aliquid. Quia veritatis quasi ipsam sed quo ut eligendi et non. Doloremque sed voluptatem at in voluptas aliquid dolorum.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-5" type="button" data-bs-toggle="collapse">
-                      Natus sunt quo atque mollitia accusamus?
-                    </button>
-                  </h2>
-                  <div id="faqsOne-5" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
-                    <div class="accordion-body">
-                      Aut necessitatibus maxime quis dolor et. Nihil laboriosam molestiae qui molestias placeat corrupti non quo accusamus. Nemo qui quis harum enim sed. Aliquam molestias pariatur delectus voluptas quidem qui rerum id quisquam. Perspiciatis voluptatem voluptatem eos. Vel aut minus labore at rerum eos.
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </div><!-- End F.A.Q Group 1 -->
-
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Chatbot -->
+    <div class="lg:col-span-2 p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Chat with AI Assistant</h2>
+      <div id="chat-box" class="chat-box flex-1 overflow-y-auto p-2 md:p-4 rounded-none md:rounded-lg mb-2 md:mb-4 shadow-inner">
+        <div class="message ai bg-soft text-gray-800 rounded-lg p-2 md:p-3 max-w-[70%] shadow-sm">
+          Bună! Sunt asistentul tău AI. Pot organiza calendarul, e-mailurile, sarcinile și îți ofer memento-uri sau recomandări zilnice. Pentru documente (ex. contracte, orare), cere-mi să creez unul și te voi redirecționa. Spune-mi „start Pomodoro” pentru a începe un timer, „create a task” pentru a adăuga o sarcină, sau „show recommendations” pentru sfaturi. Cum te ajut astăzi?
         </div>
-
-        <div class="col-lg-6">
-
-          <!-- F.A.Q Group 2 -->
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Deserunt ut unde corporis</h5>
-
-              <div class="accordion accordion-flush" id="faq-group-2">
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsTwo-1" type="button" data-bs-toggle="collapse">
-                      Cumque voluptatem recusandae blanditiis?
-                    </button>
-                  </h2>
-                  <div id="faqsTwo-1" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
-                    <div class="accordion-body">
-                      Ut quasi odit odio totam accusamus vero eius. Nostrum asperiores voluptatem eos nulla ab dolores est asperiores iure. Quo est quis praesentium aut maiores. Corrupti sed aut expedita fugit vero dolorem. Nemo rerum sapiente. A quaerat dignissimos.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsTwo-2" type="button" data-bs-toggle="collapse">
-                      Provident beatae eveniet placeat est aperiam repellat adipisci?
-                    </button>
-                  </h2>
-                  <div id="faqsTwo-2" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
-                    <div class="accordion-body">
-                      In minus quia impedit est quas deserunt deserunt et. Nulla non quo dolores minima fugiat aut saepe aut inventore. Qui nesciunt odio officia beatae iusto sed voluptatem possimus quas. Officia vitae sit voluptatem nostrum a.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsTwo-3" type="button" data-bs-toggle="collapse">
-                      Minus aliquam modi id reprehenderit nihil?
-                    </button>
-                  </h2>
-                  <div id="faqsTwo-3" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
-                    <div class="accordion-body">
-                      Voluptates magni amet enim perspiciatis atque excepturi itaque est. Sit beatae animi incidunt eum repellat sequi ea saepe inventore. Id et vel et et. Nesciunt itaque corrupti quia ducimus. Consequatur maiores voluptatum fuga quod ut non fuga.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsTwo-4" type="button" data-bs-toggle="collapse">
-                      Quaerat qui est iusto asperiores qui est reiciendis eos et?
-                    </button>
-                  </h2>
-                  <div id="faqsTwo-4" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
-                    <div class="accordion-body">
-                      Numquam ut reiciendis aliquid. Quia veritatis quasi ipsam sed quo ut eligendi et non. Doloremque sed voluptatem at in voluptas aliquid dolorum.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsTwo-5" type="button" data-bs-toggle="collapse">
-                      Laboriosam asperiores eum?
-                    </button>
-                  </h2>
-                  <div id="faqsTwo-5" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
-                    <div class="accordion-body">
-                      Aut necessitatibus maxime quis dolor et. Nihil laboriosam molestiae qui molestias placeat corrupti non quo accusamus. Nemo qui quis harum enim sed. Aliquam molestias pariatur delectus voluptas quidem qui rerum id quisquam. Perspiciatis voluptatem voluptatem eos. Vel aut minus labore at rerum eos.
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </div><!-- End F.A.Q Group 2 -->
-
-          <!-- F.A.Q Group 3 -->
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Dolore occaecati ducimus quam</h5>
-
-              <div class="accordion accordion-flush" id="faq-group-3">
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsThree-1" type="button" data-bs-toggle="collapse">
-                      Assumenda doloribus est fugiat sint incidunt animi totam nisi?
-                    </button>
-                  </h2>
-                  <div id="faqsThree-1" class="accordion-collapse collapse" data-bs-parent="#faq-group-3">
-                    <div class="accordion-body">
-                      Ut quasi odit odio totam accusamus vero eius. Nostrum asperiores voluptatem eos nulla ab dolores est asperiores iure. Quo est quis praesentium aut maiores. Corrupti sed aut expedita fugit vero dolorem. Nemo rerum sapiente. A quaerat dignissimos.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsThree-2" type="button" data-bs-toggle="collapse">
-                      Consequatur saepe explicabo odio atque nisi?
-                    </button>
-                  </h2>
-                  <div id="faqsThree-2" class="accordion-collapse collapse" data-bs-parent="#faq-group-3">
-                    <div class="accordion-body">
-                      In minus quia impedit est quas deserunt deserunt et. Nulla non quo dolores minima fugiat aut saepe aut inventore. Qui nesciunt odio officia beatae iusto sed voluptatem possimus quas. Officia vitae sit voluptatem nostrum a.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsThree-3" type="button" data-bs-toggle="collapse">
-                      Voluptates vel est fugiat molestiae rem sit eos sint?
-                    </button>
-                  </h2>
-                  <div id="faqsThree-3" class="accordion-collapse collapse" data-bs-parent="#faq-group-3">
-                    <div class="accordion-body">
-                      Voluptates magni amet enim perspiciatis atque excepturi itaque est. Sit beatae animi incidunt eum repellat sequi ea saepe inventore. Id et vel et et. Nesciunt itaque corrupti quia ducimus. Consequatur maiores voluptatum fuga quod ut non fuga.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsThree-4" type="button" data-bs-toggle="collapse">
-                      Ab ipsa cum autem voluptas doloremque velit?
-                    </button>
-                  </h2>
-                  <div id="faqsThree-4" class="accordion-collapse collapse" data-bs-parent="#faq-group-3">
-                    <div class="accordion-body">
-                      Numquam ut reiciendis aliquid. Quia veritatis quasi ipsam sed quo ut eligendi et non. Doloremque sed voluptatem at in voluptas aliquid dolorum.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" data-bs-target="#faqsThree-5" type="button" data-bs-toggle="collapse">
-                      Aliquam magni ducimus facilis numquam dolorum harum eveniet iusto?
-                    </button>
-                  </h2>
-                  <div id="faqsThree-5" class="accordion-collapse collapse" data-bs-parent="#faq-group-3">
-                    <div class="accordion-body">
-                      Aut necessitatibus maxime quis dolor et. Nihil laboriosam molestiae qui molestias placeat corrupti non quo accusamus. Nemo qui quis harum enim sed. Aliquam molestias pariatur delectus voluptas quidem qui rerum id quisquam. Perspiciatis voluptatem voluptatem eos. Vel aut minus labore at rerum eos.
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </div><!-- End F.A.Q Group 3 -->
-
-        </div>
-
       </div>
-    </section>
-
-  </main><!-- End #main -->
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer" class="footer">
-    <div class="copyright">
-      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+      <div class="typing-indicator text-gray-500 italic hidden mb-2">AI-ul tastează...</div>
+      <form id="input-form" class="flex flex-col md:flex-row items-center space-x-1 md:space-x-2 w-full">
+        <select id="lang-select" class="bg-white border border-gray-200 rounded-lg px-1 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0">
+          <option value="ro-RO">Română</option>
+          <option value="en-US">English</option>
+          <option value="ru-RU">Русский</option>
+          <option value="es-ES">Español</option>
+          <option value="fr-FR">Français</option>
+        </select>
+        <input type="text" id="user-input" placeholder="Tastează mesajul tău..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-lg px-2 md:px-4 py-1 md:py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+        <input type="file" id="file-input" accept=".txt,.md,.docx,.pdf" multiple class="hidden">
+        <button type="button" id="upload-btn" title="Încarcă document" class="bg-accent text-white rounded-full p-1 md:p-3 hover:bg-yellow-600 transition">
+          <i class="fa fa-upload text-xs md:text-base"></i>
+        </button>
+        <button type="button" id="mic-btn" title="Vorbește mesajul tău" class="bg-success text-white rounded-full p-1 md:p-3 hover:bg-green-600 transition">
+          <i class="fa fa-microphone text-xs md:text-base"></i>
+        </button>
+        <button type="submit" id="send-btn" class="bg-primary text-white rounded-full p-1 md:p-3 hover:bg-indigo-700 transition">
+          <i class="fa fa-paper-plane text-xs md:text-base"></i>
+        </button>
+      </form>
+      <div id="mobile-toggles" class="mt-2">
+        <button id="pomodoro-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Pomodoro Timer</button>
+        <button id="tasks-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Tasks & Reminders</button>
+        <button id="recommendations-toggle" class="toggle-section bg-primary text-white rounded-lg px-4 py-2 w-full hover:bg-indigo-700 hidden text-sm">Show Recommendations</button>
+      </div>
     </div>
-    <div class="credits">
-      <!-- All the links in the footer should remain intact. -->
-      <!-- You can delete the links only if you purchased the pro version. -->
-      <!-- Licensing information: https://bootstrapmade.com/license/ -->
-      <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-      Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+
+    <!-- Pomodoro Timer -->
+    <div id="pomodoro-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Pomodoro Timer</h2>
+      <div id="pomodoro-block" class="text-center flex flex-col justify-center">
+        <div id="pomodoro-timer" class="text-xl md:text-2xl font-semibold text-gray-800 mb-2 md:mb-4">25:00</div>
+        <div id="pomodoro-session" class="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">Work Session</div>
+        <div class="flex justify-center space-x-1 md:space-x-2">
+          <button id="pomodoro-start-btn" class="bg-success text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-green-600 flex items-center text-xs md:text-sm"><i class="fas fa-play mr-1 md:mr-2"></i>Start</button>
+          <button id="pomodoro-pause-btn" class="bg-gray-500 text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-gray-600 hidden flex items-center text-xs md:text-sm"><i class="fas fa-pause mr-1 md:mr-2"></i>Pause</button>
+          <button id="pomodoro-reset-btn" class="bg-danger text-white rounded-lg px-2 md:px-4 py-1 md:py-2 hover:bg-red-600 flex items-center text-xs md:text-sm"><i class="fas fa-stop mr-1 md:mr-2"></i>Reset</button>
+        </div>
+      </div>
     </div>
-  </footer><!-- End Footer -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <!-- Daily Overview -->
+    <div id="daily-overview-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Overview</h2>
+      <div id="daily-overview" class="daily-overview flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
+    </div>
 
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/chart.js/chart.umd.js"></script>
-  <script src="assets/vendor/echarts/echarts.min.js"></script>
-  <script src="assets/vendor/quill/quill.js"></script>
-  <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
+    <!-- Tasks & Reminders -->
+    <div id="tasks-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Tasks & Reminders</h2>
+      <div id="tasks-reminders" class="tasks-reminders flex-1 overflow-y-auto p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner"></div>
+    </div>
 
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
+    <!-- Daily Recommendations -->
+    <div id="recommendations-container" class="p-2 md:p-4 bg-card rounded-none md:rounded-2xl shadow-sm border-0 md:border border-soft flex flex-col">
+      <h2 class="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-4">Daily Recommendations</h2>
+      <div id="daily-recommendations" class="p-2 md:p-4 bg-white rounded-none md:rounded-lg shadow-inner flex-1">
+        <p>Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!</p>
+      </div>
+    </div>
+  </section>
 
+  <!-- Task Edit Modal -->
+  <div id="task-edit-modal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Task</h2>
+      <input type="hidden" id="task-edit-id">
+      <input type="text" id="task-edit-name" placeholder="Task Name">
+      <input type="text" id="task-edit-description" placeholder="Task Description">
+      <input type="datetime-local" id="task-edit-deadline" placeholder="Deadline">
+      <div class="btn-group">
+        <button id="task-edit-cancel" class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600">Cancel</button>
+        <button id="task-edit-save" class="bg-primary text-white rounded-lg px-4 py-2 hover:bg-indigo-700">Save</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ======= Footer ======= -->
+<footer class="bg-white py-2 md:py-6 text-center text-gray-600 w-full">
+  <div class="text-xs md:text-sm">© Copyright <strong>NeuroNexis</strong>. All Rights Reserved</div>
+  <div class="text-xs md:text-sm">Designed by <a href="#" class="text-primary hover:underline">Poalelungi Consulting</a></div>
+</footer>
+
+<!-- Vendor JS Files -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+
+<!-- Template Main JS File -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/auth.js"></script>
+
+<!-- Chatbot and Productivity Logic -->
+<script>
+  // Configure pdf.js worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+  // Elements
+  const chatBox = document.getElementById('chat-box');
+  const form = document.getElementById('input-form');
+  const input = document.getElementById('user-input');
+  const fileInput = document.getElementById('file-input');
+  const uploadBtn = document.getElementById('upload-btn');
+  const typingIndicator = document.querySelector('.typing-indicator');
+  const micBtn = document.getElementById('mic-btn');
+  const langSelect = document.getElementById('lang-select');
+  const tasksReminders = document.getElementById('tasks-reminders');
+  const dailyRecommendations = document.getElementById('daily-recommendations');
+  const dailyOverview = document.getElementById('daily-overview');
+  const dailyOverviewContainer = document.getElementById('daily-overview-container');
+  const sidebar = document.getElementById('sidebar');
+  const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const pomodoroTimer = document.getElementById('pomodoro-timer');
+  const pomodoroSession = document.getElementById('pomodoro-session');
+  const pomodoroStartBtn = document.getElementById('pomodoro-start-btn');
+  const pomodoroPauseBtn = document.getElementById('pomodoro-pause-btn');
+  const pomodoroResetBtn = document.getElementById('pomodoro-reset-btn');
+  const pomodoroContainer = document.getElementById('pomodoro-container');
+  const tasksContainer = document.getElementById('tasks-container');
+  const recommendationsContainer = document.getElementById('recommendations-container');
+  const taskEditModal = document.getElementById('task-edit-modal');
+  const taskEditId = document.getElementById('task-edit-id');
+  const taskEditName = document.getElementById('task-edit-name');
+  const taskEditDescription = document.getElementById('task-edit-description');
+  const taskEditDeadline = document.getElementById('task-edit-deadline');
+  const taskEditSave = document.getElementById('task-edit-save');
+  const taskEditCancel = document.getElementById('task-edit-cancel');
+  const pomodoroToggle = document.getElementById('pomodoro-toggle');
+  const tasksToggle = document.getElementById('tasks-toggle');
+  const recommendationsToggle = document.getElementById('recommendations-toggle');
+
+  // Language-specific placeholders
+  const placeholders = {
+    'en-US': { default: 'Type your message...', listening: 'Listening...' },
+    'ro-RO': { default: 'Tastează mesajul tău...', listening: 'Ascult...' },
+    'ru-RU': { default: 'Введите ваше сообщение...', listening: 'Слушаю...' },
+    'es-ES': { default: 'Escribe tu mensaje...', listening: 'Escuchando...' },
+    'fr-FR': { default: 'Tapez votre message...', listening: 'Écoute...' }
+  };
+
+  // In-memory store for tasks and reminders
+  let tasks = userData[currentUser]?.tasks || [];
+  let reminders = userData[currentUser]?.reminders || [];
+
+  // Track section visibility on mobile
+  let isPomodoroVisible = false;
+  let isTasksVisible = false;
+  let isRecommendationsVisible = false;
+
+  // Request notification permission
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
+
+  // Check authentication
+  if (!currentUser || !users[currentUser]) {
+    window.location.href = 'pages-login.html';
+  } else {
+    document.getElementById('login-nav').style.display = 'none';
+    document.getElementById('register-nav').style.display = 'none';
+    document.getElementById('profile-nav').style.display = 'block';
+    loadProfile();
+  }
+
+  // Load profile data
+  function loadProfile() {
+    const user = users[currentUser];
+    if (user) {
+      document.getElementById('user-name').textContent = currentUser;
+      document.getElementById('user-fullname').textContent = user.name || currentUser;
+      document.getElementById('user-role').textContent = user.email;
+      const profileImage = user.profileImage || 'assets/img/profile-img.jpg';
+      document.getElementById('header-profile-image').src = profileImage;
+    }
+    renderTasksReminders();
+    generateDailyOverview();
+    generateDailyRecommendations();
+    scheduleWorkReminder();
+  }
+
+  // Sidebar toggle
+  toggleSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+  closeSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.add('-translate-x-full');
+  });
+
+  // Dropdown toggle
+  document.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', () => {
+    const dropdown = document.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('hidden');
+  });
+
+  // Toggle sections on mobile
+  pomodoroToggle.addEventListener('click', () => {
+    isPomodoroVisible = !isPomodoroVisible;
+    pomodoroContainer.style.display = isPomodoroVisible ? 'block' : 'none';
+    pomodoroToggle.textContent = isPomodoroVisible ? 'Hide Pomodoro Timer' : 'Show Pomodoro Timer';
+  });
+
+  tasksToggle.addEventListener('click', () => {
+    isTasksVisible = !isTasksVisible;
+    tasksContainer.style.display = isTasksVisible ? 'block' : 'none';
+    tasksToggle.textContent = isTasksVisible ? 'Hide Tasks & Reminders' : 'Show Tasks & Reminders';
+  });
+
+  recommendationsToggle.addEventListener('click', () => {
+    isRecommendationsVisible = !isRecommendationsVisible;
+    recommendationsContainer.style.display = isRecommendationsVisible ? 'block' : 'none';
+    recommendationsToggle.textContent = isRecommendationsVisible ? 'Hide Recommendations' : 'Show Recommendations';
+  });
+
+  // Pomodoro Timer
+  let pomodoroState = JSON.parse(localStorage.getItem('pomodoroState')) || {
+    active: false,
+    paused: false,
+    time: 25 * 60,
+    isWorkSession: true,
+    lastUpdate: Date.now()
+  };
+  let pomodoroInterval = null;
+
+  function updatePomodoroDisplay() {
+    const minutes = Math.floor(pomodoroState.time / 60);
+    const seconds = Math.floor(pomodoroState.time % 60);
+    pomodoroTimer.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    pomodoroSession.textContent = pomodoroState.isWorkSession ? 'Work Session' : 'Break Session';
+    pomodoroStartBtn.classList.toggle('hidden', pomodoroState.active && !pomodoroState.paused);
+    pomodoroPauseBtn.classList.toggle('hidden', !pomodoroState.active || pomodoroState.paused);
+  }
+
+  function savePomodoroState() {
+    localStorage.setItem('pomodoroState', JSON.stringify(pomodoroState));
+  }
+
+  function startPomodoro() {
+    if (pomodoroState.active && !pomodoroState.paused) return;
+    pomodoroState.active = true;
+    pomodoroState.paused = false;
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+    updatePomodoroDisplay();
+    savePomodoroState();
+    if (window.innerWidth <= 1024) {
+      pomodoroToggle.classList.remove('hidden');
+      if (!isPomodoroVisible) {
+        isPomodoroVisible = true;
+        pomodoroContainer.style.display = 'block';
+        pomodoroToggle.textContent = 'Hide Pomodoro Timer';
+      }
+    }
+  }
+
+  function pausePomodoro() {
+    pomodoroState.paused = true;
+    clearInterval(pomodoroInterval);
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function resetPomodoro() {
+    clearInterval(pomodoroInterval);
+    pomodoroState = {
+      active: false,
+      paused: false,
+      time: 25 * 60,
+      isWorkSession: true,
+      lastUpdate: Date.now()
+    };
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  function updatePomodoro() {
+    const now = Date.now();
+    const elapsed = (now - pomodoroState.lastUpdate) / 1000;
+    pomodoroState.time -= elapsed;
+    pomodoroState.lastUpdate = now;
+
+    if (pomodoroState.time <= 0) {
+      pomodoroState.isWorkSession = !pomodoroState.isWorkSession;
+      pomodoroState.time = pomodoroState.isWorkSession ? 25 * 60 : 5 * 60;
+      addMessage(`Timpul de ${pomodoroState.isWorkSession ? 'pauză' : 'lucru'} s-a terminat! ${pomodoroState.isWorkSession ? 'Începe sesiunea de lucru.' : 'Ia o pauză de 5 minute.'}`, 'ai');
+      if (!pomodoroState.isWorkSession) {
+        scheduleWorkReminder();
+      }
+    }
+
+    updatePomodoroDisplay();
+    savePomodoroState();
+  }
+
+  pomodoroStartBtn.addEventListener('click', startPomodoro);
+  pomodoroPauseBtn.addEventListener('click', pausePomodoro);
+  pomodoroResetBtn.addEventListener('click', resetPomodoro);
+
+  // Initialize Pomodoro
+  if (pomodoroState.active && !pomodoroState.paused) {
+    pomodoroState.lastUpdate = Date.now();
+    pomodoroInterval = setInterval(updatePomodoro, 1000);
+  }
+  updatePomodoroDisplay();
+
+  // AI-driven work reminder
+  async function scheduleWorkReminder() {
+    const delay = Math.random() * (30 - 5) + 5; // Random delay between 5 and 30 minutes
+    setTimeout(async () => {
+      if (Notification.permission === 'granted') {
+        new Notification('E timpul să lucrezi!', {
+          body: 'AI-ul tău te îndeamnă să te apuci de lucru. Hai să finalizăm sarcinile!',
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage('E timpul să lucrezi! Hai să ne apucăm de treabă.', 'ai');
+      await scheduleNextReminder();
+    }, delay * 60 * 1000);
+  }
+
+  // AI decides next reminder based on tasks
+  async function scheduleNextReminder() {
+    const now = new Date();
+    const pendingTasks = tasks.filter(task => !task.completed && task.deadline);
+    if (pendingTasks.length === 0) {
+      setTimeout(scheduleWorkReminder, 60 * 60 * 1000); // Default to 1 hour if no tasks
+      return;
+    }
+
+    pendingTasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    const nearestDeadline = new Date(pendingTasks[0].deadline);
+    const timeToDeadline = (nearestDeadline - now) / (1000 * 60); // Minutes to deadline
+
+    let nextReminderDelay;
+    if (timeToDeadline <= 30) {
+      nextReminderDelay = timeToDeadline / 2; // Remind halfway to deadline
+    } else if (timeToDeadline <= 60) {
+      nextReminderDelay = 30; // Remind 30 minutes before
+    } else {
+      nextReminderDelay = 60; // Remind 1 hour before
+    }
+
+    setTimeout(async () => {
+      const task = pendingTasks[0];
+      if (Notification.permission === 'granted') {
+        new Notification(`Memento sarcină: ${task.name}`, {
+          body: `Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`,
+          icon: 'assets/img/favicon.png'
+        });
+      }
+      addMessage(`Memento: Sarcina "${task.name}" este scadentă la ${new Date(task.deadline).toLocaleString()}.`, 'ai');
+      await scheduleNextReminder();
+    }, nextReminderDelay * 60 * 1000);
+  }
+
+  // Task and Reminder Management
+  async function addTask(name, description, deadline) {
+    console.log('Adding task:', { name, description, deadline });
+    const task = { id: Date.now(), name, description, deadline, completed: false };
+    tasks.push(task);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
+    console.log('Tasks after adding:', tasks);
+    renderTasksReminders();
+    if (deadline && !isNaN(new Date(deadline).getTime())) {
+      console.log('Adding reminder for task:', name, 'with deadline:', deadline);
+      await addReminder(`Task: ${name}`, deadline);
+    }
+    generateDailyOverview();
+    if (window.innerWidth <= 1024) {
+      tasksToggle.classList.remove('hidden');
+      if (!isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      }
+    }
+    return task; // Return the created task for confirmation
+  }
+
+  async function addReminder(description, deadline) {
+    console.log('Adding reminder:', { description, deadline });
+    const reminder = { id: Date.now(), description, deadline, notified: false };
+    reminders.push(reminder);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
+    console.log('Reminders after adding:', reminders);
+    renderTasksReminders();
+    checkReminders();
+    generateDailyOverview();
+    return reminder; // Return the created reminder for confirmation
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+    userData[currentUser].tasks = tasks;
+    saveUserData();
+    renderTasksReminders();
+    generateDailyOverview();
+    scheduleNextReminder();
+  }
+
+  function deleteReminder(id) {
+    reminders = reminders.filter(reminder => reminder.id !== id);
+    userData[currentUser].reminders = reminders;
+    saveUserData();
+    renderTasksReminders();
+    generateDailyOverview();
+  }
+
+  async function toggleTaskCompletion(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      if (task.completed) {
+        const feedback = await sendMessageToAI(`Generează feedback pentru sarcina completată: ${task.name} - ${task.description}`);
+        addMessage(`Feedback AI: ${feedback}`, 'ai');
+        if (Notification.permission === 'granted') {
+          new Notification('Sarcină completată!', {
+            body: `Ai finalizat "${task.name}". Feedback: ${feedback}`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
+      }
+    }
+  }
+
+  function editTask(id) {
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      taskEditId.value = task.id;
+      taskEditName.value = task.name;
+      taskEditDescription.value = task.description;
+      taskEditDeadline.value = task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '';
+      taskEditModal.style.display = 'flex';
+    }
+  }
+
+  taskEditSave.addEventListener('click', async () => {
+    const id = parseInt(taskEditId.value);
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      task.name = taskEditName.value.trim();
+      task.description = taskEditDescription.value.trim();
+      task.deadline = taskEditDeadline.value ? new Date(taskEditDeadline.value) : null;
+      userData[currentUser].tasks = tasks;
+      saveUserData();
+      renderTasksReminders();
+      generateDailyOverview();
+      taskEditModal.style.display = 'none';
+      await scheduleNextReminder();
+    }
+  });
+
+  taskEditCancel.addEventListener('click', () => {
+    taskEditModal.style.display = 'none';
+  });
+
+  function renderTasksReminders() {
+    console.log('Rendering tasks and reminders:', { tasks, reminders });
+    tasksReminders.innerHTML = '';
+    // Render tasks
+    if (tasks.length > 0) {
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.className = `flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2 ${task.completed ? 'bg-green-50 line-through' : ''}`;
+        div.innerHTML = `
+          <span class="flex items-center text-xs md:text-sm">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})" class="mr-1 md:mr-2">
+            ${task.name}: ${task.description} ${task.deadline ? `(${new Date(task.deadline).toLocaleString()})` : ''}
+          </span>
+          <div class="flex space-x-2">
+            <i class="fa fa-edit text-primary cursor-pointer text-xs md:text-sm" onclick="editTask(${task.id})"></i>
+            <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteTask(${task.id})"></i>
+          </div>
+        `;
+        tasksReminders.appendChild(div);
+      });
+    }
+    // Render reminders
+    if (reminders.length > 0) {
+      reminders.forEach(reminder => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-1 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+          <span class="text-xs md:text-sm">${reminder.description} (${new Date(reminder.deadline).toLocaleString()})</span>
+          <i class="fa fa-trash text-danger cursor-pointer text-xs md:text-sm" onclick="deleteReminder(${reminder.id})"></i>
+        `;
+        tasksReminders.appendChild(div);
+      });
+    }
+    // Update mobile visibility
+    if (window.innerWidth <= 1024) {
+      const hasItems = tasks.length > 0 || reminders.length > 0;
+      tasksToggle.classList.toggle('hidden', !hasItems);
+      if (hasItems && !isTasksVisible) {
+        isTasksVisible = true;
+        tasksContainer.style.display = 'block';
+        tasksToggle.textContent = 'Hide Tasks & Reminders';
+      } else if (!hasItems && isTasksVisible) {
+        isTasksVisible = false;
+        tasksContainer.style.display = 'none';
+        tasksToggle.textContent = 'Show Tasks & Reminders';
+      }
+    }
+  }
+
+  function checkReminders() {
+    const now = new Date();
+    reminders.forEach(reminder => {
+      const deadline = new Date(reminder.deadline);
+      if (deadline <= now && !reminder.notified) {
+        if (Notification.permission === 'granted') {
+          new Notification('Memento!', {
+            body: `Memento: ${reminder.description} este scadent acum!`,
+            icon: 'assets/img/favicon.png'
+          });
+        }
+        addMessage(`Memento: ${reminder.description} este scadent acum!`, 'ai');
+        reminder.notified = true;
+        userData[currentUser].reminders = reminders;
+        saveUserData();
+      }
+    });
+  }
+
+  setInterval(checkReminders, 60000);
+
+  function generateDailyOverview() {
+    const today = new Date();
+    const emails = userData[currentUser].emails || [];
+    const events = userData[currentUser].calendarEvents || [];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    dailyOverview.innerHTML = '';
+
+    if (events.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Evenimente de astăzi</h4><ul class="list-disc pl-3 md:pl-5">${events.map(e => `<li class="text-xs md:text-sm">${e.summary} (${new Date(e.start.dateTime).toLocaleTimeString()} - ${new Date(e.end.dateTime).toLocaleTimeString()})</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    if (emails.length > 0) {
+      emails.forEach(email => {
+        const from = email.payload?.headers.find(h => h.name === 'From')?.value || 'Unknown';
+        const subject = email.payload?.headers.find(h => h.name === 'Subject')?.value || 'No Subject';
+        const snippet = email.snippet?.substring(0, 100) + (email.snippet?.length > 100 ? '...' : '') || '';
+        const taskSuggestion = `Răspunde la e-mailul de la ${from}: ${subject}`;
+        const div = document.createElement('div');
+        div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+        div.innerHTML = `
+            <p class="text-xs md:text-sm"><strong>De la:</strong> ${from}</p>
+            <p class="text-xs md:text-sm"><strong>Subiect:</strong> ${subject}</p>
+            <p class="text-xs md:text-sm">${snippet}</p>
+            <button onclick="addTask('${taskSuggestion}', null); generateDailyOverview();" class="bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 mt-1 md:mt-2 hover:bg-indigo-700 text-xs md:text-sm">Adaugă ca sarcină</button>
+          `;
+        dailyOverview.appendChild(div);
+      });
+    }
+
+    if (pendingTasks.length > 0) {
+      const div = document.createElement('div');
+      div.className = 'overview-item p-2 md:p-3 rounded-lg bg-gray-50 mb-1 md:mb-2';
+      div.innerHTML = `<h4 class="font-semibold text-gray-800 text-xs md:text-sm">Sarcini pendinte</h4><ul class="list-disc pl-3 md:pl-5">${pendingTasks.map(t => `<li class="text-xs md:text-sm">${t.name}: ${t.description} ${t.deadline ? `(${new Date(t.deadline).toLocaleString()})` : ''}</li>`).join('')}</ul>`;
+      dailyOverview.appendChild(div);
+    }
+
+    dailyOverviewContainer.classList.toggle('hidden', !events.length && !emails.length && !pendingTasks.length);
+  }
+
+  function generateDailyRecommendations() {
+    const today = new Date();
+    const recommendations = ['Începe o sesiune Pomodoro pentru a te concentra pe sarcinile tale!'];
+    const pendingTasks = tasks.filter(task => !task.completed && (!task.deadline || new Date(task.deadline) >= today));
+    if (pendingTasks.length > 0) {
+      pendingTasks.sort((a, b) => new Date(a.deadline || Infinity) - new Date(b.deadline || Infinity));
+      recommendations.push('**Priorități de astăzi:**');
+      pendingTasks.slice(0, 3).forEach(task => {
+        recommendations.push(`- ${task.name}: ${task.description} ${task.deadline ? `(scadent: ${new Date(task.deadline).toLocaleString()})` : ''}`);
+      });
+    }
+    dailyRecommendations.innerHTML = marked.parse(recommendations.join('\n'));
+    if (window.innerWidth <= 1024) {
+      recommendationsToggle.classList.toggle('hidden', pendingTasks.length === 0);
+      if (pendingTasks.length > 0 && !isRecommendationsVisible) {
+        isRecommendationsVisible = true;
+        recommendationsContainer.style.display = 'block';
+        recommendationsToggle.textContent = 'Hide Recommendations';
+      }
+    }
+  }
+
+  // Voice Recognition Setup
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = langSelect.value;
+
+    let finalTranscript = '';
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript = transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      input.value = finalTranscript + interimTranscript;
+    };
+
+    recognition.onstart = () => {
+      micBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+      input.placeholder = placeholders[langSelect.value].listening;
+    };
+
+    recognition.onend = () => {
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
+      input.placeholder = placeholders[langSelect.value].default;
+      if (finalTranscript.trim()) {
+        form.dispatchEvent(new Event('submit'));
+      }
+      finalTranscript = '';
+    };
+
+    recognition.onerror = (event) => {
+      micBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      micBtn.classList.add('bg-success', 'hover:bg-green-600');
+      input.placeholder = placeholders[langSelect.value].default;
+      console.error('Speech recognition error:', event.error);
+      addMessage('Eroare la intrarea vocală. Te rog încearcă din nou.', 'ai');
+    };
+
+    micBtn.addEventListener('click', () => {
+      if (!micBtn.classList.contains('bg-red-500')) {
+        finalTranscript = '';
+        recognition.lang = langSelect.value;
+        recognition.start();
+      } else {
+        recognition.stop();
+      }
+    });
+
+    langSelect.addEventListener('change', () => {
+      input.placeholder = placeholders[langSelect.value].default;
+    });
+  } else {
+    micBtn.style.display = 'none';
+    langSelect.style.display = 'none';
+  }
+
+  // File Upload Handling
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async () => {
+    const files = fileInput.files;
+    if (files.length === 0) return;
+
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    let fileContents = [];
+    for (const file of files) {
+      let content;
+      if (file.type === 'application/pdf') {
+        content = await extractTextFromPDF(file);
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        content = await extractTextFromDocx(file);
+      } else {
+        content = await readFile(file);
+      }
+      fileContents.push(`**${file.name}**\n${content}`);
+      addMessage(`Încărcat: ${file.name}`, 'user');
+    }
+
+    const message = input.value.trim() || 'Analizează documentele încărcate.';
+    const combinedMessage = `${message}\n\n${fileContents.join('\n\n')}`;
+    const aiResponse = await sendMessageToAI(combinedMessage);
+    typingIndicator.classList.add('hidden');
+    addMessage(aiResponse, 'ai', true);
+    fileInput.value = '';
+  });
+
+  async function readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Eroare la citirea fișierului'));
+      reader.readAsText(file);
+    });
+  }
+
+  async function extractTextFromPDF(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        text += textContent.items.map(item => item.str).join(' ') + '\n';
+      }
+      return text;
+    } catch (error) {
+      console.error('Error extracting PDF text:', error);
+      return 'Eroare la extragerea textului din PDF.';
+    }
+  }
+
+  async function extractTextFromDocx(file) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const { value } = await mammoth.extractRawText({ arrayBuffer });
+      return value;
+    } catch (error) {
+      console.error('Error extracting DOCX text:', error);
+      return 'Eroare la extragerea textului din DOCX.';
+    }
+  }
+
+  // Form Submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim().toLowerCase();
+    if (!message) return;
+
+    addMessage(input.value, 'user');
+    input.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    userData[currentUser].chats = userData[currentUser].chats || [];
+    userData[currentUser].chats.push({ type: 'user', text: message });
+    saveUserData();
+
+    // Check for document creation requests
+    if (message.includes('creează document') || message.includes('create document') ||
+            message.includes('contract') || message.includes('orar') ||
+            message.includes('schedule') || message.includes('excel')) {
+      addMessage('Redirecționez către editorul de documente pentru a crea documentul solicitat.', 'ai');
+      setTimeout(() => {
+        window.location.href = `document-editor.html?query=${encodeURIComponent(message)}`;
+      }, 1000);
+      typingIndicator.classList.add('hidden');
+      return;
+    }
+
+    if (message.includes('start pomodoro')) {
+      startPomodoro();
+      addMessage('Pomodoro timer a fost pornit! Te rog apasă „Start” pentru a începe.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('create a task') || message.includes('add task') || message.includes('adaugă sarcină') || message.includes('creaza un task')) {
+      typingIndicator.classList.remove('hidden');
+      try {
+        const aiResponse = await sendMessageToAI(`Generează un nume și o descriere pentru o sarcină bazată pe: "${message}". Returnează sub forma: **Nume:** [nume]\n**Descriere:** [descriere]\n**Dată limită (opțional):** [data limită sau "fără dată limită"]`);
+        typingIndicator.classList.add('hidden');
+
+        // Improved parsing with fallback
+        let name = 'Default Task';
+        let description = 'No description provided';
+        let deadline = null;
+
+        const nameMatch = aiResponse.match(/\*\*Nume:\*\* (.*?)(?=\n|$)/);
+        const descMatch = aiResponse.match(/\*\*Descriere:\*\* (.*?)(?=\n|$)/);
+        const deadlineMatch = aiResponse.match(/\*\*Dată limită \(opțional\):\*\* (.*?)(?=\n|$)/);
+
+        if (nameMatch) name = nameMatch[1].trim();
+        if (descMatch) description = descMatch[1].trim();
+        if (deadlineMatch && deadlineMatch[1] !== 'fără dată limită') {
+          const parsedDeadline = new Date(deadlineMatch[1]);
+          if (!isNaN(parsedDeadline.getTime())) deadline = parsedDeadline;
+        }
+
+        // For the specific request "creaza un task pentru crearea uni document"
+        if (message.includes('crearea uni document')) {
+          name = 'Crearea unui document';
+          description = 'Crearea unui document';
+          // Let's set a default deadline for testing reminder functionality, e.g., 1 hour from now
+          const now = new Date();
+          now.setHours(now.getHours() + 1);
+          deadline = now;
+        }
+
+        const task = await addTask(name, description, deadline);
+        let confirmationMessage = `Sarcină adăugată: ${task.name}: ${task.description}`;
+        if (task.deadline) {
+          confirmationMessage += ` (scadent: ${new Date(task.deadline).toLocaleString()})`;
+        }
+        addMessage(confirmationMessage, 'ai');
+      } catch (error) {
+        typingIndicator.classList.add('hidden');
+        addMessage('Eroare la generarea sarcinii. Te rog încearcă din nou.', 'ai');
+        console.error('Task creation error:', error);
+      }
+    } else if (message.includes('show recommendations')) {
+      generateDailyRecommendations();
+      addMessage('Recomandările zilnice au fost afișate.', 'ai');
+      typingIndicator.classList.add('hidden');
+    } else if (message.includes('adaugă memento') || message.includes('reminder')) {
+      const parts = message.split('la');
+      const description = parts[0].replace(/adaugă memento|reminder/i, '').trim();
+      const deadline = parts[1] ? new Date(parts[1].trim()) : null;
+      if (description && deadline && !isNaN(deadline.getTime())) {
+        const reminder = await addReminder(description, deadline);
+        addMessage(`Memento adăugat: ${reminder.description} la ${new Date(reminder.deadline).toLocaleString()}`, 'ai');
+      } else {
+        addMessage('Eroare la adăugarea mementoului. Te rog specifică o dată validă.', 'ai');
+      }
+      typingIndicator.classList.add('hidden');
+    } else {
+      const aiResponse = await sendMessageToAI(message);
+      typingIndicator.classList.add('hidden');
+      addMessage(aiResponse, 'ai', true);
+      userData[currentUser].chats.push({ type: 'ai', text: aiResponse });
+      saveUserData();
+    }
+
+    generateDailyRecommendations();
+    generateDailyOverview();
+  });
+
+  function addMessage(text, type, isDocument = false) {
+    const div = document.createElement('div');
+    div.className = `message ${type} p-1 md:p-3 rounded-lg max-w-[70%] ${type === 'user' ? 'bg-primary text-white ml-auto rounded-br-none' : 'bg-soft text-gray-800 rounded-bl-none'} animate-slideIn shadow-sm`;
+
+    let generalContent = text;
+    let documentContent = '';
+    const documentMarker = '===DOCUMENT===';
+    const documentEndMarker = '===END_DOCUMENT===';
+    if (isDocument && text.includes(documentMarker)) {
+      const startIdx = text.indexOf(documentMarker) + documentMarker.length;
+      const endIdx = text.includes(documentEndMarker) ? text.indexOf(documentEndMarker) : text.length;
+      documentContent = text.slice(startIdx, endIdx).trim();
+      generalContent = text.slice(0, startIdx - documentMarker.length).trim() + text.slice(endIdx + documentEndMarker.length).trim();
+      div.classList.add('border-2', 'border-primary');
+    }
+
+    if (generalContent) {
+      const renderedHtml = marked.parse(generalContent);
+      const contentDiv = document.createElement('div');
+      contentDiv.innerHTML = renderedHtml;
+      contentDiv.className = 'prose prose-sm max-w-none text-xs md:text-sm';
+      div.appendChild(contentDiv);
+    }
+
+    if (documentContent && type === 'ai') {
+      const openBtn = document.createElement('button');
+      openBtn.className = 'mt-1 md:mt-2 bg-primary text-white rounded-lg px-2 md:px-4 py-1 md:py-1 hover:bg-indigo-700 flex items-center text-xs md:text-sm';
+      openBtn.innerHTML = '<i class="fas fa-file-alt mr-1 md:mr-2"></i>Deschide în Editorul de Documente';
+      openBtn.addEventListener('click', () => {
+        window.location.href = `document-editor.html?content=${encodeURIComponent(documentContent)}`;
+      });
+      div.appendChild(openBtn);
+    }
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  async function sendMessageToAI(message) {
+    try {
+      const response = await fetch('http://localhost:11434/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama3.1', // Adjust to your preferred Ollama model
+          messages: [
+            {
+              role: 'system',
+              content: 'Ești un asistent AI pentru productivitate, care ajută cu organizarea calendarului, e-mailurilor, sarcinilor și oferă memento-uri inteligente. Răspunde în română, folosind markdown (titluri cu **text**, liste, blocuri de cod cu ```). Pentru documente generate (ex. contracte, orare), include conținutul între ===DOCUMENT=== și ===END_DOCUMENT===. Pentru sarcini sau memento-uri, extrage informațiile relevante (descriere, dată limită) și returnează un răspuns structurat. Oferă recomandări zilnice bazate pe sarcinile utilizatorului. Afișează secțiunile (Pomodoro, Tasks, Recommendations) doar pe mobil (≤ 1024px) când utilizatorul cere „start Pomodoro”, „create a task”, sau „show recommendations”.'
+            },
+            { role: 'user', content: message }
+          ],
+          stream: false,
+          temperature: 0.7,
+          max_tokens: 4096
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.message.content || 'Îmi pare rău, nu am primit un răspuns de la AI.';
+    } catch (error) {
+      console.error('Error:', error);
+      return 'Eroare la conectarea cu API-ul Ollama. Asigură-te că serverul Ollama rulează pe localhost:11434.';
+    }
+  }
+
+  // Adjust heights for mobile
+  window.addEventListener('resize', () => {
+    const height = window.innerHeight - (document.getElementById('header').offsetHeight + document.querySelector('footer').offsetHeight + 20);
+    chatBox.style.maxHeight = `${height * 0.6}px`;
+    dailyOverview.style.maxHeight = `${height * 0.6}px`;
+    tasksReminders.style.maxHeight = `${height * 0.4}px`;
+  });
+  window.dispatchEvent(new Event('resize'));
+
+  // Set initial placeholder
+  input.placeholder = placeholders[langSelect.value].default;
+
+  // Logout
+  document.getElementById('logout-btn').addEventListener('click', logout);
+</script>
 </body>
-
 </html>
