@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NEURONEXIS AI Chat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,17 +23,29 @@
     .dark .xai-explanation:hover { background: #1e293b; }
     .sidebar { transition: transform 0.3s ease; }
     .dark .bg-gray-100 { background: #1f2937; }
+    @media (max-width: 640px) {
+      .chat-container { height: calc(100vh - 220px); }
+      .container { padding: 0.5rem; }
+      .g_id_signin { width: 100%; }
+      .sidebar { width: 100%; }
+      textarea { font-size: 14px; }
+      .max-w-md { max-width: 100%; }
+    }
+    @media (max-width: 768px) {
+      .chat-container { height: calc(100vh - 200px); }
+      .container { padding: 1rem; }
+    }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
 <div class="container mx-auto max-w-6xl px-4 py-6">
   <!-- Login Section -->
   <div id="login-section" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md mx-auto my-12 text-center">
-    <h2 class="text-2xl font-bold mb-6">Welcome to NEURONEXIS AI</h2>
+    <h2 class="text-2xl font-bold mb-6" data-translate="welcome">Welcome to NEURONEXIS AI</h2>
     <div id="g_id_onload" data-client_id="906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleGoogleSignIn" data-auto_prompt="false"></div>
     <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="300"></div>
-    <div class="mt-6 text-sm text-gray-500 dark:text-gray-400">By signing in, you agree to our Terms.</div>
-    <button id="try-without-login" class="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">Try Without Login</button>
+    <div class="mt-6 text-sm text-gray-500 dark:text-gray-400" data-translate="terms">By signing in, you agree to our Terms.</div>
+    <button id="try-without-login" class="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-translate="try_without_login">Try Without Login</button>
   </div>
 
   <!-- Main App -->
@@ -60,7 +72,7 @@
           <div class="border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-400"></div>
-              <h2 class="font-semibold">NEURONEXIS Chat</h2>
+              <h2 class="font-semibold" data-translate="chat_title">NEURONEXIS Chat</h2>
             </div>
             <button id="toggle-sidebar-btn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
               <i class="fas fa-bars"></i>
@@ -73,7 +85,7 @@
                 <i class="fas fa-file-word"></i>
               </button>
               <div class="flex-grow relative">
-                <textarea id="user-input" rows="1" class="w-full border border-gray-300 dark:border-gray-600 rounded-full py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 resize-none" placeholder="Message NEURONEXIS..."></textarea>
+                <textarea id="user-input" rows="1" class="w-full border border-gray-300 dark:border-gray-600 rounded-full py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 resize-none" placeholder="Message NEURONEXIS..." data-translate-placeholder="message_placeholder"></textarea>
                 <button id="send-btn" class="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full text-gray-500 hover:text-purple-600 dark:hover:text-purple-400">
                   <i class="fas fa-paper-plane text-xl"></i>
                 </button>
@@ -83,9 +95,9 @@
               </button>
             </div>
             <div class="flex justify-between items-center mt-2 px-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400">NEURONEXIS may produce inaccurate info</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400" data-translate="disclaimer">NEURONEXIS may produce inaccurate info</div>
               <button id="xai-toggle" class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full flex items-center space-x-1">
-                <i class="fas fa-brain"></i><span>XAI Mode: On</span>
+                <i class="fas fa-brain"></i><span data-translate="xai_mode">XAI Mode: On</span>
               </button>
             </div>
           </div>
@@ -93,22 +105,25 @@
       </div>
 
       <div id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-gray-100 dark:bg-gray-800 shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-50 p-4">
-        <h3 class="text-lg font-semibold mb-4">Settings</h3>
+        <h3 class="text-lg font-semibold mb-4" data-translate="settings">Settings</h3>
         <select id="lang-select" class="w-full p-2 mb-4 bg-white dark:bg-gray-700 rounded">
           <option value="en">English</option>
           <option value="es">Spanish</option>
+          <option value="ro">Romanian</option>
+          <option value="ru">Russian</option>
+          <option value="fr">French</option>
         </select>
         <div id="login-nav" class="mb-4">
-          <button id="login-btn" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login</button>
+          <button id="login-btn" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600" data-translate="login">Login</button>
         </div>
         <div id="profile-nav" class="hidden mb-4">
           <p id="user-name" class="mb-2"></p>
-          <input id="instagram" class="w-full p-2 mb-2 bg-white dark:bg-gray-700 rounded" placeholder="Instagram Handle">
-          <input id="facebook" class="w-full p-2 mb-2 bg-white dark:bg-gray-700 rounded" placeholder="Facebook Name">
-          <button id="logout-btn" class="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
+          <input id="instagram" class="w-full p-2 mb-2 bg-white dark:bg-gray-700 rounded" placeholder="Instagram Handle" data-translate-placeholder="instagram_placeholder">
+          <input id="facebook" class="w-full p-2 mb-2 bg-white dark:bg-gray-700 rounded" placeholder="Facebook Name" data-translate-placeholder="facebook_placeholder">
+          <button id="logout-btn" class="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600" data-translate="logout">Logout</button>
         </div>
         <div class="mt-4">
-          <label class="block mb-2">Upload File</label>
+          <label class="block mb-2" data-translate="upload_file">Upload File</label>
           <input type="file" id="file-input" class="w-full p-2 bg-white dark:bg-gray-700 rounded">
         </div>
         <div id="dialog-menu" class="mt-4">
@@ -123,7 +138,7 @@
     <div id="document-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
       <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-bold">Document Editor</h3>
+          <h3 class="text-xl font-bold" data-translate="document_editor">Document Editor</h3>
           <button id="close-document-modal" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
             <i class="fas fa-times"></i>
           </button>
@@ -135,9 +150,7 @@
             <option value="pdf">PDF</option>
             <option value="txt">Text File</option>
           </select>
-          <button id="download-document" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-            Download
-          </button>
+          <button id="download-document" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700" data-translate="download">Download</button>
         </div>
       </div>
     </div>
@@ -169,6 +182,82 @@
     let instagram = localStorage.getItem('instagram') || '';
     let facebook = localStorage.getItem('facebook') || '';
     let xaiMode = true;
+    let currentLanguage = localStorage.getItem('language') || 'en';
+
+    const translations = {
+      en: {
+        welcome: 'Welcome to NEURONEXIS AI',
+        terms: 'By signing in, you agree to our Terms.',
+        try_without_login: 'Try Without Login',
+        chat_title: 'NEURONEXIS Chat',
+        message_placeholder: 'Message NEURONEXIS...',
+        disclaimer: 'NEURONEXIS may produce inaccurate info',
+        xai_mode: 'XAI Mode: On',
+        xai_mode_off: 'XAI Mode: Off',
+        settings: 'Settings',
+        login: 'Login',
+        logout: 'Logout',
+        instagram_placeholder: 'Instagram Handle',
+        facebook_placeholder: 'Facebook Name',
+        upload_file: 'Upload File',
+        document_editor: 'Document Editor',
+        download: 'Download'
+      },
+      ro: {
+        welcome: 'Bun venit la NEURONEXIS AI',
+        terms: 'Prin autentificare, sunteți de acord cu Termenii noștri.',
+        try_without_login: 'Încearcă fără autentificare',
+        chat_title: 'Chat NEURONEXIS',
+        message_placeholder: 'Mesaj către NEURONEXIS...',
+        disclaimer: 'NEURONEXIS poate produce informații inexacte',
+        xai_mode: 'Mod XAI: Activat',
+        xai_mode_off: 'Mod XAI: Dezactivat',
+        settings: 'Setări',
+        login: 'Autentificare',
+        logout: 'Deconectare',
+        instagram_placeholder: 'Nume Instagram',
+        facebook_placeholder: 'Nume Facebook',
+        upload_file: 'Încarcă fișier',
+        document_editor: 'Editor de documente',
+        download: 'Descarcă'
+      },
+      ru: {
+        welcome: 'Добро пожаловать в NEURONEXIS AI',
+        terms: 'Входя в систему, вы соглашаетесь с нашими Условиями.',
+        try_without_login: 'Попробовать без входа',
+        chat_title: 'Чат NEURONEXIS',
+        message_placeholder: 'Сообщение для NEURONEXIS...',
+        disclaimer: 'NEURONEXIS может предоставлять неточную информацию',
+        xai_mode: 'Режим XAI: Включен',
+        xai_mode_off: 'Режим XAI: Выключен',
+        settings: 'Настройки',
+        login: 'Войти',
+        logout: 'Выйти',
+        instagram_placeholder: 'Имя в Instagram',
+        facebook_placeholder: 'Имя в Facebook',
+        upload_file: 'Загрузить файл',
+        document_editor: 'Редактор документов',
+        download: 'Скачать'
+      },
+      fr: {
+        welcome: 'Bienvenue sur NEURONEXIS AI',
+        terms: 'En vous connectant, vous acceptez nos conditions.',
+        try_without_login: 'Essayer sans connexion',
+        chat_title: 'Chat NEURONEXIS',
+        message_placeholder: 'Message à NEURONEXIS...',
+        disclaimer: 'NEURONEXIS peut produire des informations inexactes',
+        xai_mode: 'Mode XAI : Activé',
+        xai_mode_off: 'Mode XAI : Désactivé',
+        settings: 'Paramètres',
+        login: 'Connexion',
+        logout: 'Déconnexion',
+        instagram_placeholder: 'Identifiant Instagram',
+        facebook_placeholder: 'Nom Facebook',
+        upload_file: 'Télécharger un fichier',
+        document_editor: 'Éditeur de documents',
+        download: 'Télécharger'
+      }
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
       const chatBox = document.getElementById('chat-box');
@@ -236,29 +325,65 @@
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(pos => {
             userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            addMessage(`Located near ${userLocation.lat}, ${userLocation.lng}. How can I assist?`, 'ai');
-          }, err => console.error('Geolocation error:', err));
+            fetchLocationName(userLocation).then(locationName => {
+              addMessage(translations[currentLanguage].welcome + `! Located near ${locationName}. How can I assist?`, 'ai');
+            }).catch(() => {
+              addMessage(translations[currentLanguage].welcome + `! Located near ${userLocation.lat}, ${userLocation.lng}. How can I assist?`, 'ai');
+            });
+          }, err => {
+            console.error('Geolocation error:', err);
+            addMessage(translations[currentLanguage].welcome + `! Location unknown. How can I assist?`, 'ai');
+          });
         }
         if (userData[currentUser]) {
           instagram = userData[currentUser].instagram || '';
           facebook = userData[currentUser].facebook || '';
           instagramInput.value = instagram;
           facebookInput.value = facebook;
-          userName.textContent = currentUser === 'guest@neuronexis.com' ? 'Guest User' : userInfo.name || currentUser;
+          userName.textContent = currentUser === 'guest@neuronexis.com' ? translations[currentLanguage].guest_user || 'Guest User' : userInfo.name || currentUser;
           chatHistory.forEach(msg => addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai'));
+        }
+        updateTranslations();
+      }
+
+      async function fetchLocationName(location) {
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=10&addressdetails=1`);
+          const data = await response.json();
+          return data.display_name || `${location.lat}, ${location.lng}`;
+        } catch (error) {
+          console.error('Reverse geocoding error:', error);
+          return `${location.lat}, ${location.lng}`;
         }
       }
 
       function updateUI() {
         loginNav.classList.add('hidden');
         profileNav.classList.remove('hidden');
-        userName.textContent = currentUser === 'guest@neuronexis.com' ? 'Guest User' : userData[currentUser]?.name || currentUser;
+        userName.textContent = currentUser === 'guest@neuronexis.com' ? translations[currentLanguage].guest_user || 'Guest User' : userData[currentUser]?.name || currentUser;
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('app-content').classList.remove('hidden');
         const avatar = document.createElement('div');
         avatar.className = 'w-8 h-8 rounded-full bg-cover bg-center';
         avatar.style.backgroundImage = `url(https://via.placeholder.com/150)`;
         document.querySelector('header').prepend(avatar);
+        updateTranslations();
+      }
+
+      function updateTranslations() {
+        document.querySelectorAll('[data-translate]').forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[currentLanguage][key]) {
+            element.textContent = translations[currentLanguage][key];
+          }
+        });
+        document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+          const key = element.getAttribute('data-translate-placeholder');
+          if (translations[currentLanguage][key]) {
+            element.placeholder = translations[currentLanguage][key];
+          }
+        });
+        xaiToggle.innerHTML = xaiMode ? `<i class="fas fa-brain"></i><span>${translations[currentLanguage].xai_mode}</span>` : `<i class="fas fa-brain"></i><span>${translations[currentLanguage].xai_mode_off}</span>`;
       }
 
       document.getElementById('try-without-login').addEventListener('click', () => {
@@ -270,7 +395,6 @@
       });
 
       loginBtn.addEventListener('click', () => {
-        // Trigger Google Sign-In manually if needed
         google.accounts.id.prompt();
       });
 
@@ -284,7 +408,7 @@
         chatBox.innerHTML = '';
         document.getElementById('login-section').classList.remove('hidden');
         document.getElementById('app-content').classList.add('hidden');
-        addMessage('You have been logged out.', 'ai');
+        addMessage(translations[currentLanguage].logged_out || 'You have been logged out.', 'ai');
       });
 
       document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -306,7 +430,11 @@
         sidebar.classList.toggle('translate-x-0');
       });
 
-      langSelect.addEventListener('change', e => console.log('Language changed to:', e.target.value));
+      langSelect.addEventListener('change', e => {
+        currentLanguage = e.target.value;
+        localStorage.setItem('language', currentLanguage);
+        updateTranslations();
+      });
 
       userInput.addEventListener('input', function() {
         this.style.height = 'auto';
@@ -324,7 +452,7 @@
 
       xaiToggle.addEventListener('click', () => {
         xaiMode = !xaiMode;
-        xaiToggle.innerHTML = xaiMode ? '<i class="fas fa-brain"></i><span>XAI Mode: On</span>' : '<i class="fas fa-brain"></i><span>XAI Mode: Off</span>';
+        xaiToggle.innerHTML = xaiMode ? `<i class="fas fa-brain"></i><span>${translations[currentLanguage].xai_mode}</span>` : `<i class="fas fa-brain"></i><span>${translations[currentLanguage].xai_mode_off}</span>`;
         xaiToggle.classList.toggle('bg-purple-100', xaiMode);
         xaiToggle.classList.toggle('dark:bg-purple-900', xaiMode);
         xaiToggle.classList.toggle('bg-gray-200', !xaiMode);
@@ -380,7 +508,7 @@
                         <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-lg p-3 shadow-md xai-explanation">
                             <div class="flex items-start space-x-2">
                                 <div class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-blue-400 mt-1 flex items-center justify-center text-white text-xs">N</div>
-                                <div><p class="font-semibold text-purple-600 dark:text-purple-400">Explanation</p><p>${text}</p></div>
+                                <div><p class="font-semibold text-purple-600 dark:text-purple-400" data-translate="explanation">Explanation</p><p>${text}</p></div>
                             </div>
                         </div>` : `
                         <div class="max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-lg p-3 shadow-md">
@@ -421,22 +549,28 @@
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${XAI_API_KEY}` },
             body: JSON.stringify({
               model: 'grok-3',
-              messages: [{ role: 'system', content: `You are NEURONEXIS AI. Use location: ${userLocation ? `${userLocation.lat}, ${userLocation.lng}` : 'unknown'}. Include Instagram: ${instagram}, Facebook: ${facebook} in responses if relevant.` }, { role: 'user', content: userMessage }],
+              messages: [
+                {
+                  role: 'system',
+                  content: `You are NEURONEXIS AI. Language: ${currentLanguage}. Use location: ${userLocation ? `${userLocation.lat}, ${userLocation.lng}` : 'unknown'}. Include Instagram: ${instagram}, Facebook: ${facebook} in responses if relevant.`
+                },
+                { role: 'user', content: userMessage }
+              ],
               temperature: 0.7,
               max_tokens: 4000
             })
           });
           const data = await response.json();
           const fullResponse = data.choices[0].message.content;
-          let explanation = xaiMode ? 'Response crafted based on your input and location.' : '';
+          let explanation = xaiMode ? translations[currentLanguage].explanation_response || 'Response crafted based on your input and location.' : '';
           return { response: fullResponse, explanation };
         } catch (error) {
           console.error('xAI API Error:', error);
-          let response = `Sorry, I couldn’t connect. Based on your location ${userLocation ? `near ${userLocation.lat}, ${userLocation.lng}` : 'unknown'}, how can I help?`;
-          let explanation = "API failed; using local logic with location.";
+          let response = translations[currentLanguage].connection_error || `Sorry, I couldn’t connect. Based on your location ${userLocation ? `near ${userLocation.lat}, ${userLocation.lng}` : 'unknown'}, how can I help?`;
+          let explanation = translations[currentLanguage].api_failed || "API failed; using local logic with location.";
           if (userMessage.toLowerCase().includes('how are you')) {
-            response = "I'm running smoothly! Ready to assist from your area.";
-            explanation += " You checked my status, so I confirmed my readiness.";
+            response = translations[currentLanguage].status_response || "I'm running smoothly! Ready to assist from your area.";
+            explanation += translations[currentLanguage].status_check || " You checked my status, so I confirmed my readiness.";
           }
           return { response, explanation };
         }
@@ -466,7 +600,7 @@
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = event => addMessage(`Uploaded: ${event.target.result.substring(0, 100)}${event.target.result.length > 100 ? '...' : ''}`, 'ai');
+          reader.onload = event => addMessage(`${translations[currentLanguage].uploaded || 'Uploaded'}: ${event.target.result.substring(0, 100)}${event.target.result.length > 100 ? '...' : ''}`, 'ai');
           reader.readAsText(file);
         }
       });
