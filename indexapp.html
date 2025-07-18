@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NEURONEXIS AI Chat</title>
+  <title>NEURONEXIS AI Chat with Google Calendar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -24,6 +23,17 @@
     .dark .xai-explanation:hover { background: #1e293b; }
     .sidebar { transition: transform 0.3s ease; }
     .dark .bg-gray-100 { background: #1f2937; }
+    .event-card {
+      border-left: 4px solid #6366f1;
+      transition: all 0.2s ease;
+    }
+    .event-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .calendar-icon {
+      background: linear-gradient(135deg, #4285F4 0%, #34A853 50%, #FBBC05 100%);
+    }
     @media (max-width: 640px) {
       .chat-container { height: calc(100vh - 220px); }
       .container { padding: 0.5rem; }
@@ -49,8 +59,20 @@
   <!-- Login Section -->
   <div id="login-section" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-md mx-auto my-12 text-center">
     <h2 class="text-2xl font-bold mb-6" data-translate="welcome">Welcome to NEURONEXIS AI</h2>
-    <div id="g_id_onload" data-client_id="906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleGoogleSignIn" data-auto_prompt="false"></div>
-    <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="300"></div>
+    <div id="g_id_onload"
+         data-client_id="906465572275-hanrq89dvi0a8bpf2benqdq7quu3njtc.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleGoogleSignIn"
+         data-auto_prompt="false"></div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-shape="pill"
+         data-theme="outline"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left"
+         data-width="300"></div>
     <div class="mt-6 text-sm text-gray-500 dark:text-gray-400" data-translate="terms">By signing in, you agree to our Terms.</div>
     <button id="try-without-login" class="mt-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-translate="try_without_login">Try Without Login</button>
   </div>
@@ -90,6 +112,9 @@
             <div class="flex items-center space-x-2">
               <button id="document-creation" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="Create Document">
                 <i class="fas fa-file-word"></i>
+              </button>
+              <button id="calendar-actions" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="Calendar Actions">
+                <i class="fas fa-calendar-alt"></i>
               </button>
               <div class="flex-grow relative">
                 <textarea id="user-input" rows="1" class="w-full border border-gray-300 dark:border-gray-600 rounded-full py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 resize-none" placeholder="Message NEURONEXIS..." data-translate-placeholder="message_placeholder"></textarea>
@@ -161,6 +186,98 @@
         </div>
       </div>
     </div>
+
+    <!-- Calendar Modal -->
+    <div id="calendar-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold flex items-center space-x-2">
+            <div class="calendar-icon w-8 h-8 rounded-full flex items-center justify-center text-white">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <span data-translate="calendar_actions">Calendar Actions</span>
+          </h3>
+          <button id="close-calendar-modal" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <button id="list-events" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-list-ul text-2xl mb-2"></i>
+              <span data-translate="list_events">List Events</span>
+            </button>
+            <button id="create-event" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-plus text-2xl mb-2"></i>
+              <span data-translate="create_event">Create Event</span>
+            </button>
+            <button id="find-free-time" class="bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-clock text-2xl mb-2"></i>
+              <span data-translate="find_free_time">Find Free Time</span>
+            </button>
+            <button id="calendar-settings" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-lg flex flex-col items-center">
+              <i class="fas fa-cog text-2xl mb-2"></i>
+              <span data-translate="calendar_settings">Calendar Settings</span>
+            </button>
+          </div>
+
+          <!-- Event Creation Form -->
+          <div id="event-creation-form" class="hidden mt-4 space-y-4">
+            <div class="space-y-2">
+              <label class="block" data-translate="event_title">Event Title</label>
+              <input type="text" id="event-title" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+            </div>
+            <div class="space-y-2">
+              <label class="block" data-translate="event_description">Description</label>
+              <textarea id="event-description" rows="3" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="block" data-translate="start_time">Start Time</label>
+                <input type="datetime-local" id="event-start" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+              </div>
+              <div class="space-y-2">
+                <label class="block" data-translate="end_time">End Time</label>
+                <input type="datetime-local" id="event-end" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+              </div>
+            </div>
+            <div class="flex justify-end space-x-2">
+              <button id="cancel-event" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500" data-translate="cancel">Cancel</button>
+              <button id="submit-event" class="px-4 py-2 bg-green-500 rounded hover:bg-green-600 text-white" data-translate="create_event">Create Event</button>
+            </div>
+          </div>
+
+          <!-- Events List -->
+          <div id="events-list" class="hidden mt-4 space-y-3">
+            <h4 class="font-semibold" data-translate="your_events">Your Upcoming Events</h4>
+            <div id="events-container" class="space-y-2">
+              <!-- Events will be populated here -->
+            </div>
+          </div>
+
+          <!-- Free Time Finder -->
+          <div id="free-time-finder" class="hidden mt-4 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="block" data-translate="start_date">Start Date</label>
+                <input type="date" id="free-time-start" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+              </div>
+              <div class="space-y-2">
+                <label class="block" data-translate="end_date">End Date</label>
+                <input type="date" id="free-time-end" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+              </div>
+            </div>
+            <button id="find-free-slots" class="w-full py-2 bg-blue-500 rounded hover:bg-blue-600 text-white" data-translate="find_free_slots">Find Free Time Slots</button>
+            <div id="free-time-results" class="hidden space-y-2">
+              <h4 class="font-semibold" data-translate="available_slots">Available Time Slots</h4>
+              <div id="free-time-container" class="space-y-2">
+                <!-- Free time slots will be populated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -176,7 +293,7 @@
     const XAI_API_KEY_PART2 = 'mmODsOVzpC';
     const XAI_API_KEY_PART3 = 'gPGP1xT9AZA8RLNMDjRVkuTYuzrhMoC6tChxA7WWnNvXT4RJ4';
     const XAI_API_KEY = XAI_API_KEY_PART1 + XAI_API_KEY_PART2 + XAI_API_KEY_PART3;
-    const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar';
+    const SCOPES = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events';
 
     let currentUser = localStorage.getItem('currentUser');
     let currentDialog = localStorage.getItem('currentDialog') || 'default';
@@ -214,121 +331,197 @@
         logged_out: 'You have been logged out.',
         explanation: 'Explanation',
         explanation_response: 'Response crafted based on your input and location.',
-        connection_error: 'Sorry, I couldn’t connect. Based on your location {location}, how can I help?',
-        api_failed: 'API failed; using local logic with coordinates.',
-        status_response: 'I\'m running smoothly! Ready to assist from your area.',
-        status_check: ' You checked my status, so I confirmed my readiness.',
-        uploaded: 'Uploaded',
-        location_unknown: 'Location unknown. Please enable location services or provide your city/country. How can I assist?',
-        where_am_i: 'I cannot determine your exact location without geolocation access. Please enable location services or provide your city/country.',
-        located_near: 'Located near',
-        coordinates: 'Coordinates: ({lat}, {lng})',
-        how_can_i_help: 'How can I assist?',
-        location_error: 'Unable to access location. Please enable location services or try again later.',
-        login_error: 'Failed to load chat. Please check your connection or try again.'
-      },
-      ro: {
-        welcome: 'Bun venit la NEURONEXIS AI',
-        terms: 'Prin autentificare, sunteți de acord cu Termenii noștri.',
-        try_without_login: 'Încearcă fără autentificare',
-        chat_title: 'Chat NEURONEXIS',
-        message_placeholder: 'Mesaj către NEURONEXIS...',
-        disclaimer: 'NEURONEXIS poate produce informații inexacte',
-        xai_mode: 'Mod XAI: Activat',
-        xai_mode_off: 'Mod XAI: Dezactivat',
-        settings: 'Setări',
-        login: 'Autentificare',
-        logout: 'Deconectare',
-        instagram_placeholder: 'Nume Instagram',
-        facebook_placeholder: 'Nume Facebook',
-        upload_file: 'Încarcă fișier',
-        document_editor: 'Editor de documente',
-        download: 'Descarcă',
-        guest_user: 'Utilizator invitat',
-        logged_out: 'Ați fost deconectat.',
-        explanation: 'Explicație',
-        explanation_response: 'Răspuns creat pe baza inputului și locației tale.',
-        connection_error: 'Îmi pare rău, nu m-am putut conecta. În funcție de locația ta {location}, ce mai pot face pentru tine?',
-        api_failed: 'API a eșuat; folosesc logica locală cu coordonate.',
-        status_response: 'Funcționez fără probleme! Gata să te ajut din zona ta.',
-        status_check: ' Ai verificat starea mea, așa că am confirmat disponibilitatea.',
-        uploaded: 'Încărcat',
-        location_unknown: 'Locație necunoscută. Te rog să activezi serviciile de localizare sau să indici orașul/țara. Cum te pot ajuta?',
-        where_am_i: 'Nu pot determina locația ta exactă fără acces la geolocalizare. Te rog să activezi serviciile de localizare sau să indici orașul/țara.',
-        located_near: 'Situat în apropiere de',
-        coordinates: 'Coordonate: ({lat}, {lng})',
-        how_can_i_help: 'Cum te pot ajuta?',
-        location_error: 'Nu pot accesa locația. Te rog să activezi serviciile de localizare sau să încerci din nou mai târziu.',
-        login_error: 'Nu s-a putut încărca chatul. Verifică conexiunea sau încearcă din nou.'
-      },
-      ru: {
-        welcome: 'Добро пожаловать в NEURONEXIS AI',
-        terms: 'Входя в систему, вы соглашаетесь с нашими Условиями.',
-        try_without_login: 'Попробовать без входа',
-        chat_title: 'Чат NEURONEXIS',
-        message_placeholder: 'Сообщение для NEURONEXIS...',
-        disclaimer: 'NEURONEXIS может предоставлять неточную информацию',
-        xai_mode: 'Режим XAI: Включен',
-        xai_mode_off: 'Режим XAI: Выключен',
-        settings: 'Настройки',
-        login: 'Войти',
-        logout: 'Выйти',
-        instagram_placeholder: 'Имя в Instagram',
-        facebook_placeholder: 'Имя в Facebook',
-        upload_file: 'Загрузить файл',
-        document_editor: 'Редактор документов',
-        download: 'Скачать',
-        guest_user: 'Гость',
-        logged_out: 'Вы вышли из системы.',
-        explanation: 'Объяснение',
-        explanation_response: 'Ответ сформирован на основе вашего ввода и местоположения.',
-        connection_error: 'Извините, не удалось подключиться. Как могу помочь, учитывая ваше местоположение {location}?',
-        api_failed: 'API не работает; использую локальную логику с координатами.',
-        status_response: 'Я работаю без сбоев! Готов помочь из вашего региона.',
-        status_check: ' Вы проверили мой статус, поэтому я подтвердил готовность.',
-        uploaded: 'Загружено',
-        location_unknown: 'Местоположение неизвестно. Пожалуйста, включите службы геолокации или укажите ваш город/страну. Как могу помочь?',
-        where_am_i: 'Я не могу определить ваше точное местоположение без доступа к геолокации. Пожалуйста, включите службы геолокации или укажите ваш город/страну.',
-        located_near: 'Находится рядом с',
-        coordinates: 'Координаты: ({lat}, {lng})',
-        how_can_i_help: 'Как могу помочь?',
-        location_error: 'Не удалось получить доступ к местоположению. Пожалуйста, включите службы геолокации или попробуйте снова позже.',
-        login_error: 'Не удалось загрузить чат. Проверьте подключение или попробуйте снова.'
-      },
-      fr: {
-        welcome: 'Bienvenue sur NEURONEXIS AI',
-        terms: 'En vous connectant, vous acceptez nos conditions.',
-        try_without_login: 'Essayer sans connexion',
-        chat_title: 'Chat NEURONEXIS',
-        message_placeholder: 'Message à NEURONEXIS...',
-        disclaimer: 'NEURONEXIS peut produire des informations inexactes',
-        xai_mode: 'Mode XAI : Activé',
-        xai_mode_off: 'Mode XAI : Désactivé',
-        settings: 'Paramètres',
-        login: 'Connexion',
-        logout: 'Déconnexion',
-        instagram_placeholder: 'Identifiant Instagram',
-        facebook_placeholder: 'Nom Facebook',
-        upload_file: 'Télécharger un fichier',
-        document_editor: 'Éditeur de documents',
-        download: 'Télécharger',
-        guest_user: 'Utilisateur invité',
-        logged_out: 'Vous avez été déconnecté.',
-        explanation: 'Explication',
-        explanation_response: 'Réponse élaborée en fonction de votre saisie et de votre emplacement.',
-        connection_error: 'Désolé, je n’ai pas pu me connecter. En fonction de votre emplacement {location}, comment puis-je vous aider ?',
-        api_failed: 'L’API a échoué ; j’utilise une logique locale avec les coordonnées.',
-        status_response: 'Je fonctionne parfaitement ! Prêt à vous aider depuis votre région.',
-        status_check: ' Vous avez vérifié mon statut, j’ai donc confirmé ma disponibilité.',
-        uploaded: 'Téléchargé',
-        location_unknown: 'Emplacement inconnu. Veuillez activer les services de localisation ou indiquer votre ville/pays. Comment puis-je vous aider ?',
-        where_am_i: 'Je ne peux pas déterminer votre emplacement exact sans accès à la géolocalisation. Veuillez activer les services de localisation ou indiquer votre ville/pays.',
-        located_near: 'Situé près de',
-        coordinates: 'Coordonnées : ({lat}, {lng})',
-        how_can_i_help: 'Comment puis-je vous aider ?',
-        location_error: 'Impossible d’accéder à l’emplacement. Veuillez activer les services de localisation ou réessayer plus tard.',
-        login_error: 'Impossible de charger le chat. Vérifiez votre connexion ou réessayez.'
-      }
+        connection_error: 'Sorry, I couldnt connect. Based on your location {location}, how can I help?',
+                api_failed: 'API failed; using local logic with coordinates.',
+            status_response: 'Im running smoothly! Ready to assist from your area.',
+    status_check: ' You checked my status, so I confirmed my readiness.',
+            uploaded: 'Uploaded',
+            location_unknown: 'Location unknown. Please enable location services or provide your city/country. How can I assist?',
+            where_am_i: 'I cannot determine your exact location without geolocation access. Please enable location services or provide your city/country.',
+            located_near: 'Located near',
+            coordinates: 'Coordinates: ({lat}, {lng})',
+            how_can_i_help: 'How can I assist?',
+            location_error: 'Unable to access location. Please enable location services or try again later.',
+            login_error: 'Failed to load chat. Please check your connection or try again.',
+            calendar_actions: 'Google Calendar',
+            list_events: 'List Events',
+            create_event: 'Create Event',
+            find_free_time: 'Find Free Time',
+            calendar_settings: 'Settings',
+            event_title: 'Event Title',
+            event_description: 'Description',
+            start_time: 'Start Time',
+            end_time: 'End Time',
+            cancel: 'Cancel',
+            your_events: 'Your Upcoming Events',
+            start_date: 'Start Date',
+            end_date: 'End Date',
+            find_free_slots: 'Find Free Slots',
+            available_slots: 'Available Time Slots',
+            no_events: 'No upcoming events found.',
+            event_created: 'Event created successfully!',
+            free_time_found: 'Found free time slots:',
+            calendar_error: 'Error accessing calendar. Please try again.'
+    },
+    ro: {
+      welcome: 'Bun venit la NEURONEXIS AI',
+              terms: 'Prin autentificare, sunteți de acord cu Termenii noștri.',
+              try_without_login: 'Încearcă fără autentificare',
+              chat_title: 'Chat NEURONEXIS',
+              message_placeholder: 'Mesaj către NEURONEXIS...',
+              disclaimer: 'NEURONEXIS poate produce informații inexacte',
+              xai_mode: 'Mod XAI: Activat',
+              xai_mode_off: 'Mod XAI: Dezactivat',
+              settings: 'Setări',
+              login: 'Autentificare',
+              logout: 'Deconectare',
+              instagram_placeholder: 'Nume Instagram',
+              facebook_placeholder: 'Nume Facebook',
+              upload_file: 'Încarcă fișier',
+              document_editor: 'Editor de documente',
+              download: 'Descarcă',
+              guest_user: 'Utilizator invitat',
+              logged_out: 'Ați fost deconectat.',
+              explanation: 'Explicație',
+              explanation_response: 'Răspuns creat pe baza inputului și locației tale.',
+              connection_error: 'Îmi pare rău, nu m-am putut conecta. În funcție de locația ta {location}, ce mai pot face pentru tine?',
+              api_failed: 'API a eșuat; folosesc logica locală cu coordonate.',
+              status_response: 'Funcționez fără probleme! Gata să te ajut din zona ta.',
+              status_check: ' Ai verificat starea mea, așa că am confirmat disponibilitatea.',
+              uploaded: 'Încărcat',
+              location_unknown: 'Locație necunoscută. Te rog să activezi serviciile de localizare sau să indici orașul/țara. Cum te pot ajuta?',
+              where_am_i: 'Nu pot determina locația ta exactă fără acces la geolocalizare. Te rog să activezi serviciile de localizare sau să indici orașul/țara.',
+              located_near: 'Situat în apropiere de',
+              coordinates: 'Coordonate: ({lat}, {lng})',
+              how_can_i_help: 'Cum te pot ajuta?',
+              location_error: 'Nu pot accesa locația. Te rog să activezi serviciile de localizare sau să încerci din nou mai târziu.',
+              login_error: 'Nu s-a putut încărca chatul. Verifică conexiunea sau încearcă din nou.',
+              calendar_actions: 'Google Calendar',
+              list_events: 'Listează Evenimente',
+              create_event: 'Creează Eveniment',
+              find_free_time: 'Găsește Timp Liber',
+              calendar_settings: 'Setări',
+              event_title: 'Titlu Eveniment',
+              event_description: 'Descriere',
+              start_time: 'Ora de început',
+              end_time: 'Ora de sfârșit',
+              cancel: 'Anulează',
+              your_events: 'Evenimentele tale viitoare',
+              start_date: 'Data de început',
+              end_date: 'Data de sfârșit',
+              find_free_slots: 'Găsește Intervale Libere',
+              available_slots: 'Intervale de timp disponibile',
+              no_events: 'Nu s-au găsit evenimente viitoare.',
+              event_created: 'Eveniment creat cu succes!',
+              free_time_found: 'Am găsit intervale de timp liber:',
+              calendar_error: 'Eroare la accesarea calendarului. Te rog să încerci din nou.'
+    },
+    ru: {
+      welcome: 'Добро пожаловать в NEURONEXIS AI',
+              terms: 'Входя в систему, вы соглашаетесь с нашими Условиями.',
+              try_without_login: 'Попробовать без входа',
+              chat_title: 'Чат NEURONEXIS',
+              message_placeholder: 'Сообщение для NEURONEXIS...',
+              disclaimer: 'NEURONEXIS может предоставлять неточную информацию',
+              xai_mode: 'Режим XAI: Включен',
+              xai_mode_off: 'Режим XAI: Выключен',
+              settings: 'Настройки',
+              login: 'Войти',
+              logout: 'Выйти',
+              instagram_placeholder: 'Имя в Instagram',
+              facebook_placeholder: 'Имя в Facebook',
+              upload_file: 'Загрузить файл',
+              document_editor: 'Редактор документов',
+              download: 'Скачать',
+              guest_user: 'Гость',
+              logged_out: 'Вы вышли из системы.',
+              explanation: 'Объяснение',
+              explanation_response: 'Ответ сформирован на основе вашего ввода и местоположения.',
+              connection_error: 'Извините, не удалось подключиться. Как могу помочь, учитывая ваше местоположение {location}?',
+              api_failed: 'API не работает; использую локальную логику с координатами.',
+              status_response: 'Я работаю без сбоев! Готов помочь из вашего региона.',
+              status_check: ' Вы проверили мой статус, поэтому я подтвердил готовность.',
+              uploaded: 'Загружено',
+              location_unknown: 'Местоположение неизвестно. Пожалуйста, включите службы геолокации или укажите ваш город/страну. Как могу помочь?',
+              where_am_i: 'Я не могу определить ваше точное местоположение без доступа к геолокации. Пожалуйста, включите службы геолокации или укажите ваш город/страну.',
+              located_near: 'Находится рядом с',
+              coordinates: 'Координаты: ({lat}, {lng})',
+              how_can_i_help: 'Как могу помочь?',
+              location_error: 'Не удалось получить доступ к местоположению. Пожалуйста, включите службы геолокации или попробуйте снова позже.',
+              login_error: 'Не удалось загрузить чат. Проверьте подключение или попробуйте снова.',
+              calendar_actions: 'Google Календарь',
+              list_events: 'Список Событий',
+              create_event: 'Создать Событие',
+              find_free_time: 'Найти Свободное Время',
+              calendar_settings: 'Настройки',
+              event_title: 'Название События',
+              event_description: 'Описание',
+              start_time: 'Время Начала',
+              end_time: 'Время Окончания',
+              cancel: 'Отмена',
+              your_events: 'Ваши Предстоящие События',
+              start_date: 'Дата Начала',
+              end_date: 'Дата Окончания',
+              find_free_slots: 'Найти Свободные Промежутки',
+              available_slots: 'Доступные Промежутки Времени',
+              no_events: 'Предстоящих событий не найдено.',
+              event_created: 'Событие успешно создано!',
+              free_time_found: 'Найдены свободные промежутки времени:',
+              calendar_error: 'Ошибка доступа к календарю. Пожалуйста, попробуйте снова.'
+    },
+    fr: {
+      welcome: 'Bienvenue sur NEURONEXIS AI',
+              terms: 'En vous connectant, vous acceptez nos conditions.',
+              try_without_login: 'Essayer sans connexion',
+              chat_title: 'Chat NEURONEXIS',
+              message_placeholder: 'Message à NEURONEXIS...',
+              disclaimer: 'NEURONEXIS peut produire des informations inexactes',
+              xai_mode: 'Mode XAI : Activé',
+              xai_mode_off: 'Mode XAI : Désactivé',
+              settings: 'Paramètres',
+              login: 'Connexion',
+              logout: 'Déconnexion',
+              instagram_placeholder: 'Identifiant Instagram',
+              facebook_placeholder: 'Nom Facebook',
+              upload_file: 'Télécharger un fichier',
+              document_editor: 'Éditeur de documents',
+              download: 'Télécharger',
+              guest_user: 'Utilisateur invité',
+              logged_out: 'Vous avez été déconnecté.',
+              explanation: 'Explication',
+              explanation_response: 'Réponse élaborée en fonction de votre saisie et de votre emplacement.',
+              connection_error: 'Désolé, je nai pas pu me connecter. En fonction de votre emplacement {location}, comment puis-je vous aider ?',
+              api_failed: 'LAPI a échoué ; jutilise une logique locale avec les coordonnées.',
+              status_response: 'Je fonctionne parfaitement ! Prêt à vous aider depuis votre région.',
+              status_check: ' Vous avez vérifié mon statut, jai donc confirmé ma disponibilité.',
+      uploaded: 'Téléchargé',
+              location_unknown: 'Emplacement inconnu. Veuillez activer les services de localisation ou indiquer votre ville/pays. Comment puis-je vous aider ?',
+              where_am_i: 'Je ne peux pas déterminer votre emplacement exact sans accès à la géolocalisation. Veuillez activer les services de localisation ou indiquer votre ville/pays.',
+              located_near: 'Situé près de',
+              coordinates: 'Coordonnées : ({lat}, {lng})',
+              how_can_i_help: 'Comment puis-je vous aider ?',
+              location_error: 'Impossible daccéder à lemplacement. Veuillez activer les services de localisation ou réessayer plus tard.',
+              login_error: 'Impossible de charger le chat. Vérifiez votre connexion ou réessayez.',
+              calendar_actions: 'Google Agenda',
+              list_events: 'Lister les Événements',
+              create_event: 'Créer un Événement',
+              find_free_time: 'Trouver du Temps Libre',
+              calendar_settings: 'Paramètres',
+              event_title: 'Titre de lÉvénement',
+      event_description: 'Description',
+              start_time: 'Heure de Début',
+              end_time: 'Heure de Fin',
+              cancel: 'Annuler',
+              your_events: 'Vos Événements à Venir',
+              start_date: 'Date de Début',
+              end_date: 'Date de Fin',
+              find_free_slots: 'Trouver des Créneaux Libres',
+              available_slots: 'Créneaux Disponibles',
+              no_events: 'Aucun événement à venir trouvé.',
+              event_created: 'Événement créé avec succès !',
+              free_time_found: 'Temps libre trouvé :',
+              calendar_error: 'Erreur lors de laccès au calendrier. Veuillez réessayer.'
+    }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -353,6 +546,22 @@
       const facebookInput = document.getElementById('facebook');
       const loginBtn = document.getElementById('login-btn');
       const logoutBtn = document.getElementById('logout-btn');
+      const calendarModal = document.getElementById('calendar-modal');
+      const closeCalendarModal = document.getElementById('close-calendar-modal');
+      const calendarActions = document.getElementById('calendar-actions');
+      const listEventsBtn = document.getElementById('list-events');
+      const createEventBtn = document.getElementById('create-event');
+      const findFreeTimeBtn = document.getElementById('find-free-time');
+      const calendarSettingsBtn = document.getElementById('calendar-settings');
+      const eventCreationForm = document.getElementById('event-creation-form');
+      const eventsList = document.getElementById('events-list');
+      const freeTimeFinder = document.getElementById('free-time-finder');
+      const cancelEventBtn = document.getElementById('cancel-event');
+      const submitEventBtn = document.getElementById('submit-event');
+      const findFreeSlotsBtn = document.getElementById('find-free-slots');
+      const eventsContainer = document.getElementById('events-container');
+      const freeTimeContainer = document.getElementById('free-time-container');
+      const freeTimeResults = document.getElementById('free-time-results');
 
       // Google API Initialization
       function gapiLoaded() {
@@ -360,7 +569,7 @@
           gapi.load('client', initializeGapiClient);
         } catch (error) {
           console.error('gapi.load failed:', error);
-          gapiInited = true; // Proceed even if gapi fails
+          gapiInited = true;
           maybeEnableApp();
         }
       }
@@ -370,8 +579,7 @@
           await gapi.client.init({
             apiKey: API_KEY,
             discoveryDocs: [
-              'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
-              'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'
+              'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'
             ]
           });
           console.log('Google API initialized');
@@ -379,7 +587,7 @@
           maybeEnableApp();
         } catch (error) {
           console.error('Google API initialization error:', error);
-          gapiInited = true; // Proceed to avoid blocking
+          gapiInited = true;
           maybeEnableApp();
         }
       }
@@ -396,7 +604,7 @@
           document.getElementById('login-section').classList.add('hidden');
           document.getElementById('app-content').classList.remove('hidden');
           updateUI();
-          loadUserData(); // Load location data after showing UI
+          loadUserData();
         } else {
           console.log('No user detected, showing login section');
           document.getElementById('login-section').classList.remove('hidden');
@@ -425,9 +633,8 @@
       }
 
       async function loadUserData() {
-        // Check for cached location
         const cachedLocation = JSON.parse(localStorage.getItem('userLocation'));
-        if (cachedLocation && Date.now() - cachedLocation.timestamp < 3600000) { // 1 hour cache
+        if (cachedLocation && Date.now() - cachedLocation.timestamp < 3600000) {
           userLocation = cachedLocation.coords;
           userLocationName = cachedLocation.name || translations[currentLanguage].coordinates.replace('{lat}', userLocation.lat).replace('{lng}', userLocation.lng);
           console.log('Using cached location:', userLocationName, userLocation);
@@ -831,6 +1038,237 @@
         chatHistory = userData[currentUser]?.chats?.[currentDialog] || [];
         chatBox.innerHTML = '';
         chatHistory.forEach(msg => addMessage(msg.content, msg.role === 'user' ? 'user' : 'ai'));
+      });
+
+      // Calendar Functions
+      calendarActions.addEventListener('click', () => {
+        if (!currentUser || currentUser === 'guest@neuronexis.com') {
+          addMessage(translations[currentLanguage].login_error, 'ai');
+          return;
+        }
+        calendarModal.classList.remove('hidden');
+        resetCalendarUI();
+      });
+
+      closeCalendarModal.addEventListener('click', () => {
+        calendarModal.classList.add('hidden');
+        resetCalendarUI();
+      });
+
+      function resetCalendarUI() {
+        eventCreationForm.classList.add('hidden');
+        eventsList.classList.add('hidden');
+        freeTimeFinder.classList.add('hidden');
+        freeTimeResults.classList.add('hidden');
+      }
+
+      listEventsBtn.addEventListener('click', async () => {
+        resetCalendarUI();
+        eventsList.classList.remove('hidden');
+        eventsContainer.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
+
+        try {
+          const response = await gapi.client.calendar.events.list({
+            'calendarId': 'primary',
+            'timeMin': (new Date()).toISOString(),
+            'showDeleted': false,
+            'singleEvents': true,
+            'maxResults': 10,
+            'orderBy': 'startTime'
+          });
+
+          const events = response.result.items;
+          if (events.length > 0) {
+            eventsContainer.innerHTML = '';
+            events.forEach(event => {
+              const start = event.start.dateTime || event.start.date;
+              const end = event.end.dateTime || event.end.date;
+              const eventDiv = document.createElement('div');
+              eventDiv.className = 'event-card bg-white dark:bg-gray-700 p-3 rounded-lg shadow cursor-pointer';
+              eventDiv.innerHTML = `
+                <h4 class="font-semibold">${event.summary || 'No title'}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${new Date(start).toLocaleString()} - ${new Date(end).toLocaleString()}</p>
+                ${event.description ? `<p class="text-sm mt-1">${event.description.substring(0, 100)}${event.description.length > 100 ? '...' : ''}</p>` : ''}
+              `;
+              eventsContainer.appendChild(eventDiv);
+            });
+          } else {
+            eventsContainer.innerHTML = `<div class="text-center py-4 text-gray-500">${translations[currentLanguage].no_events}</div>`;
+          }
+        } catch (error) {
+          console.error('Error listing events:', error);
+          eventsContainer.innerHTML = `<div class="text-center py-4 text-red-500">${translations[currentLanguage].calendar_error}</div>`;
+        }
+      });
+
+      createEventBtn.addEventListener('click', () => {
+        resetCalendarUI();
+        eventCreationForm.classList.remove('hidden');
+
+        // Set default times (now and 1 hour from now)
+        const now = new Date();
+        const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
+        document.getElementById('event-start').value = formatDateTimeLocal(now);
+        document.getElementById('event-end').value = formatDateTimeLocal(oneHourLater);
+      });
+
+      function formatDateTimeLocal(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      }
+
+      cancelEventBtn.addEventListener('click', () => {
+        resetCalendarUI();
+      });
+
+      submitEventBtn.addEventListener('click', async () => {
+        const title = document.getElementById('event-title').value.trim();
+        const description = document.getElementById('event-description').value.trim();
+        const start = document.getElementById('event-start').value;
+        const end = document.getElementById('event-end').value;
+
+        if (!title) {
+          alert(translations[currentLanguage].event_title + ' is required');
+          return;
+        }
+
+        try {
+          const event = {
+            'summary': title,
+            'description': description,
+            'start': {
+              'dateTime': start,
+              'timeZone': Intl.DateTimeFormat().resolvedOptions().timeZone
+            },
+            'end': {
+              'dateTime': end,
+              'timeZone': Intl.DateTimeFormat().resolvedOptions().timeZone
+            }
+          };
+
+          const response = await gapi.client.calendar.events.insert({
+            'calendarId': 'primary',
+            'resource': event
+          });
+
+          addMessage(translations[currentLanguage].event_created, 'ai');
+          calendarModal.classList.add('hidden');
+          resetCalendarUI();
+        } catch (error) {
+          console.error('Error creating event:', error);
+          eventsContainer.innerHTML = `<div class="text-center py-4 text-red-500">${translations[currentLanguage].calendar_error}</div>`;
+        }
+      });
+
+      findFreeTimeBtn.addEventListener('click', () => {
+        resetCalendarUI();
+        freeTimeFinder.classList.remove('hidden');
+
+        // Set default dates (today and tomorrow)
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        document.getElementById('free-time-start').value = formatDate(today);
+        document.getElementById('free-time-end').value = formatDate(tomorrow);
+      });
+
+      function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+      }
+
+      findFreeSlotsBtn.addEventListener('click', async () => {
+        const startDate = document.getElementById('free-time-start').value;
+        const endDate = document.getElementById('free-time-end').value;
+
+        if (!startDate || !endDate) {
+          alert('Please select both start and end dates');
+          return;
+        }
+
+        freeTimeContainer.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
+
+        try {
+          const timeMin = new Date(startDate + 'T00:00:00');
+          const timeMax = new Date(endDate + 'T23:59:59');
+
+          const response = await gapi.client.calendar.freebusy.query({
+            'timeMin': timeMin.toISOString(),
+            'timeMax': timeMax.toISOString(),
+            'items': [{ 'id': 'primary' }]
+          });
+
+          const busySlots = response.result.calendars.primary.busy || [];
+          const freeSlots = findFreeTimeSlots(timeMin, timeMax, busySlots);
+
+          if (freeSlots.length > 0) {
+            freeTimeContainer.innerHTML = '';
+            freeSlots.forEach(slot => {
+              const slotDiv = document.createElement('div');
+              slotDiv.className = 'event-card bg-white dark:bg-gray-700 p-3 rounded-lg shadow';
+              slotDiv.innerHTML = `
+                <p class="font-semibold">${new Date(slot.start).toLocaleString()} - ${new Date(slot.end).toLocaleString()}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">${Math.round((slot.end - slot.start) / (60 * 60 * 1000) * 10) / 10} hours available</p>
+              `;
+              freeTimeContainer.appendChild(slotDiv);
+            });
+            freeTimeResults.classList.remove('hidden');
+          } else {
+            freeTimeContainer.innerHTML = `<div class="text-center py-4 text-gray-500">${translations[currentLanguage].no_events}</div>`;
+            freeTimeResults.classList.remove('hidden');
+          }
+        } catch (error) {
+          console.error('Error finding free time:', error);
+          freeTimeContainer.innerHTML = `<div class="text-center py-4 text-red-500">${translations[currentLanguage].calendar_error}</div>`;
+        }
+      });
+
+      function findFreeTimeSlots(timeMin, timeMax, busySlots) {
+        const freeSlots = [];
+        let currentTime = new Date(timeMin);
+
+        // Sort busy slots by start time
+        busySlots.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        for (const busy of busySlots) {
+          const busyStart = new Date(busy.start);
+          const busyEnd = new Date(busy.end);
+
+          if (busyStart > currentTime) {
+            freeSlots.push({
+              start: new Date(currentTime),
+              end: new Date(busyStart)
+            });
+          }
+
+          if (busyEnd > currentTime) {
+            currentTime = new Date(busyEnd);
+          }
+        }
+
+        // Add remaining free time after last busy slot
+        if (currentTime < timeMax) {
+          freeSlots.push({
+            start: new Date(currentTime),
+            end: new Date(timeMax)
+          });
+        }
+
+        return freeSlots.filter(slot => (slot.end - slot.start) > 0);
+      }
+
+      calendarSettingsBtn.addEventListener('click', () => {
+        addMessage("Calendar settings would be displayed here. This is a demo interface.", 'ai');
       });
 
       // Initialize app if user exists
